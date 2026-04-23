@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UX Design Directions — Real-Time Task Board</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    /* =====================================================
+       LINEAR-INSPIRED LIGHT THEME
+       ===================================================== */
+    :root {
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+      /* Surface */
+      --bg-page:    #F7F7F8;
+      --bg-header:  #FFFFFF;
+      --bg-card:    #FFFFFF;
+      --bg-col:     #F1F2F4;
+      --bg-input:   #FFFFFF;
+      --bg-hover:   #F1F2F4;
+      --bg-secondary: #F7F7F8;
+
+      /* Borders */
+      --border:        #E3E4E6;
+      --border-subtle: #EBEBED;
+      --border-strong: #C8C9CC;
+
+      /* Text */
+      --text-primary:   #1A1A1F;
+      --text-secondary: #4A4A55;
+      --text-muted:     #6E6E7C;
+      --text-placeholder: #9696A5;
+
+      /* Accent — Violet */
+      --accent:       #6D28D9;
+      --accent-light: #EDE9FE;
+      --accent-text:  #5B21B6;
+
+      /* Priority / status */
+      --rose:        #E11D48;
+      --rose-bg:     #FFF1F3;
+      --rose-border: #FECDD3;
+      --rose-text:   #BE123C;
+
+      --amber:        #D97706;
+      --amber-bg:     #FFFBEB;
+      --amber-border: #FDE68A;
+      --amber-text:   #92400E;
+
+      --sky:        #0284C7;
+      --sky-bg:     #F0F9FF;
+      --sky-border: #BAE6FD;
+      --sky-text:   #075985;
+
+      --emerald:        #059669;
+      --emerald-bg:     #F0FDF4;
+      --emerald-border: #A7F3D0;
+      --emerald-text:   #065F46;
+
+      /* Error toast */
+      --error:        #DC2626;
+      --error-bg:     #FEF2F2;
+      --error-border: #FECACA;
+      --error-text:   #991B1B;
+
+      /* Shadows */
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+
+      /* Radius */
+      --r-sm: 4px; --r-md: 6px; --r-lg: 8px; --r-xl: 10px; --r-2xl: 14px; --r-full: 9999px;
+
+      /* Spacing */
+      --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s8: 32px;
+
+      /* Transition */
+      --t-fast: 100ms ease; --t-base: 160ms ease;
+    }
+
+    /* === Reset === */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      background: var(--bg-page);
+      -webkit-font-smoothing: antialiased;
+    }
+    ul { list-style: none; }
+    svg { display: inline-block; flex-shrink: 0; }
+    button { font-family: var(--font); cursor: pointer; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--r-full); }
+
+    /* === Base Components === */
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: var(--s1);
+      font-size: 12px; font-weight: 500; white-space: nowrap;
+      border-radius: var(--r-lg); border: 1px solid transparent;
+      transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+      user-select: none; outline: none;
+    }
+    .btn-sm  { height: 26px; padding: 0 var(--s2); }
+    .btn-md  { height: 30px; padding: 0 var(--s3); }
+    .btn-primary {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent-text); border-color: var(--accent-text); }
+    .btn-secondary {
+      background: var(--bg-card); color: var(--text-secondary);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+    .btn-ghost {
+      background: transparent; color: var(--text-muted); border-color: transparent;
+    }
+    .btn-ghost:hover { background: var(--bg-hover); color: var(--text-secondary); }
+
+    /* Priority badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 0 6px; height: 18px; border-radius: var(--r-full);
+      font-size: 10px; font-weight: 600; border: 1px solid; white-space: nowrap;
+    }
+    .badge-dot { width: 5px; height: 5px; border-radius: var(--r-full); display: inline-block; flex-shrink: 0; }
+    .badge-high    { background: var(--rose-bg);    color: var(--rose-text);    border-color: var(--rose-border); }
+    .badge-high    .badge-dot { background: var(--rose); }
+    .badge-med     { background: var(--amber-bg);   color: var(--amber-text);   border-color: var(--amber-border); }
+    .badge-med     .badge-dot { background: var(--amber); }
+    .badge-low     { background: var(--sky-bg);     color: var(--sky-text);     border-color: var(--sky-border); }
+    .badge-low     .badge-dot { background: var(--sky); }
+    .badge-done    { background: var(--emerald-bg); color: var(--emerald-text); border-color: var(--emerald-border); }
+    .badge-done    .badge-dot { background: var(--emerald); }
+
+    /* Tag chips */
+    .chip {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 1px 6px; border-radius: var(--r-md);
+      font-size: 10px; font-weight: 500;
+      background: var(--bg-secondary); color: var(--text-muted); border: 1px solid var(--border);
+    }
+    .chip-blue   { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+    .chip-violet { background: var(--accent-light); color: var(--accent-text); border-color: #DDD6FE; }
+    .chip-green  { background: var(--emerald-bg); color: var(--emerald-text); border-color: var(--emerald-border); }
+    .chip-red    { background: var(--rose-bg); color: var(--rose-text); border-color: var(--rose-border); }
+
+    /* Avatar */
+    .avatar {
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--r-full); font-weight: 600; color: #fff;
+      flex-shrink: 0; user-select: none; font-size: 9px;
+    }
+    .avatar-sm { width: 20px; height: 20px; }
+    .av-violet  { background: #7C3AED; }
+    .av-blue    { background: #2563EB; }
+    .av-teal    { background: #0D9488; }
+    .av-orange  { background: #EA580C; }
+
+    /* Utilities */
+    .flex        { display: flex; }
+    .flex-col    { flex-direction: column; }
+    .flex-1      { flex: 1 1 0; }
+    .items-center  { align-items: center; }
+    .items-start   { align-items: flex-start; }
+    .justify-between { justify-content: space-between; }
+    .gap-1 { gap: var(--s1); } .gap-2 { gap: var(--s2); } .gap-3 { gap: var(--s3); }
+    .gap-4 { gap: var(--s4); }
+    .ml-auto { margin-left: auto; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .min-w-0 { min-width: 0; }
+    .w-full  { width: 100%; }
+    .text-xs   { font-size: 11px; }
+    .text-sm   { font-size: 13px; }
+    .text-muted { color: var(--text-muted); }
+    .font-medium { font-weight: 500; }
+    .font-semibold { font-weight: 600; }
+    .overflow-hidden { overflow: hidden; }
+    .relative { position: relative; }
+    .absolute { position: absolute; }
+
+    /* =====================================================
+       PAGE LAYOUT
+       ===================================================== */
+    .page-header {
+      padding: var(--s6) var(--s8) var(--s5);
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header h1 { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+    .page-header p  { font-size: 13px; color: var(--text-muted); margin-top: var(--s1); }
+
+    /* Direction tabs nav */
+    .dir-nav {
+      display: flex; gap: var(--s2);
+      padding: var(--s3) var(--s8);
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 40;
+      flex-wrap: wrap;
+    }
+    .dir-tab {
+      display: inline-flex; align-items: center; gap: var(--s2);
+      padding: 5px var(--s3); border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      background: var(--bg-secondary); color: var(--text-muted);
+      font-size: 12px; font-weight: 500;
+      transition: all var(--t-base); user-select: none;
+    }
+    .dir-tab:hover { background: var(--bg-hover); color: var(--text-secondary); border-color: var(--border-strong); }
+    .dir-tab.active { background: var(--accent-light); color: var(--accent-text); border-color: #C4B5FD; }
+    .dir-tab.chosen { background: var(--emerald-bg); color: var(--emerald-text); border-color: var(--emerald-border); }
+    .dir-letter {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 17px; height: 17px; border-radius: var(--r-sm);
+      background: var(--border); font-size: 10px; font-weight: 700; color: var(--text-muted);
+    }
+    .dir-tab.active  .dir-letter { background: #C4B5FD; color: var(--accent-text); }
+    .dir-tab.chosen  .dir-letter { background: var(--emerald-border); color: var(--emerald-text); }
+
+    /* Direction panels */
+    .dir-panel { display: none; padding: var(--s6) var(--s8); animation: fadeIn 120ms ease; }
+    .dir-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+    .dir-label {
+      display: flex; align-items: center; gap: var(--s3); margin-bottom: var(--s4);
+    }
+    .dir-label-text h2 { font-size: 15px; font-weight: 700; }
+    .dir-label-text p  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    .choose-btn {
+      margin-left: auto;
+      display: inline-flex; align-items: center; gap: var(--s1);
+      padding: 6px var(--s4); border-radius: var(--r-lg);
+      border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text-muted);
+      font-size: 12px; font-weight: 500;
+      transition: all var(--t-base);
+    }
+    .choose-btn:hover {
+      border-color: var(--emerald-border); color: var(--emerald-text); background: var(--emerald-bg);
+    }
+    .choose-btn.chosen {
+      border-color: var(--emerald-border); color: var(--emerald-text); background: var(--emerald-bg);
+      font-weight: 600;
+    }
+
+    /* =====================================================
+       BOARD SHELL
+       ===================================================== */
+    .board-shell {
+      border: 1px solid var(--border);
+      border-radius: var(--r-2xl);
+      overflow: hidden;
+      background: var(--bg-secondary);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Board header row */
+    .board-header {
+      display: flex; align-items: center; gap: var(--s3);
+      padding: var(--s3) var(--s4);
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+    }
+    .board-title {
+      display: flex; align-items: center; gap: var(--s2);
+      font-size: 13px; font-weight: 600; color: var(--text-primary);
+    }
+    .board-title svg { color: var(--text-muted); }
+
+    /* Search mock */
+    .search-mock {
+      display: flex; align-items: center; gap: var(--s2);
+      height: 28px; padding: 0 var(--s3);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      background: var(--bg-input); color: var(--text-placeholder);
+      font-size: 12px; min-width: 160px;
+    }
+    .search-mock kbd {
+      margin-left: auto; font-family: var(--font); font-size: 10px;
+      font-weight: 500; color: var(--text-muted);
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 0 4px;
+    }
+
+    /* Undo bar */
+    .undo-bar {
+      display: flex; align-items: center; gap: var(--s3);
+      padding: 5px var(--s4);
+      border-bottom: 1px solid var(--border-subtle);
+      background: #FAFAFA; font-size: 11px; color: var(--text-muted);
+    }
+    .undo-action-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 2px var(--s2); border-radius: var(--r-md);
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-muted); font-size: 11px; font-weight: 500;
+      transition: all var(--t-fast);
+    }
+    .undo-action-btn:hover { color: var(--accent); border-color: #C4B5FD; background: var(--accent-light); }
+    .undo-action-text { color: var(--accent-text); font-weight: 600; }
+    .redo-btn-plain {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 2px var(--s2); border-radius: var(--r-md);
+      border: 1px solid transparent; background: transparent;
+      color: var(--text-muted); font-size: 11px; font-weight: 500;
+      transition: all var(--t-fast);
+    }
+    .redo-btn-plain:hover { color: var(--text-secondary); background: var(--bg-hover); }
+
+    /* =====================================================
+       COLUMNS
+       ===================================================== */
+    .board-cols { display: flex; }
+    .col {
+      flex: 1; min-width: 0;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+    }
+    .col:last-child { border-right: none; }
+
+    .col-header {
+      display: flex; align-items: center; gap: var(--s2);
+      padding: 8px var(--s3);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-header);
+    }
+    .col-name {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .col-todo       .col-name { color: var(--text-muted); }
+    .col-inprogress .col-name { color: var(--amber); }
+    .col-done       .col-name { color: var(--emerald); }
+
+    .col-count {
+      font-size: 10px; font-weight: 600; color: var(--text-muted);
+      background: var(--border-subtle); border: 1px solid var(--border);
+      border-radius: var(--r-full); padding: 0 5px; height: 16px;
+      display: inline-flex; align-items: center;
+    }
+    .col-body { padding: var(--s2); display: flex; flex-direction: column; gap: var(--s2); flex: 1; }
+
+    /* Add card button */
+    .add-card-btn {
+      display: flex; align-items: center; gap: var(--s1);
+      width: 100%; padding: 5px var(--s2);
+      border: 1px dashed var(--border); border-radius: var(--r-lg);
+      background: transparent; color: var(--text-placeholder);
+      font-size: 11px; font-weight: 500;
+      transition: all var(--t-fast);
+    }
+    .add-card-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    /* =====================================================
+       TASK CARDS
+       ===================================================== */
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r-xl); padding: var(--s3);
+      cursor: pointer; position: relative;
+      transition: border-color var(--t-base), box-shadow var(--t-base);
+      box-shadow: var(--shadow-xs);
+    }
+    .card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+
+    /* In-flight card — violet pulse */
+    .card.in-flight { border-color: var(--accent); animation: cardPulse 1.8s ease-in-out infinite; }
+    @keyframes cardPulse {
+      0%, 100% { border-color: var(--accent); box-shadow: 0 0 0 0 rgba(109,40,217,0); }
+      50%       { border-color: #A78BFA;       box-shadow: 0 0 0 3px rgba(109,40,217,0.12); }
+    }
+
+    /* In-flight spinner */
+    .spinner {
+      position: absolute; top: var(--s2); right: var(--s2);
+      width: 13px; height: 13px; border-radius: var(--r-full);
+      border: 2px solid var(--border-subtle); border-top-color: var(--accent);
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .card-title {
+      font-size: 13px; font-weight: 500; color: var(--text-primary);
+      line-height: 1.4; margin-bottom: var(--s2);
+      padding-right: 20px;
+    }
+    .card-meta  { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+    .card-date  { font-size: 10px; color: var(--text-muted); }
+    .card-who   { font-size: 10px; color: var(--text-muted); }
+
+    /* Compact card */
+    .card-compact {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 6px var(--s3);
+      cursor: pointer; position: relative;
+      transition: border-color var(--t-base);
+    }
+    .card-compact:hover { border-color: var(--border-strong); }
+    .card-compact.in-flight { border-color: var(--accent); animation: cardPulse 1.8s ease-in-out infinite; }
+    .compact-title { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+    .compact-meta  { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+
+    /* Minimal card (B) */
+    .card-minimal {
+      background: var(--bg-card); border: 1px solid transparent;
+      border-radius: var(--r-2xl); padding: var(--s4);
+      cursor: pointer; position: relative;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--t-base), border-color var(--t-base), transform var(--t-base);
+    }
+    .card-minimal:hover { box-shadow: var(--shadow-md); border-color: var(--border); transform: translateY(-1px); }
+    .card-minimal.in-flight { border-color: var(--accent); animation: cardPulse 1.8s ease-in-out infinite; }
+    .minimal-title  { font-size: 14px; font-weight: 500; margin-bottom: var(--s3); color: var(--text-primary); }
+    .minimal-footer {
+      display: flex; align-items: center; gap: var(--s3);
+      padding-top: var(--s3); border-top: 1px solid var(--border-subtle);
+    }
+
+    /* Rich card (F) */
+    .card-rich {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r-2xl); padding: var(--s4);
+      cursor: pointer; position: relative;
+      box-shadow: var(--shadow-xs);
+      transition: border-color var(--t-base), box-shadow var(--t-base);
+    }
+    .card-rich:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+    .card-rich.in-flight { border-color: var(--accent); animation: cardPulse 1.8s ease-in-out infinite; }
+    .rich-title { font-size: 13px; font-weight: 600; margin-bottom: var(--s2); color: var(--text-primary); }
+    .rich-desc  {
+      font-size: 11px; color: var(--text-muted); line-height: 1.5;
+      margin-bottom: var(--s3);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .rich-chips  { display: flex; gap: var(--s1); flex-wrap: wrap; margin-bottom: var(--s3); }
+    .rich-footer { display: flex; align-items: center; gap: var(--s2); }
+
+    /* =====================================================
+       FILTER BAR (Direction D)
+       ===================================================== */
+    .filter-bar {
+      display: flex; align-items: center; gap: var(--s2);
+      padding: 7px var(--s4);
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .filter-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .filter-sep { width: 1px; height: 16px; background: var(--border); flex-shrink: 0; }
+    .filter-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px var(--s2); border-radius: var(--r-full);
+      border: 1px solid var(--border);
+      background: var(--bg-secondary); color: var(--text-muted);
+      font-size: 11px; font-weight: 500; cursor: pointer;
+      transition: all var(--t-fast);
+    }
+    .filter-chip:hover { border-color: var(--border-strong); color: var(--text-secondary); }
+    .filter-chip.active { border-color: #C4B5FD; color: var(--accent-text); background: var(--accent-light); }
+    .chip-x { color: var(--text-placeholder); transition: color var(--t-fast); }
+    .filter-chip.active .chip-x:hover { color: var(--accent-text); }
+
+    /* =====================================================
+       FILTER SIDEBAR (Direction E)
+       ===================================================== */
+    .board-with-sidebar { display: flex; }
+    .sidebar {
+      width: 184px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      background: var(--bg-secondary);
+      padding: var(--s3);
+    }
+    .sidebar-section { margin-bottom: var(--s4); }
+    .sidebar-section-title {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 4px;
+    }
+    .sidebar-item {
+      display: flex; align-items: center; gap: var(--s2);
+      padding: 4px var(--s2); border-radius: var(--r-md);
+      font-size: 12px; color: var(--text-secondary);
+      cursor: pointer; transition: all var(--t-fast); margin-bottom: 1px;
+    }
+    .sidebar-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .sidebar-item.active { background: var(--accent-light); color: var(--accent-text); }
+    .sidebar-dot { width: 7px; height: 7px; border-radius: var(--r-full); flex-shrink: 0; }
+    .sidebar-clear { width: 100%; margin-top: var(--s3); font-size: 11px; }
+
+    /* =====================================================
+       TOAST
+       ===================================================== */
+    .toast {
+      position: absolute; bottom: var(--s4); right: var(--s4);
+      display: flex; align-items: flex-start; gap: var(--s2);
+      padding: var(--s3); max-width: 268px;
+      background: var(--error-bg); border: 1px solid var(--error-border);
+      border-radius: var(--r-xl); box-shadow: var(--shadow-lg);
+      z-index: 60;
+    }
+    .toast-icon { color: var(--error); flex-shrink: 0; margin-top: 1px; }
+    .toast-body { flex: 1; }
+    .toast-title { font-size: 12px; font-weight: 600; color: var(--error-text); }
+    .toast-desc  { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .toast-close {
+      background: none; border: none; color: var(--text-placeholder);
+      cursor: pointer; padding: 0; line-height: 1; flex-shrink: 0;
+      transition: color var(--t-fast);
+    }
+    .toast-close:hover { color: var(--text-primary); }
+
+    /* Done card opacity */
+    .card-done { opacity: 0.65; }
+    .done-strike { text-decoration: line-through; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <h1>UX Design Directions</h1>
+    <p>Real-Time Collaborative Task Board — 6 visual approaches. Preview each direction, then confirm your choice.</p>
+  </header>
+
+  <!-- Direction Tabs -->
+  <nav class="dir-nav" aria-label="Design directions">
+    <button class="dir-tab" onclick="showDir('A',this)" id="tab-A">
+      <span class="dir-letter">A</span> Linear Classic
+    </button>
+    <button class="dir-tab" onclick="showDir('B',this)" id="tab-B">
+      <span class="dir-letter">B</span> Minimal Focus
+    </button>
+    <button class="dir-tab" onclick="showDir('C',this)" id="tab-C">
+      <span class="dir-letter">C</span> Dense Productivity
+    </button>
+    <button class="dir-tab active chosen" onclick="showDir('D',this)" id="tab-D">
+      <span class="dir-letter">D</span> Header Filter Bar
+    </button>
+    <button class="dir-tab" onclick="showDir('E',this)" id="tab-E">
+      <span class="dir-letter">E</span> Sidebar Filters
+    </button>
+    <button class="dir-tab" onclick="showDir('F',this)" id="tab-F">
+      <span class="dir-letter">F</span> Card-Rich
+    </button>
+  </nav>
+
+  <!-- ============================================================
+       DIRECTION A — Linear Classic
+       ============================================================ -->
+  <section class="dir-panel" id="panel-A">
+    <div class="dir-label">
+      <div class="dir-label-text">
+        <h2>A — Linear Classic</h2>
+        <p>Compact cards, violet accent, undo hint bar below header, per-card loading ring, corner toast</p>
+      </div>
+      <button class="choose-btn" onclick="chooseDir('A',this)">
+        <i data-lucide="square-check" width="14" height="14"></i> Choose this direction
+      </button>
+    </div>
+    <div class="board-shell relative">
+      <!-- Header -->
+      <div class="board-header">
+        <div class="board-title">
+          <i data-lucide="layout-kanban" width="16" height="16"></i> Task Board
+        </div>
+        <div class="search-mock">
+          <i data-lucide="search" width="12" height="12"></i>
+          Search &amp; Filter
+          <kbd>⌘K</kbd>
+        </div>
+        <div class="ml-auto flex gap-2">
+          <button class="btn btn-secondary btn-md">
+            Assignee <i data-lucide="chevron-down" width="12" height="12"></i>
+          </button>
+          <button class="btn btn-primary btn-md">
+            <i data-lucide="plus" width="13" height="13"></i> New Task
+          </button>
+        </div>
+      </div>
+      <!-- Undo bar -->
+      <div class="undo-bar">
+        <button class="undo-action-btn">
+          <i data-lucide="undo-2" width="11" height="11"></i>
+          Undo: <span class="undo-action-text">Move "Auth bug" → Done</span>
+        </button>
+        <button class="redo-btn-plain">
+          <i data-lucide="redo-2" width="11" height="11"></i> Redo
+        </button>
+        <span class="ml-auto" style="font-size:10px;">50 actions max</span>
+      </div>
+      <!-- Columns -->
+      <div class="board-cols">
+        <div class="col col-todo">
+          <div class="col-header">
+            <span class="col-name">Todo</span><span class="col-count">4</span>
+          </div>
+          <div class="col-body">
+            <div class="card">
+              <div class="card-title">Implement authentication</div>
+              <div class="card-meta">
+                <span class="badge badge-high"><span class="badge-dot"></span>HIGH</span>
+                <span class="card-who">John Doe</span>
+                <span class="card-date ml-auto">Nov 20</span>
+              </div>
+            </div>
+            <div class="card in-flight">
+              <div class="spinner"></div>
+              <div class="card-title">Fix payment gateway bug</div>
+              <div class="card-meta">
+                <span class="badge badge-high"><span class="badge-dot"></span>HIGH</span>
+                <span class="card-who">John Doe</span>
+                <span class="card-date ml-auto">Nov 21</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Write API documentation</div>
+              <div class="card-meta">
+                <span class="badge badge-med"><span class="badge-dot"></span>MED</span>
+                <span class="card-who">Jane Smith</span>
+                <span class="card-date ml-auto">Nov 22</span>
+              </div>
+            </div>
+            <button class="add-card-btn">
+              <i data-lucide="plus" width="11" height="11"></i> Add task
+            </button>
+          </div>
+        </div>
+        <div class="col col-inprogress">
+          <div class="col-header">
+            <span class="col-name">In Progress</span><span class="col-count">2</span>
+          </div>
+          <div class="col-body">
+            <div class="card">
+              <div class="card-title">Design new landing page</div>
+              <div class="card-meta">
+                <span class="badge badge-med"><span class="badge-dot"></span>MED</span>
+                <span class="card-who">Jane Smith</span>
+                <span class="card-date ml-auto">Nov 19</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Setup CI/CD pipeline</div>
+              <div class="card-meta">
+                <span class="badge badge-low"><span class="badge-dot"></span>LOW</span>
+                <span class="card-who">Alex Kim</span>
+                <span class="card-date ml-auto">Nov 18</span>
+              </div>
+            </div>
+            <button class="add-card-btn"><i data-lucide="plus" width="11" height="11"></i> Add task</button>
+          </div>
+        </div>
+        <div class="col col-done">
+          <div class="col-header">
+            <span class="col-name">Done</span><span class="col-count">8</span>
+          </div>
+          <div class="col-body">
+            <div class="card card-done">
+              <div class="card-title done-strike">User onboarding flow</div>
+              <div class="card-meta">
+                <span class="badge badge-done"><span class="badge-dot"></span>DONE</span>
+                <span class="card-who">Jane Smith</span>
+                <span class="card-date ml-auto">Nov 15</span>
+              </div>
+            </div>
+            <div class="card card-done">
+              <div class="card-title done-strike">Database schema migration</div>
+              <div class="card-meta">
+                <span class="badge badge-done"><span class="badge-dot"></span>DONE</span>
+                <span class="card-who">Alex Kim</span>
+                <span class="card-date ml-auto">Nov 14</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Error toast -->
+      <div class="toast" id="toastA">
+        <i class="toast-icon" data-lucide="alert-circle" width="14" height="14"></i>
+        <div class="toast-body">
+          <div class="toast-title">Update failed</div>
+          <div class="toast-desc">Change was reverted automatically</div>
+        </div>
+        <button class="toast-close" onclick="this.closest('.toast').style.display='none'">
+          <i data-lucide="x" width="13" height="13"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DIRECTION B — Minimal Focus
+       ============================================================ -->
+  <section class="dir-panel" id="panel-B">
+    <div class="dir-label">
+      <div class="dir-label-text">
+        <h2>B — Minimal Focus</h2>
+        <p>More whitespace, larger cards with soft shadows, clean typography-first hierarchy</p>
+      </div>
+      <button class="choose-btn" onclick="chooseDir('B',this)">
+        <i data-lucide="square-check" width="14" height="14"></i> Choose this direction
+      </button>
+    </div>
+    <div class="board-shell relative">
+      <div class="board-header">
+        <div class="board-title">
+          <i data-lucide="layout-kanban" width="16" height="16"></i> Task Board
+        </div>
+        <div class="search-mock" style="min-width:200px;">
+          <i data-lucide="search" width="12" height="12"></i> Search tasks...
+        </div>
+        <div class="ml-auto">
+          <button class="btn btn-primary btn-md">
+            <i data-lucide="plus" width="13" height="13"></i> New Task
+          </button>
+        </div>
+      </div>
+      <div class="board-cols">
+        <div class="col col-todo">
+          <div class="col-header" style="border-bottom:2px solid var(--border-strong);">
+            <span style="font-size:14px;font-weight:600;color:var(--text-primary);">Todo</span>
+            <span class="col-count">4</span>
+          </div>
+          <div class="col-body" style="padding:var(--s3);gap:var(--s3);">
+            <div class="card-minimal">
+              <div class="minimal-title">Implement authentication</div>
+              <div class="minimal-footer">
+                <span class="badge badge-high">HIGH</span>
+                <span class="card-date">John Doe · Nov 20</span>
+              </div>
+            </div>
+            <div class="card-minimal in-flight">
+              <div class="spinner"></div>
+              <div class="minimal-title">Fix payment gateway bug</div>
+              <div class="minimal-footer">
+                <span class="badge badge-high">HIGH</span>
+                <span class="card-date">John Doe · Nov 21</span>
+              </div>
+            </div>
+            <div class="card-minimal">
+              <div class="minimal-title">Write API documentation</div>
+              <div class="minimal-footer">
+                <span class="badge badge-med">MED</span>
+                <span class="card-date">Jane Smith · Nov 22</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col col-inprogress">
+          <div class="col-header" style="border-bottom:2px solid var(--amber);">
+            <span style="font-size:14px;font-weight:600;color:var(--amber);">In Progress</span>
+            <span class="col-count">2</span>
+          </div>
+          <div class="col-body" style="padding:var(--s3);gap:var(--s3);">
+            <div class="card-minimal">
+              <div class="minimal-title">Design new landing page</div>
+              <div class="minimal-footer">
+                <span class="badge badge-med">MED</span>
+                <span class="card-date">Jane Smith · Nov 19</span>
+              </div>
+            </div>
+            <div class="card-minimal">
+              <div class="minimal-title">Setup CI/CD pipeline</div>
+              <div class="minimal-footer">
+                <span class="badge badge-low">LOW</span>
+                <span class="card-date">Alex Kim · Nov 18</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col col-done">
+          <div class="col-header" style="border-bottom:2px solid var(--emerald);">
+            <span style="font-size:14px;font-weight:600;color:var(--emerald);">Done</span>
+            <span class="col-count">8</span>
+          </div>
+          <div class="col-body" style="padding:var(--s3);gap:var(--s3);">
+            <div class="card-minimal card-done">
+              <div class="minimal-title done-strike">User onboarding flow</div>
+              <div class="minimal-footer">
+                <span class="badge badge-done">DONE</span>
+                <span class="card-date">Jane Smith · Nov 15</span>
+              </div>
+            </div>
+            <div class="card-minimal card-done">
+              <div class="minimal-title done-strike">Database schema migration</div>
+              <div class="minimal-footer">
+                <span class="badge badge-done">DONE</span>
+                <span class="card-date">Alex Kim · Nov 14</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="toast" id="toastB">
+        <i class="toast-icon" data-lucide="alert-circle" width="14" height="14"></i>
+        <div class="toast-body">
+          <div class="toast-title">Update failed</div>
+          <div class="toast-desc">Change was reverted automatically</div>
+        </div>
+        <button class="toast-close" onclick="this.closest('.toast').style.display='none'">
+          <i data-lucide="x" width="13" height="13"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DIRECTION C — Dense Productivity
+       ============================================================ -->
+  <section class="dir-panel" id="panel-C">
+    <div class="dir-label">
+      <div class="dir-label-text">
+        <h2>C — Dense Productivity</h2>
+        <p>Maximum information density, compact cards, all metadata visible at once, undo bar</p>
+      </div>
+      <button class="choose-btn" onclick="chooseDir('C',this)">
+        <i data-lucide="square-check" width="14" height="14"></i> Choose this direction
+      </button>
+    </div>
+    <div class="board-shell relative">
+      <div class="board-header" style="padding:var(--s2) var(--s3);">
+        <div class="board-title" style="font-size:12px;">
+          <i data-lucide="layout-kanban" width="14" height="14"></i> Task Board
+        </div>
+        <div class="search-mock" style="min-width:140px;height:24px;font-size:11px;">
+          <i data-lucide="search" width="11" height="11"></i> Search...
+        </div>
+        <div class="ml-auto flex gap-2">
+          <button class="btn btn-ghost btn-sm">
+            <i data-lucide="filter" width="11" height="11"></i> Filters
+          </button>
+          <button class="btn btn-primary btn-sm">
+            <i data-lucide="plus" width="11" height="11"></i> Add
+          </button>
+        </div>
+      </div>
+      <div class="undo-bar" style="padding:4px var(--s3);">
+        <button class="undo-action-btn" style="font-size:10px;">
+          <i data-lucide="undo-2" width="10" height="10"></i>
+          Undo: Move "Auth bug"
+        </button>
+        <button class="redo-btn-plain" style="font-size:10px;">
+          <i data-lucide="redo-2" width="10" height="10"></i> Redo
+        </button>
+      </div>
+      <div class="board-cols">
+        <div class="col col-todo">
+          <div class="col-header" style="padding:5px var(--s2);">
+            <span class="col-name" style="font-size:10px;">TODO</span><span class="col-count">4</span>
+          </div>
+          <div class="col-body" style="gap:4px;padding:var(--s1);">
+            <div class="card-compact">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-high">HIGH</span>
+                <span class="compact-title truncate">Implement authentication</span>
+              </div>
+              <div class="compact-meta">
+                <span class="card-date">John Doe · Nov 20</span>
+              </div>
+            </div>
+            <div class="card-compact in-flight">
+              <div class="spinner" style="width:10px;height:10px;top:5px;right:var(--s1);"></div>
+              <div class="flex items-center gap-2">
+                <span class="badge badge-high">HIGH</span>
+                <span class="compact-title truncate">Fix payment gateway bug</span>
+              </div>
+              <div class="compact-meta"><span class="card-date">John Doe · Nov 21</span></div>
+            </div>
+            <div class="card-compact">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-med">MED</span>
+                <span class="compact-title truncate">Write API documentation</span>
+              </div>
+              <div class="compact-meta"><span class="card-date">Jane Smith · Nov 22</span></div>
+            </div>
+            <div class="card-compact">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-low">LOW</span>
+                <span class="compact-title truncate">Refactor auth module</span>
+              </div>
+              <div class="compact-meta"><span class="card-date">Alex Kim · Nov 23</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="col col-inprogress">
+          <div class="col-header" style="padding:5px var(--s2);">
+            <span class="col-name" style="font-size:10px;">IN PROGRESS</span><span class="col-count">2</span>
+          </div>
+          <div class="col-body" style="gap:4px;padding:var(--s1);">
+            <div class="card-compact">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-med">MED</span>
+                <span class="compact-title truncate">Design new landing page</span>
+              </div>
+              <div class="compact-meta"><span class="card-date">Jane Smith · Nov 19</span></div>
+            </div>
+            <div class="card-compact">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-low">LOW</span>
+                <span class="compact-title truncate">Setup CI/CD pipeline</span>
+              </div>
+              <div class="compact-meta"><span class="card-date">Alex Kim · Nov 18</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="col col-done">
+          <div class="col-header" style="padding:5px var(--s2);">
+            <span class="col-name" style="font-size:10px;">DONE</span><span class="col-count">8</span>
+          </div>
+          <div class="col-body" style="gap:4px;padding:var(--s1);">
+            <div class="card-compact card-done">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-done">DONE</span>
+                <span class="compact-title truncate done-strike">User onboarding flow</span>
+              </div>
+              <div class="compact-meta"><span class="card-date">Jane Smith · Nov 15</span></div>
+            </div>
+            <div class="card-compact card-done">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-done">DONE</span>
+                <span class="compact-title truncate done-strike">Database schema migration</span>
+              </div>
+              <div class="compact-meta"><span class="card-date">Alex Kim · Nov 14</span></div>
+            </div>
+            <div class="card-compact card-done">
+              <div class="flex items-center gap-2">
+                <span class="badge badge-done">DONE</span>
+                <span class="compact-title truncate done-strike">Initial project setup</span>
+              </div>
+              <div class="compact-meta"><span class="card-date">Alex Kim · Nov 12</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="toast" id="toastC">
+        <i class="toast-icon" data-lucide="alert-circle" width="14" height="14"></i>
+        <div class="toast-body">
+          <div class="toast-title">Update failed</div>
+          <div class="toast-desc">Change reverted automatically</div>
+        </div>
+        <button class="toast-close" onclick="this.closest('.toast').style.display='none'">
+          <i data-lucide="x" width="13" height="13"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DIRECTION D — Header Filter Bar  ★ CHOSEN ★
+       ============================================================ -->
+  <section class="dir-panel active" id="panel-D">
+    <div class="dir-label">
+      <div class="dir-label-text">
+        <h2>D — Header Filter Bar</h2>
+        <p>Prominent full-width filter bar with active chips between header and columns</p>
+      </div>
+      <button class="choose-btn chosen" onclick="chooseDir('D',this)">
+        <i data-lucide="check" width="14" height="14"></i> Chosen direction
+      </button>
+    </div>
+    <div class="board-shell relative">
+      <!-- Header -->
+      <div class="board-header">
+        <div class="board-title">
+          <i data-lucide="layout-kanban" width="16" height="16"></i> Task Board
+        </div>
+        <div class="ml-auto flex gap-2">
+          <button class="btn btn-secondary btn-md">
+            <i data-lucide="sliders-horizontal" width="12" height="12"></i> View
+          </button>
+          <button class="btn btn-primary btn-md">
+            <i data-lucide="plus" width="13" height="13"></i> New Task
+          </button>
+        </div>
+      </div>
+      <!-- Full-width filter bar -->
+      <div class="filter-bar">
+        <div class="search-mock" style="min-width:220px;">
+          <i data-lucide="search" width="12" height="12"></i>
+          Search by title or description...
+          <kbd>⌘K</kbd>
+        </div>
+        <div class="filter-sep"></div>
+        <span class="filter-label">
+          <i data-lucide="filter" width="11" height="11" style="display:inline;vertical-align:-2px;"></i>
+          Filters:
+        </span>
+        <div class="filter-chip active">
+          <i data-lucide="user" width="10" height="10"></i>
+          Assignee: John Doe
+          <span class="chip-x"><i data-lucide="x" width="9" height="9"></i></span>
+        </div>
+        <div class="filter-chip">
+          <i data-lucide="flag" width="10" height="10"></i>
+          Priority
+          <i data-lucide="chevron-down" width="9" height="9"></i>
+        </div>
+        <div class="filter-chip">
+          <i data-lucide="tag" width="10" height="10"></i>
+          Tags
+          <i data-lucide="chevron-down" width="9" height="9"></i>
+        </div>
+        <button class="btn btn-ghost btn-sm ml-auto" style="font-size:11px;color:var(--text-muted);">
+          <i data-lucide="x" width="10" height="10"></i> Clear all
+        </button>
+      </div>
+      <!-- Undo bar -->
+      <div class="undo-bar">
+        <button class="undo-action-btn">
+          <i data-lucide="undo-2" width="11" height="11"></i>
+          Undo: <span class="undo-action-text">Move "Auth bug" → Done</span>
+        </button>
+        <button class="redo-btn-plain">
+          <i data-lucide="redo-2" width="11" height="11"></i> Redo
+        </button>
+        <span class="ml-auto" style="font-size:10px;color:var(--text-placeholder);">1 filter active</span>
+      </div>
+      <!-- Columns -->
+      <div class="board-cols">
+        <div class="col col-todo">
+          <div class="col-header">
+            <span class="col-name">Todo</span>
+            <span class="col-count">2</span>
+            <span class="ml-auto" style="font-size:10px;color:var(--text-placeholder);">
+              <i data-lucide="filter" width="10" height="10" style="display:inline;vertical-align:-1px;"></i> filtered
+            </span>
+          </div>
+          <div class="col-body">
+            <div class="card">
+              <div class="card-title">Implement authentication</div>
+              <div class="card-meta">
+                <span class="badge badge-high"><span class="badge-dot"></span>HIGH</span>
+                <span class="card-who">John Doe</span>
+                <span class="card-date ml-auto">Nov 20</span>
+              </div>
+            </div>
+            <div class="card in-flight">
+              <div class="spinner"></div>
+              <div class="card-title">Fix payment gateway bug</div>
+              <div class="card-meta">
+                <span class="badge badge-high"><span class="badge-dot"></span>HIGH</span>
+                <span class="card-who">John Doe</span>
+                <span class="card-date ml-auto">Nov 21</span>
+              </div>
+            </div>
+            <button class="add-card-btn"><i data-lucide="plus" width="11" height="11"></i> Add task</button>
+          </div>
+        </div>
+        <div class="col col-inprogress">
+          <div class="col-header">
+            <span class="col-name">In Progress</span>
+            <span class="col-count">0</span>
+            <span class="ml-auto" style="font-size:10px;color:var(--text-placeholder);">
+              <i data-lucide="filter" width="10" height="10" style="display:inline;vertical-align:-1px;"></i> filtered
+            </span>
+          </div>
+          <div class="col-body">
+            <div style="padding:var(--s4);text-align:center;font-size:11px;color:var(--text-placeholder);">
+              <i data-lucide="inbox" width="24" height="24" style="margin:0 auto var(--s2);display:block;color:var(--border-strong);"></i>
+              No tasks match this filter
+            </div>
+          </div>
+        </div>
+        <div class="col col-done">
+          <div class="col-header">
+            <span class="col-name">Done</span>
+            <span class="col-count">3</span>
+            <span class="ml-auto" style="font-size:10px;color:var(--text-placeholder);">
+              <i data-lucide="filter" width="10" height="10" style="display:inline;vertical-align:-1px;"></i> filtered
+            </span>
+          </div>
+          <div class="col-body">
+            <div class="card card-done">
+              <div class="card-title done-strike">User onboarding flow</div>
+              <div class="card-meta">
+                <span class="badge badge-done"><span class="badge-dot"></span>DONE</span>
+                <span class="card-who">John Doe</span>
+                <span class="card-date ml-auto">Nov 15</span>
+              </div>
+            </div>
+            <div class="card card-done">
+              <div class="card-title done-strike">Database schema migration</div>
+              <div class="card-meta">
+                <span class="badge badge-done"><span class="badge-dot"></span>DONE</span>
+                <span class="card-who">John Doe</span>
+                <span class="card-date ml-auto">Nov 14</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="toast" id="toastD">
+        <i class="toast-icon" data-lucide="alert-circle" width="14" height="14"></i>
+        <div class="toast-body">
+          <div class="toast-title">Update failed</div>
+          <div class="toast-desc">Change was reverted automatically</div>
+        </div>
+        <button class="toast-close" onclick="this.closest('.toast').style.display='none'">
+          <i data-lucide="x" width="13" height="13"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DIRECTION E — Sidebar Filters
+       ============================================================ -->
+  <section class="dir-panel" id="panel-E">
+    <div class="dir-label">
+      <div class="dir-label-text">
+        <h2>E — Sidebar Filters</h2>
+        <p>Persistent left sidebar with filter controls; main board area is narrower columns</p>
+      </div>
+      <button class="choose-btn" onclick="chooseDir('E',this)">
+        <i data-lucide="square-check" width="14" height="14"></i> Choose this direction
+      </button>
+    </div>
+    <div class="board-shell relative">
+      <div class="board-header">
+        <div class="board-title">
+          <i data-lucide="layout-kanban" width="16" height="16"></i> Task Board
+        </div>
+        <div class="search-mock" style="min-width:180px;">
+          <i data-lucide="search" width="12" height="12"></i> Search...
+        </div>
+        <div class="ml-auto">
+          <button class="btn btn-primary btn-md">
+            <i data-lucide="plus" width="13" height="13"></i> New Task
+          </button>
+        </div>
+      </div>
+      <div class="board-with-sidebar">
+        <div class="sidebar">
+          <div class="sidebar-section">
+            <div class="sidebar-section-title">
+              <i data-lucide="user" width="9" height="9" style="display:inline;vertical-align:-1px;"></i> Assignee
+            </div>
+            <div class="sidebar-item active">
+              <span class="sidebar-dot" style="background:#7C3AED;"></span> John Doe
+            </div>
+            <div class="sidebar-item">
+              <span class="sidebar-dot" style="background:#2563EB;"></span> Jane Smith
+            </div>
+            <div class="sidebar-item">
+              <span class="sidebar-dot" style="background:#0D9488;"></span> Alex Kim
+            </div>
+          </div>
+          <div class="sidebar-section">
+            <div class="sidebar-section-title">
+              <i data-lucide="flag" width="9" height="9" style="display:inline;vertical-align:-1px;"></i> Priority
+            </div>
+            <div class="sidebar-item">
+              <span class="sidebar-dot" style="background:var(--rose);"></span> High
+            </div>
+            <div class="sidebar-item">
+              <span class="sidebar-dot" style="background:var(--amber);"></span> Medium
+            </div>
+            <div class="sidebar-item">
+              <span class="sidebar-dot" style="background:var(--sky);"></span> Low
+            </div>
+          </div>
+          <div class="sidebar-section">
+            <div class="sidebar-section-title">
+              <i data-lucide="tag" width="9" height="9" style="display:inline;vertical-align:-1px;"></i> Tags
+            </div>
+            <div class="sidebar-item">
+              <i data-lucide="hash" width="10" height="10"></i> backend
+            </div>
+            <div class="sidebar-item">
+              <i data-lucide="hash" width="10" height="10"></i> frontend
+            </div>
+            <div class="sidebar-item">
+              <i data-lucide="hash" width="10" height="10"></i> security
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm sidebar-clear">
+            <i data-lucide="x" width="10" height="10"></i> Clear filters
+          </button>
+        </div>
+        <div class="flex-1 overflow-hidden relative">
+          <div class="board-cols" style="height:100%;">
+            <div class="col col-todo">
+              <div class="col-header">
+                <span class="col-name">Todo</span><span class="col-count">4</span>
+              </div>
+              <div class="col-body">
+                <div class="card">
+                  <div class="card-title">Implement authentication</div>
+                  <div class="card-meta">
+                    <span class="badge badge-high"><span class="badge-dot"></span>HIGH</span>
+                    <span class="card-date ml-auto">Nov 20</span>
+                  </div>
+                </div>
+                <div class="card in-flight">
+                  <div class="spinner"></div>
+                  <div class="card-title">Fix payment gateway bug</div>
+                  <div class="card-meta">
+                    <span class="badge badge-high"><span class="badge-dot"></span>HIGH</span>
+                    <span class="card-date ml-auto">Nov 21</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col col-inprogress">
+              <div class="col-header">
+                <span class="col-name">In Progress</span><span class="col-count">2</span>
+              </div>
+              <div class="col-body">
+                <div class="card">
+                  <div class="card-title">Design landing page</div>
+                  <div class="card-meta">
+                    <span class="badge badge-med"><span class="badge-dot"></span>MED</span>
+                    <span class="card-date ml-auto">Nov 19</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col col-done">
+              <div class="col-header">
+                <span class="col-name">Done</span><span class="col-count">8</span>
+              </div>
+              <div class="col-body">
+                <div class="card card-done">
+                  <div class="card-title done-strike">User onboarding flow</div>
+                  <div class="card-meta">
+                    <span class="badge badge-done"><span class="badge-dot"></span>DONE</span>
+                    <span class="card-date ml-auto">Nov 15</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="toast" id="toastE">
+            <i class="toast-icon" data-lucide="alert-circle" width="14" height="14"></i>
+            <div class="toast-body">
+              <div class="toast-title">Update failed</div>
+              <div class="toast-desc">Change was reverted automatically</div>
+            </div>
+            <button class="toast-close" onclick="this.closest('.toast').style.display='none'">
+              <i data-lucide="x" width="13" height="13"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DIRECTION F — Card-Rich
+       ============================================================ -->
+  <section class="dir-panel" id="panel-F">
+    <div class="dir-label">
+      <div class="dir-label-text">
+        <h2>F — Card-Rich</h2>
+        <p>Wider cards with description preview, tag chips, assignee avatar circles</p>
+      </div>
+      <button class="choose-btn" onclick="chooseDir('F',this)">
+        <i data-lucide="square-check" width="14" height="14"></i> Choose this direction
+      </button>
+    </div>
+    <div class="board-shell relative">
+      <div class="board-header">
+        <div class="board-title">
+          <i data-lucide="layout-kanban" width="16" height="16"></i> Task Board
+        </div>
+        <div class="search-mock" style="min-width:200px;">
+          <i data-lucide="search" width="12" height="12"></i> Search tasks...
+        </div>
+        <div class="ml-auto flex gap-2">
+          <button class="btn btn-secondary btn-md">
+            <kbd style="font-family:var(--font);font-size:11px;">⌘K</kbd>
+          </button>
+          <button class="btn btn-primary btn-md">
+            <i data-lucide="plus" width="13" height="13"></i> New Task
+          </button>
+        </div>
+      </div>
+      <div class="board-cols">
+        <div class="col col-todo">
+          <div class="col-header">
+            <span class="col-name">Todo</span><span class="col-count">4</span>
+          </div>
+          <div class="col-body" style="padding:var(--s3);gap:var(--s3);">
+            <div class="card-rich">
+              <div class="rich-title">Implement authentication</div>
+              <div class="rich-desc">Add JWT-based auth with refresh token rotation and secure cookie storage</div>
+              <div class="rich-chips">
+                <span class="chip chip-blue"><i data-lucide="hash" width="8" height="8"></i>backend</span>
+                <span class="chip chip-red"><i data-lucide="shield" width="8" height="8"></i>security</span>
+              </div>
+              <div class="rich-footer">
+                <span class="badge badge-high"><span class="badge-dot"></span>HIGH</span>
+                <div class="avatar avatar-sm av-violet ml-auto">JD</div>
+                <span class="card-date" style="font-size:10px;">Nov 20</span>
+              </div>
+            </div>
+            <div class="card-rich in-flight">
+              <div class="spinner"></div>
+              <div class="rich-title">Fix payment gateway bug</div>
+              <div class="rich-desc">Users unable to complete checkout — investigate Stripe webhook handler timeout</div>
+              <div class="rich-chips">
+                <span class="chip chip-blue"><i data-lucide="hash" width="8" height="8"></i>backend</span>
+                <span class="chip chip-violet"><i data-lucide="zap" width="8" height="8"></i>urgent</span>
+              </div>
+              <div class="rich-footer">
+                <span class="badge badge-high"><span class="badge-dot"></span>HIGH</span>
+                <div class="avatar avatar-sm av-violet ml-auto">JD</div>
+                <span class="card-date" style="font-size:10px;">Nov 21</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col col-inprogress">
+          <div class="col-header">
+            <span class="col-name">In Progress</span><span class="col-count">2</span>
+          </div>
+          <div class="col-body" style="padding:var(--s3);gap:var(--s3);">
+            <div class="card-rich">
+              <div class="rich-title">Design new landing page</div>
+              <div class="rich-desc">Create mockups for homepage redesign, focusing on conversion optimization</div>
+              <div class="rich-chips">
+                <span class="chip chip-green"><i data-lucide="hash" width="8" height="8"></i>design</span>
+                <span class="chip chip-blue"><i data-lucide="hash" width="8" height="8"></i>frontend</span>
+              </div>
+              <div class="rich-footer">
+                <span class="badge badge-med"><span class="badge-dot"></span>MED</span>
+                <div class="avatar avatar-sm av-blue ml-auto">JS</div>
+                <span class="card-date" style="font-size:10px;">Nov 19</span>
+              </div>
+            </div>
+            <div class="card-rich">
+              <div class="rich-title">Setup CI/CD pipeline</div>
+              <div class="rich-desc">Configure GitHub Actions for automated testing and deployment to staging</div>
+              <div class="rich-chips">
+                <span class="chip"><i data-lucide="hash" width="8" height="8"></i>devops</span>
+              </div>
+              <div class="rich-footer">
+                <span class="badge badge-low"><span class="badge-dot"></span>LOW</span>
+                <div class="avatar avatar-sm av-teal ml-auto">AK</div>
+                <span class="card-date" style="font-size:10px;">Nov 18</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col col-done">
+          <div class="col-header">
+            <span class="col-name">Done</span><span class="col-count">8</span>
+          </div>
+          <div class="col-body" style="padding:var(--s3);gap:var(--s3);">
+            <div class="card-rich card-done">
+              <div class="rich-title done-strike">User onboarding flow</div>
+              <div class="rich-chips">
+                <span class="chip chip-blue"><i data-lucide="hash" width="8" height="8"></i>frontend</span>
+              </div>
+              <div class="rich-footer">
+                <span class="badge badge-done"><span class="badge-dot"></span>DONE</span>
+                <div class="avatar avatar-sm av-blue ml-auto">JS</div>
+                <span class="card-date" style="font-size:10px;">Nov 15</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="toast" id="toastF">
+        <i class="toast-icon" data-lucide="alert-circle" width="14" height="14"></i>
+        <div class="toast-body">
+          <div class="toast-title">Update failed</div>
+          <div class="toast-desc">Change was reverted automatically</div>
+        </div>
+        <button class="toast-close" onclick="this.closest('.toast').style.display='none'">
+          <i data-lucide="x" width="13" height="13"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lucide icons CDN -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    let chosen = 'D';
+
+    function showDir(letter, btn) {
+      document.querySelectorAll('.dir-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.dir-tab').forEach(t => {
+        t.classList.remove('active');
+        if (t.id === 'tab-' + chosen) t.classList.add('chosen');
+      });
+      document.getElementById('panel-' + letter).classList.add('active');
+      btn.classList.add('active');
+      if (letter === chosen) btn.classList.add('chosen');
+    }
+
+    function chooseDir(letter, btn) {
+      chosen = letter;
+      document.querySelectorAll('.dir-tab').forEach(t => {
+        t.classList.remove('chosen');
+        if (t.id === 'tab-' + letter) t.classList.add('chosen');
+      });
+      document.querySelectorAll('.choose-btn').forEach(b => {
+        b.classList.remove('chosen');
+        b.innerHTML = '<i data-lucide="square-check" width="14" height="14"></i> Choose this direction';
+      });
+      btn.classList.add('chosen');
+      btn.innerHTML = '<i data-lucide="check" width="14" height="14"></i> Chosen direction';
+      lucide.createIcons();
+    }
+
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

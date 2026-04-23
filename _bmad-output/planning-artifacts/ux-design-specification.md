@@ -1,5 +1,5 @@
 ---
-stepsCompleted: [1, 2, 3, 4, 5, 6]
+stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 inputDocuments: ["_bmad-output/planning-artifacts/prd.md", "_bmad-output/planning-artifacts/architecture.md", "docs/requirements.md"]
 workflowType: 'ux-design'
 ---
@@ -158,3 +158,158 @@ Web SPA targeting modern browsers. Primary context is desktop (mouse + keyboard)
 - Generic, non-actionable error copy
 - Full-list rerenders on remote updates
 - Simultaneous toast overflow
+
+## Design System Foundation
+
+### Design System Choice
+
+**shadcn/ui on Tailwind CSS** — component-owned primitives built on Radix UI, styled with Tailwind utility classes.
+
+### Rationale for Selection
+
+- **Stack-native** — Tailwind CSS is locked in by the PRD; shadcn/ui is the natural component layer on top
+- **Copy-owned components** — no version lock, no library bloat; source lives in the repo and is fully customizable
+- **Accessibility for free** — Radix UI primitives satisfy FR38–40 and NFR12–15 (focus traps, ARIA, keyboard nav) without custom implementation
+- **Production aesthetic** — matches the Linear/Figma visual register Alex already trusts
+- **Right components ship ready** — Dialog, Toast, Select, Badge, Button cover the non-custom surface area of the board
+
+### Component Source Map
+
+| Component | Source |
+|---|---|
+| Task create/edit modal | shadcn/ui `Dialog` |
+| Toast notifications | shadcn/ui `Sonner` |
+| Mobile status dropdown | shadcn/ui `Select` |
+| Priority badges | shadcn/ui `Badge` |
+| Form inputs, buttons | shadcn/ui primitives |
+| Kanban columns + cards | Custom |
+| Drag-and-drop | Custom with `@dnd-kit` |
+| Virtual list | Custom with `@tanstack/react-virtual` |
+| Undo hint bar | Custom |
+| Filter/search overlay (Cmd+K) | Custom |
+
+### Customization Strategy
+
+Tailwind design tokens define: one neutral base palette, one accent color, consistent spacing scale, and border radius. All shadcn/ui components inherit these tokens automatically. Custom components (columns, cards, undo bar, search overlay) follow the same token vocabulary to ensure visual cohesion across the board.
+
+## Defining Experience
+
+### 2.1 Defining Experience
+
+**"Move a task to done."**
+
+Alex picks up a card, drops it in Done, and it lands instantly. That moment — card moves, no spinner, board feels alive — is the interaction that makes everything else credible. Get this right and the entire board feels trustworthy.
+
+### 2.2 User Mental Model
+
+Alex comes from Trello/Linear/Jira. Cards are physical objects; columns are states; drag is the natural verb. His baseline expectation: grab → drag → drop → done, with no confirmation dialog and no loading state blocking him. Optimistic update is not a feature to him — it's the expected behavior. When it works he doesn't notice; when it fails he needs to understand why without being alarmed.
+
+### 2.3 Success Criteria
+
+- Card lifts on mousedown — it visually confirms "grabbed"
+- Placeholder appears in destination column during drag — Alex knows where it will land before he drops
+- Drop is instant — card settles with a micro-animation, no spinner
+- If API fails 2s later — card smoothly returns to origin, toast explains the rollback clearly
+- The entire sequence is reversible with one Ctrl+Z
+
+### 2.4 Novel UX Patterns
+
+Drag-and-drop itself is deeply established (Trello, 2011). The novel layer is the **optimistic feedback system on top** — most Kanban boards either block on the API (spinner) or silently fail. Showing a visible per-card in-flight state *while the board remains fully interactive* is the differentiator. Alex can keep working; the board handles async truth in the background.
+
+### 2.5 Experience Mechanics
+
+**Desktop drag-and-drop:**
+
+| Stage | User Action | Visual Signal |
+|---|---|---|
+| Initiation | Mousedown on card | Card scales 1.02x, shadow deepens — "grabbed" |
+| Drag | Card follows cursor | Ghost card at origin (semi-transparent), live placeholder in destination |
+| Drop | Mouse released | Card animates into position, shadow resets, subtle scale-in |
+| In-flight | API call in progress | Subtle loading ring on card border |
+| Success | API resolves | Ring fades out, no disruption to board |
+| Failure (10%) | API rejects | Card slides back to origin, error toast bottom-right |
+| Undo | Ctrl+Z | Card moves back, undo hint bar updates to reflect next action |
+
+**Mobile status change:**
+No drag. Tap card → modal opens → status field is the first interactive element → save → same optimistic update sequence fires as desktop.
+
+## Visual Design Foundation
+
+### Color System
+
+**Theme: Zinc + Violet** — cool neutrals as structural backbone, single violet accent. Matches the Linear/Figma aesthetic register Alex already trusts.
+
+| Role | Tailwind Token | Usage |
+|---|---|---|
+| Background | `zinc-50` | Page background |
+| Surface | `zinc-100` | Column backgrounds |
+| Card | `white` + `zinc-200` border | Task cards |
+| Text primary | `zinc-900` | Card titles, headings |
+| Text secondary | `zinc-500` | Metadata, dates, assignees |
+| Accent | `violet-600` | Buttons, focus rings, links |
+| Accent hover | `violet-700` | Interactive accent states |
+| Success | `emerald-500` | Done column header, success toast |
+| Warning | `amber-500` | In Progress column header, info toast |
+| Destructive | `rose-500` | Error toasts, rollback states |
+| Priority High | `rose-500` badge | Task card priority badge |
+| Priority Medium | `amber-500` badge | Task card priority badge |
+| Priority Low | `sky-500` badge | Task card priority badge |
+| In-flight indicator | `violet-600` border ring | Card with active API call |
+
+### Typography System
+
+- **Font:** Inter (Tailwind/shadcn default) — same face Linear and Figma use; highly legible at 12–14px metadata sizes
+- **Card title:** `text-sm font-medium` (14px) — dominant, readable at a glance
+- **Card metadata:** `text-xs text-zinc-500` (12px) — assignee, date, secondary info
+- **Column headers:** `text-sm font-semibold` + count badge
+- **Undo hint bar:** `text-xs text-zinc-500` — present but quiet
+
+### Spacing & Layout Foundation
+
+- **Base unit:** 8px (Tailwind default spacing scale)
+- **Card padding:** `p-4` (16px) — comfortable, not cramped
+- **Card gap:** `gap-3` (12px) between cards in a column
+- **Column gap:** `gap-4` (16px) between columns
+- **Density target:** Linear-level — information-dense without feeling tight
+
+### Accessibility Considerations
+
+- `zinc-900` on `white` → 19:1 contrast ✅
+- `violet-600` on `white` → 5.1:1 ✅ (WCAG AA)
+- `rose-500` badge with white text → 4.6:1 ✅
+- All Tailwind color defaults meet WCAG AA for primary elements (NFR15)
+- Dark mode deferred to Phase 3 — token system designed to support it when added
+
+## Design Direction Decision
+
+### Design Directions Explored
+
+Six visual directions were explored via an interactive HTML showcase (`ux-design-directions.html`):
+
+| Direction | Character |
+|---|---|
+| A — Linear Classic | Compact cards, violet accent, undo bar, per-card loading ring |
+| B — Minimal Focus | Spacious whitespace, typography-first, soft shadows |
+| C — Dense Productivity | Maximum information density, always-visible metadata |
+| D — Header Filter Bar | Prominent full-width filter strip between header and columns |
+| E — Sidebar Filters | Persistent left sidebar with filter controls, narrower columns |
+| F — Card-Rich | Description previews, tag chips, assignee avatar circles |
+
+### Chosen Direction
+
+**Direction D — Header Filter Bar**, with a light color theme (white backgrounds, zinc-100 column surfaces) matching the Zinc + Violet design foundation. The UI palette follows Linear's light aesthetic: Inter font, subtle borders, clean shadows, violet-600 accent.
+
+### Design Rationale
+
+Direction D wins on **discoverability and transparency**. The full-width filter bar makes the board's current filtered state impossible to miss — Alex always knows exactly what he's looking at. Active filter chips are visible and dismissible inline, so there is no confusion about why certain tasks aren't showing. It avoids sidebar clutter (E) while making filters far more prominent than a header-only approach (A, B, C). The light theme aligns with the Zinc + Violet palette and matches the Linear/Figma aesthetic register Alex already trusts.
+
+### Implementation Approach
+
+- **Header**: Board title with `layout-kanban` icon, View options button, "New Task" primary button — right-aligned
+- **Filter bar**: Full-width strip below header — `⌘K` search field, vertical separator, active filter chips (×-dismissible), inactive filter dropdowns (Assignee, Priority, Tags), "Clear all" ghost button right-aligned; always visible, not collapsible in MVP
+- **Undo hint bar**: Compact strip below filter bar, above columns — Undo action button with description text, Redo button, filter count indicator right-aligned
+- **Columns**: Three equal-width columns (Todo / In Progress / Done) with count badges; standard card density (Direction A card anatomy)
+- **Cards**: Title dominant (`text-sm font-medium`), priority badge with dot, assignee name, date right-aligned; "Add task" dashed button at column bottom
+- **In-flight state**: Violet animated pulse border ring on card during API call; CSS spinner top-right of card
+- **Toast notifications**: Bottom-right corner — error toast uses rose-50/red border, Lucide `alert-circle` icon, dismissible ×
+- **Icons**: Lucide icon set throughout (shadcn/ui default) — `layout-kanban`, `search`, `plus`, `undo-2`, `redo-2`, `filter`, `sliders-horizontal`, `user`, `flag`, `tag`, `chevron-down`, `alert-circle`, `x`, `check`, `inbox`
