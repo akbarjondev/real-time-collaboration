@@ -213,6 +213,8 @@ Users can use the full board on mobile devices (stacked columns, status dropdown
 
 A developer can run the project locally and see a Kanban board populated with seed tasks in 3 columns. The complete state architecture, mock API layer, and feature folder structure are in place as the foundation for all subsequent epics.
 
+**Note:** Stories 1.2 and 1.3 are technical setup stories (no direct end-user value). They are prerequisites for Story 1.4 and all subsequent epics. In a team context these would be implementation tasks, not stories.
+
 ### Story 1.1: Initialize Project with Dependencies and Configuration
 
 As a developer,
@@ -253,7 +255,7 @@ So that I can start implementing features on a correctly configured, TypeScript-
 
 ---
 
-### Story 1.2: Implement Core State Architecture
+### Story 1.2: [Technical Setup] Implement Core State Architecture
 
 As a developer,
 I want the complete state management architecture (boardReducer, all contexts, and AppProvider) implemented,
@@ -295,7 +297,7 @@ So that all subsequent feature stories can dispatch actions and consume state vi
 
 ---
 
-### Story 1.3: Implement Mock API Layer, Shared Utilities, and Seed Data
+### Story 1.3: [Technical Setup] Implement Mock API Layer, Shared Utilities, and Seed Data
 
 As a developer,
 I want the mock API layer and seed data in place,
@@ -484,8 +486,17 @@ So that I can remove completed or irrelevant work items.
 
 **Given** the task detail modal is open
 **When** the user clicks the "Delete" destructive action
-**Then** the task is removed from the board immediately (optimistic delete — preparation for Epic 5)
+**Then** `useBoardAPI().deleteTask()` generates a `nanoid()` opId, records a task snapshot in `pendingOps`, dispatches `TASK_DELETE` to remove the task immediately, and calls `deleteTask()` in `src/api/tasks.ts` (which calls `mockRequest<void>`)
 **And** the deletion is dispatched through `useBoardAPI().deleteTask()` for history tracking
+
+**Given** the `mockRequest()` call resolves successfully (~90%)
+**When** `OP_SUCCESS` is dispatched with the matching opId
+**Then** the task remains deleted and the `pendingOps` entry is removed
+
+**Given** the `mockRequest()` call throws `MockApiError` (~10%)
+**When** `OP_ROLLBACK` is dispatched with the matching opId
+**Then** the task is restored to its original column from the `pendingOps` snapshot
+**And** `toast.error('Delete failed — "[task title]" has been restored')` is shown
 
 **Given** a task is deleted
 **When** the deletion is executed
@@ -522,8 +533,19 @@ So that moving tasks between statuses feels instant and natural.
 
 **Given** a card is dropped into a different column
 **When** the drop is completed
-**Then** the card animates into its new position with a micro-animation (shadow resets, scale returns)
-**And** the task's status updates immediately in board state (optimistic — full API call comes in Epic 5)
+**Then** the card animates into its new position (shadow resets, scale returns)
+**And** `useBoardAPI().moveTask()` generates a `nanoid()` opId, records the prior status as a snapshot in `pendingOps`, dispatches `TASK_MOVE` to update the column immediately, and calls `moveTask()` in `src/api/tasks.ts` (which calls `mockRequest<void>`)
+
+**Given** the `mockRequest()` call resolves successfully (~90%)
+**When** `OP_SUCCESS` is dispatched
+**Then** the task remains in the destination column and the `pendingOps` entry is removed
+
+**Given** the `mockRequest()` call throws `MockApiError` (~10%)
+**When** `OP_ROLLBACK` is dispatched
+**Then** the card slides back to its origin column (restored from the `pendingOps` snapshot)
+**And** `toast.error('Move failed — "[task title]" has been reverted')` is shown
+
+**Note:** The per-card in-flight loading indicator (violet pulse border + spinner) is added in Epic 5 Story 5.2. Until then, the card has no visual in-flight state — rollback is functional but silent on the UI.
 **And** the move is dispatched through `useBoardAPI().moveTask()` for history tracking
 
 **Given** a card is dropped back into its origin column at the same position
@@ -749,9 +771,15 @@ So that I'm informed of async events without being overwhelmed.
 **Then** it uses rose border styling (error tier), persists until the user manually dismisses it
 **And** the message names the specific action and task: e.g., `"Update failed — \"Auth task\" has been reverted"` — generic "Something went wrong" messages are forbidden
 
-**Given** a remote update is applied (Epic 6 will trigger this, but the toast infrastructure is set up here)
+**Given** a remote update is applied (production trigger: `useRealtimeSimulation` in Epic 6; test trigger: dispatch `REMOTE_UPDATE` directly via `boardDispatch` with a modified task)
 **When** the info toast is shown
 **Then** it uses zinc border styling, auto-dismisses after 4 seconds
+**And** the message text is: `"[task title] was updated by another user"`
+
+**Given** a test for the info toast in `ToastNotifications.test.tsx`
+**When** the test directly dispatches `{ type: 'REMOTE_UPDATE', payload: updatedTask }` via the `boardDispatch` context (not via the realtime hook)
+**Then** the info toast appears with zinc border and the correct task title
+**And** the test does not depend on Epic 6 being implemented
 
 **Given** a successful operation completes (optional success toast for create)
 **When** shown
