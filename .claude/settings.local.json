@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:/Users/akbarali_tojiyev/Documents/projects/real-time-collaboration/_bmad-output/planning-artifacts\")",
+      "Bash(mkdir -p \"C:/Users/akbarali_tojiyev/Documents/projects/real-time-collaboration/docs\")"
+    ]
+  }
+}
