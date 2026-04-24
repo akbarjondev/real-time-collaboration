@@ -1,6 +1,6 @@
 # Story 1.1: Initialize Project with Dependencies and Configuration
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -26,36 +26,36 @@ so that I can start implementing features on a correctly configured, TypeScript-
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Initialize Vite project with React SWC TypeScript template (AC: #1)
+- [x] Task 1: Initialize Vite project with React SWC TypeScript template (AC: #1)
   - [ ] Run `npm create vite@latest real-time-collaboration -- --template react-swc-ts`
   - [ ] Verify `npm run dev` starts without errors on the default scaffold
 
-- [ ] Task 2: Install all production and dev dependencies (AC: #2)
+- [x] Task 2: Install all production and dev dependencies (AC: #2)
   - [ ] Install production deps: `npm install tailwindcss @tailwindcss/vite @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities nanoid sonner react-hook-form`
   - [ ] Install dev deps: `npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom`
   - [ ] Verify `npm install` completes with zero errors
 
-- [ ] Task 3: Configure `vite.config.ts` (AC: #3)
+- [x] Task 3: Configure `vite.config.ts` (AC: #3)
   - [ ] Import `react` from `@vitejs/plugin-react-swc`, `tailwindcss` from `@tailwindcss/vite`, `path` from `node:path`
   - [ ] Add both plugins to `plugins: [react(), tailwindcss()]`
   - [ ] Add `resolve.alias: { '@': path.resolve(__dirname, './src') }`
 
-- [ ] Task 4: Configure `tsconfig.app.json` (AC: #4)
+- [x] Task 4: Configure `tsconfig.app.json` (AC: #4)
   - [ ] Set `"strict": true`
   - [ ] Set `"noUncheckedIndexedAccess": true`
   - [ ] Add `"paths": { "@/*": ["./src/*"] }` under `compilerOptions`
   - [ ] Run `tsc --noEmit` and confirm zero errors
 
-- [ ] Task 5: Create `vitest.config.ts` and `src/test-setup.ts` (AC: #5)
+- [x] Task 5: Create `vitest.config.ts` and `src/test-setup.ts` (AC: #5)
   - [ ] Create `vitest.config.ts` with `environment: 'jsdom'` and `setupFiles: ['./src/test-setup.ts']`
   - [ ] Create `src/test-setup.ts` containing `import '@testing-library/jest-dom'`
   - [ ] Verify `npm run test` runs successfully
 
-- [ ] Task 6: Configure Tailwind CSS v4 (AC: #6)
+- [x] Task 6: Configure Tailwind CSS v4 (AC: #6)
   - [ ] Replace entire contents of `src/index.css` with `@import "tailwindcss"`
   - [ ] **DO NOT create `tailwind.config.js`** — Tailwind v4 uses the CSS import approach only
 
-- [ ] Task 7: Scaffold complete feature-based folder structure (AC: #7)
+- [x] Task 7: Scaffold complete feature-based folder structure (AC: #7)
   - [ ] Create all directories per the architecture spec (see Dev Notes)
   - [ ] Create placeholder `.gitkeep` files where needed to track empty directories
   - [ ] **DO NOT create any `index.ts` barrel export files**

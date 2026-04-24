@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-24
-last_updated: 2026-04-24  # updated by create-story for all Epic 2 stories
+last_updated: 2026-04-24  # 1-1 done
 project: real-time-collaboration
 project_key: NOKEY
 tracking_system: file-system
@@ -44,7 +44,7 @@ story_location: _bmad-output/implementation-artifacts
 development_status:
   # Epic 1: Project Foundation & Runnable Board Shell
   epic-1: in-progress
-  1-1-initialize-project-with-dependencies-and-configuration: ready-for-dev
+  1-1-initialize-project-with-dependencies-and-configuration: done
   1-2-implement-core-state-architecture: ready-for-dev
   1-3-implement-mock-api-layer-shared-utilities-and-seed-data: ready-for-dev
   1-4-build-kanban-board-shell-with-three-columns: ready-for-dev
