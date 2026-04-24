@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createElement } from 'react'
 import { useBoardDnd } from '@/features/board/hooks/useBoardDnd'
-import { BoardAPIContext, type BoardAPIContextType } from '@/store/BoardAPIContext'
+import { HistoryContext, type HistoryContextType } from '@/store/HistoryContext'
 import { BoardStateContext } from '@/store/BoardStateContext'
 import type { Task, TaskStatus } from '@/types/task.types'
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core'
@@ -22,7 +22,13 @@ const mockTask: Task = {
 
 const mockMoveTask = vi.fn()
 
-const mockBoardAPI: BoardAPIContextType = {
+const mockHistory: HistoryContextType = {
+  undoLabel: null,
+  redoLabel: null,
+  canUndo: false,
+  canRedo: false,
+  undo: vi.fn(),
+  redo: vi.fn(),
   moveTask: mockMoveTask,
   createTask: vi.fn(),
   updateTask: vi.fn(),
@@ -33,7 +39,7 @@ function wrapper({ children }: { children: React.ReactNode }) {
   return createElement(
     BoardStateContext.Provider,
     { value: [mockTask] },
-    createElement(BoardAPIContext.Provider, { value: mockBoardAPI }, children)
+    createElement(HistoryContext.Provider, { value: mockHistory }, children)
   )
 }
 
@@ -41,6 +47,12 @@ describe('useBoardDnd', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockMoveTask.mockResolvedValue(undefined)
+  })
+
+  it('includes KeyboardSensor in the sensors array', () => {
+    const { result } = renderHook(() => useBoardDnd(), { wrapper })
+    // sensors is an array of sensor descriptors
+    expect(result.current.sensors).toHaveLength(2)
   })
 
   it('sets activeTask on handleDragStart', () => {
@@ -138,7 +150,7 @@ describe('useBoardDnd', () => {
       return createElement(
         BoardStateContext.Provider,
         { value: [mockTask, secondTask] },
-        createElement(BoardAPIContext.Provider, { value: mockBoardAPI }, children)
+        createElement(HistoryContext.Provider, { value: mockHistory }, children)
       )
     }
 

@@ -30,6 +30,7 @@ describe('BoardAPIContext — context stability', () => {
   })
 })
 
+describe('BoardAPIContext — moveTask optimistic flow', () => {
   const mockDispatch = vi.fn()
 
   function wrapper({ children }: { children: React.ReactNode }) {

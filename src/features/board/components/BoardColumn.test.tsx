@@ -82,6 +82,19 @@ describe('BoardColumn', () => {
     mockSortableContext.mockImplementation(({ children }: { children: React.ReactNode }) => <>{children}</>)
   })
 
+  it('has responsive width classes for mobile-first layout', () => {
+    renderColumn([mockTask])
+    const section = screen.getByRole('region')
+    expect(section.className).toContain('w-full')
+    expect(section.className).toContain('md:w-80')
+  })
+
+  it('has min-h-[120px] for visible empty column on mobile', () => {
+    renderColumn([mockTask])
+    const section = screen.getByRole('region')
+    expect(section.className).toContain('min-h-[120px]')
+  })
+
   it('renders column title and task count', () => {
     renderColumn([mockTask])
     expect(screen.getByText('Todo')).toBeInTheDocument()

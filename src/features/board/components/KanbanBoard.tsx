@@ -19,6 +19,7 @@ import { useRealtimeSimulation } from "@/features/realtime/hooks/useRealtimeSimu
 import { useUndoRedoShortcuts } from "@/features/history/hooks/useUndoRedoShortcuts";
 import { UndoHintBar } from "@/features/history/components/UndoHintBar";
 import { ConflictModal } from "@/features/realtime/components/ConflictModal";
+import { useTasks } from "@/store/BoardStateContext";
 import type { TaskStatus } from "@/types/task.types";
 import type { Task } from "@/types/task.types";
 
@@ -32,7 +33,14 @@ const COLUMNS: { status: TaskStatus; title: string }[] = [
   { status: "done", title: "Done" },
 ];
 
+const COLUMN_LABELS: Record<string, string> = {
+  'todo': 'Todo',
+  'in-progress': 'In Progress',
+  'done': 'Done',
+}
+
 export function KanbanBoard() {
+  const tasks = useTasks();
   const {
     isOpen,
     mode,
@@ -59,7 +67,7 @@ export function KanbanBoard() {
 
   return (
     <div className="h-screen bg-zinc-50 flex flex-col overflow-hidden">
-      <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 bg-white">
+      <header className="flex flex-wrap items-center justify-between gap-y-2 px-6 py-4 border-b border-zinc-200 bg-white">
         <div className="flex items-center gap-2">
           <LayoutGrid className="h-5 w-5 text-violet-600" aria-hidden="true" />
           <h1 className="text-lg font-semibold text-zinc-900">
@@ -94,8 +102,29 @@ export function KanbanBoard() {
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
+          accessibility={{
+            announcements: {
+              onDragStart({ active }) {
+                const task = tasks.find(t => t.id === String(active.id))
+                return task ? `Picked up task "${task.title}"` : 'Picked up task'
+              },
+              onDragOver({ over }) {
+                if (!over) return 'Not over a drop area'
+                const colLabel = COLUMN_LABELS[String(over.id)] ?? String(over.id)
+                return `Dragging over ${colLabel} column`
+              },
+              onDragEnd({ over }) {
+                if (!over) return 'Drag cancelled'
+                const colLabel = COLUMN_LABELS[String(over.id)] ?? String(over.id)
+                return `Task dropped in ${colLabel} column`
+              },
+              onDragCancel() {
+                return 'Drag cancelled'
+              },
+            }
+          }}
         >
-          <main className="flex flex-1 gap-4 p-4 overflow-x-auto scrollbar-hide">
+          <main id="main-content" className="flex flex-col md:flex-row flex-1 gap-4 p-4 overflow-x-auto scrollbar-hide">
             {COLUMNS.map((col) => (
               <BoardColumn
                 key={col.status}

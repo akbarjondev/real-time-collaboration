@@ -1,6 +1,6 @@
 # Story 9.2: Keyboard Navigation and ARIA Labeling
 
-Status: ready-for-dev
+Status: done
 
 ## Blocker
 

@@ -74,6 +74,19 @@ describe('TaskCard', () => {
       renderCard(taskNoAssignee)
       expect(screen.getByText('Unassigned')).toBeInTheDocument()
     })
+
+    it('has aria-label with "unassigned" (lowercase) when no assignee', () => {
+      const taskNoAssignee = { ...baseTask, assignee: undefined }
+      renderCard(taskNoAssignee)
+      const article = screen.getByRole('article')
+      expect(article).toHaveAttribute('aria-label', 'Fix login bug, high priority, unassigned')
+    })
+
+    it('has min-h-[44px] class for touch target compliance', () => {
+      renderCard(baseTask)
+      const article = screen.getByRole('article')
+      expect(article.className).toContain('min-h-[44px]')
+    })
   })
 
   describe('done state', () => {

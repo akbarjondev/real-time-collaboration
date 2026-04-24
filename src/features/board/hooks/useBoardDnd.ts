@@ -3,9 +3,11 @@ import {
   type DragStartEvent,
   type DragEndEvent,
   PointerSensor,
+  KeyboardSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { toast } from 'sonner'
 import { useHistory } from '@/store/HistoryContext'
 import { useTasks } from '@/store/BoardStateContext'
@@ -24,7 +26,8 @@ export function useBoardDnd() {
   }, [])
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   )
 
   function handleDragStart({ active }: DragStartEvent) {

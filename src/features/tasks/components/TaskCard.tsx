@@ -39,11 +39,11 @@ export const TaskCard = memo(function TaskCard({ task, isPending, onOpen, isOver
       style={style}
       {...(isOverlay ? {} : attributes)}
       role="article"
-      aria-label={`${task.title}, ${task.priority} priority, assigned to ${task.assignee ?? 'Unassigned'}`}
+      aria-label={`${task.title}, ${task.priority} priority${task.assignee ? `, assigned to ${task.assignee}` : ', unassigned'}`}
       aria-busy={isPending}
       tabIndex={isOverlay ? -1 : 0}
       className={cn(
-        'relative rounded-lg border bg-white p-4 transition-shadow',
+        'relative rounded-lg border bg-white p-4 transition-shadow min-h-[44px]',
         'hover:border-zinc-300 hover:shadow-md',
         'focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none',
         isPending ? 'border-zinc-200 card-pulse' : 'border-zinc-200',

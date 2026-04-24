@@ -207,7 +207,7 @@ export function TaskModal({
                     value={task.status}
                     onValueChange={(v) => handleStatusChange(v as TaskStatus)}
                   >
-                    <SelectTrigger ref={statusTriggerRef} className="w-full">
+                    <SelectTrigger ref={statusTriggerRef} className="w-full min-h-[44px]" aria-label="Status">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -226,7 +226,7 @@ export function TaskModal({
                 </label>
                 <input
                   id="task-title"
-                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive"
+                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive min-h-[44px]"
                   placeholder="Task title"
                   aria-invalid={!!errors.title}
                   aria-describedby={errors.title ? 'title-error' : undefined}
@@ -249,7 +249,7 @@ export function TaskModal({
                   control={control}
                   render={({ field }) => (
                     <Select value={field.value ?? ''} onValueChange={(v) => field.onChange(v || undefined)}>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full min-h-[44px]" aria-label="Priority">
                         <SelectValue placeholder="Select priority" />
                       </SelectTrigger>
                       <SelectContent>
@@ -269,7 +269,7 @@ export function TaskModal({
                 </label>
                 <input
                   id="task-assignee"
-                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 min-h-[44px]"
                   placeholder="Assignee name"
                   {...register('assignee')}
                 />
@@ -283,7 +283,7 @@ export function TaskModal({
                 <textarea
                   id="task-description"
                   rows={3}
-                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 resize-none"
+                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 resize-none min-h-[44px]"
                   placeholder="Optional description"
                   {...register('description')}
                 />
@@ -296,7 +296,7 @@ export function TaskModal({
                 </label>
                 <input
                   id="task-tags"
-                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 min-h-[44px]"
                   placeholder="Comma-separated tags"
                   {...register('tags')}
                 />
@@ -311,15 +311,16 @@ export function TaskModal({
                 variant="destructive"
                 onClick={handleDelete}
                 aria-label="Delete task"
+                className="min-h-[44px]"
               >
                 Delete
               </Button>
             )}
             <div className="flex gap-2">
-              <Button type="button" variant="ghost" onClick={handleCloseAttempt}>
+              <Button type="button" variant="ghost" onClick={handleCloseAttempt} className="min-h-[44px]">
                 Cancel
               </Button>
-              <Button type="submit" form="task-form">
+              <Button type="submit" form="task-form" className="min-h-[44px]">
                 {mode === 'create' ? 'Create' : 'Save'}
               </Button>
             </div>

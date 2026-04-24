@@ -1,6 +1,6 @@
 # Story 9.1: Responsive Layout and Mobile-First Design
 
-Status: ready-for-dev
+Status: done
 
 ## Blocker
 

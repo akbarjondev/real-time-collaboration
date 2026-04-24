@@ -303,6 +303,7 @@ describe('boardReducer — object reference preservation', () => {
   })
 })
 
+describe('boardReducer — REMOTE_UPDATE', () => {
   it('changes task status — task appears in new status', () => {
     const task: Task = { ...mockTask, status: 'todo' }
     const state: BoardState = { ...initialBoardState, tasks: [task] }

@@ -56,7 +56,7 @@ export function BoardColumn({ status, title, onOpenCreate, onOpenEdit }: BoardCo
       role="region"
       aria-label={`${title} column, ${count} task${count !== 1 ? 's' : ''}`}
       className={cn(
-        'bg-zinc-100 rounded-xl p-3 flex flex-col w-80 min-w-[280px] self-stretch',
+        'bg-zinc-100 rounded-xl p-3 flex flex-col w-full md:w-80 md:min-w-[280px] min-h-[120px] self-stretch',
         isOver ? 'ring-2 ring-violet-400 ring-inset' : ''
       )}
     >
