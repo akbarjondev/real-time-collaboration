@@ -1,6 +1,6 @@
 # Story 4.1: Implement filterTasks Logic and Filter State
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -31,29 +31,29 @@ so that I can focus on relevant work items without page reloads.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Implement `filterTasks` pure function (AC: #1, #2)
-  - [ ] Replace `export {}` stub in `src/features/filters/utils/filterTasks.ts` with the full implementation
-  - [ ] Import `Task` from `@/types/task.types` and `FilterState` from `@/store/FilterContext`
-  - [ ] Early return all tasks when all filter fields are null/empty (performance fast path)
-  - [ ] Apply AND logic: assignee exact match → priority exact match → searchQuery substring match
+- [x] Task 1: Implement `filterTasks` pure function (AC: #1, #2)
+  - [x] Replace `export {}` stub in `src/features/filters/utils/filterTasks.ts` with the full implementation
+  - [x] Import `Task` from `@/types/task.types` and `FilterState` from `@/store/FilterContext`
+  - [x] Early return all tasks when all filter fields are null/empty (performance fast path)
+  - [x] Apply AND logic: assignee exact match → priority exact match → searchQuery substring match
 
-- [ ] Task 2: Wire `filterTasks` into `BoardColumn` (AC: #2, #3)
-  - [ ] Add `useFilters()` call in `BoardColumn.tsx`
-  - [ ] Update the existing `useMemo` to apply `filterTasks` AFTER the status filter
-  - [ ] Update deps array to `[tasks, filters, status]`
-  - [ ] No other changes to BoardColumn in this story — empty state UI is Story 4.2
+- [x] Task 2: Wire `filterTasks` into `BoardColumn` (AC: #2, #3)
+  - [x] Add `useFilters()` call in `BoardColumn.tsx`
+  - [x] Update the existing `useMemo` to apply `filterTasks` AFTER the status filter
+  - [x] Update deps array to `[tasks, filters, status]`
+  - [x] No other changes to BoardColumn in this story — empty state UI is Story 4.2
 
-- [ ] Task 3: Write tests (AC: #1, #4)
-  - [ ] Create `src/features/filters/utils/filterTasks.test.ts` (co-located with the utility)
-  - [ ] Test: empty filters returns all tasks unchanged
-  - [ ] Test: assignee filter (Alice only)
-  - [ ] Test: priority filter (high only)
-  - [ ] Test: searchQuery matches title (case-insensitive)
-  - [ ] Test: searchQuery matches description (case-insensitive)
-  - [ ] Test: combined assignee + priority filter (AND logic)
-  - [ ] Test: combined assignee + searchQuery filter
-  - [ ] Test: no tasks match → returns empty array
-  - [ ] Test: null assignee/priority fields are ignored (partial filter state)
+- [x] Task 3: Write tests (AC: #1, #4)
+  - [x] Create `src/features/filters/utils/filterTasks.test.ts` (co-located with the utility)
+  - [x] Test: empty filters returns all tasks unchanged
+  - [x] Test: assignee filter (Alice only)
+  - [x] Test: priority filter (high only)
+  - [x] Test: searchQuery matches title (case-insensitive)
+  - [x] Test: searchQuery matches description (case-insensitive)
+  - [x] Test: combined assignee + priority filter (AND logic)
+  - [x] Test: combined assignee + searchQuery filter
+  - [x] Test: no tasks match → returns empty array
+  - [x] Test: null assignee/priority fields are ignored (partial filter state)
 
 ---
 
@@ -173,12 +173,25 @@ src/features/board/components/BoardColumn.tsx   ← add useFilters() + update us
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+claude-sonnet-4-6
 
 ### Debug Log References
 
+None — implementation matched spec exactly.
+
 ### Completion Notes List
+
+- Implemented `filterTasks` pure function with early-return fast path and AND logic
+- Updated `BoardColumn.tsx` to call `useFilters()` and apply `filterTasks` after status filter
+- 10 new tests covering all filter combinations; all 110 tests pass; 0 TypeScript errors
+- `FilterContext` default value (`initialFilterState`) means existing tests still work without context provider
 
 ### File List
 
+- src/features/filters/utils/filterTasks.ts
+- src/features/filters/utils/filterTasks.test.ts
+- src/features/board/components/BoardColumn.tsx
+
 ### Change Log
+
+- 2026-04-24: Implemented filterTasks, wired into BoardColumn, wrote 10 unit tests (all pass)

@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-24
-last_updated: 2026-04-24  # epics 1+2 done; epic-3 in-progress; epic-4 in-progress, all 3 stories ready-for-dev
+last_updated: 2026-04-24  # epics 1+2+3 done; epic-4 in-progress; epics 5-9 all stories ready-for-dev
 project: real-time-collaboration
 project_key: NOKEY
 tracking_system: file-system
@@ -66,42 +66,42 @@ development_status:
 
   # Epic 4: Filtering & Search
   epic-4: in-progress
-  4-1-implement-filtertasks-logic-and-filter-state: ready-for-dev
-  4-2-build-direction-d-filter-bar-with-active-chips: ready-for-dev
-  4-3-implement-cmdk-search-overlay: ready-for-dev
+  4-1-implement-filtertasks-logic-and-filter-state: done
+  4-2-build-direction-d-filter-bar-with-active-chips: done
+  4-3-implement-cmdk-search-overlay: in-progress
   epic-4-retrospective: optional
 
   # Epic 5: Optimistic Updates & Error Recovery
-  epic-5: backlog
-  5-1-implement-optimistic-update-sequence-with-automatic-rollback: backlog
-  5-2-per-card-in-flight-loading-indicator: backlog
-  5-3-tiered-toast-notification-system: backlog
-  5-4-feature-level-error-boundaries: backlog
+  epic-5: in-progress
+  5-1-implement-optimistic-update-sequence-with-automatic-rollback: ready-for-dev
+  5-2-per-card-in-flight-loading-indicator: ready-for-dev
+  5-3-tiered-toast-notification-system: ready-for-dev
+  5-4-feature-level-error-boundaries: ready-for-dev
   epic-5-retrospective: optional
 
   # Epic 6: Real-Time Collaboration Simulation & Conflict Resolution
-  epic-6: backlog
-  6-1-implement-real-time-simulation-hook: backlog
-  6-2-remote-update-notifications: backlog
-  6-3-conflict-detection-and-resolution-modal: backlog
+  epic-6: in-progress
+  6-1-implement-real-time-simulation-hook: ready-for-dev
+  6-2-remote-update-notifications: ready-for-dev
+  6-3-conflict-detection-and-resolution-modal: ready-for-dev
   epic-6-retrospective: optional
 
   # Epic 7: Undo/Redo History System
-  epic-7: backlog
-  7-1-implement-usehistory-hook-with-command-stack: backlog
-  7-2-keyboard-shortcuts-for-undo-and-redo: backlog
-  7-3-undo-hint-bar-component: backlog
+  epic-7: in-progress
+  7-1-implement-usehistory-hook-with-command-stack: ready-for-dev
+  7-2-keyboard-shortcuts-for-undo-and-redo: ready-for-dev
+  7-3-undo-hint-bar-component: ready-for-dev
   epic-7-retrospective: optional
 
   # Epic 8: Performance & Scale
-  epic-8: backlog
-  8-1-virtualized-task-list-per-column: backlog
-  8-2-performance-optimizations-memoization-and-render-isolation: backlog
+  epic-8: in-progress
+  8-1-virtualized-task-list-per-column: ready-for-dev
+  8-2-performance-optimizations-memoization-and-render-isolation: ready-for-dev
   epic-8-retrospective: optional
 
   # Epic 9: Responsive Design & Accessibility
-  epic-9: backlog
-  9-1-responsive-layout-and-mobile-first-design: backlog
-  9-2-keyboard-navigation-and-aria-labeling: backlog
-  9-3-focus-management-screen-reader-support-and-reduced-motion: backlog
+  epic-9: in-progress
+  9-1-responsive-layout-and-mobile-first-design: ready-for-dev
+  9-2-keyboard-navigation-and-aria-labeling: ready-for-dev
+  9-3-focus-management-screen-reader-support-and-reduced-motion: ready-for-dev
   epic-9-retrospective: optional

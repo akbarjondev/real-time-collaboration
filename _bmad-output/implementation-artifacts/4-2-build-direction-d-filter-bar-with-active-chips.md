@@ -1,6 +1,6 @@
 # Story 4.2: Build Direction D Filter Bar with Active Chips
 
-Status: ready-for-dev
+Status: review
 
 ## Blocker
 
@@ -48,42 +48,42 @@ so that I always know what filter state the board is in.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Build `FilterBar` component (AC: #1, #2, #3, #4, #5)
-  - [ ] Replace `export {}` stub in `src/features/filters/components/FilterBar.tsx`
-  - [ ] Call `useFilters()` (read state) and `useFilterAPI()` (dispatch)
-  - [ ] Render search input — `value={filters.searchQuery}`, `onChange` calls `filterAPI.setSearch()`
-  - [ ] Render Assignee `Select` dropdown with options: `All`, `Alice`, `Bob`, `Carol`, `Dave`
-  - [ ] Render Priority `Select` dropdown with options: `All`, `High`, `Medium`, `Low`
-  - [ ] Render active chip for assignee when `filters.assignee !== null`
-  - [ ] Render active chip for priority when `filters.priority !== null`
-  - [ ] Render active chip for searchQuery when `filters.searchQuery !== ''`
-  - [ ] Each chip: violet-100 bg + violet-300 border + label + `×` button that calls the appropriate clear function
-  - [ ] Render "Clear all" ghost button — only visible when any filter is active; calls `filterAPI.resetFilters()`
-  - [ ] Chips container uses `flex flex-wrap gap-2` for wrapping (AC: #4)
-  - [ ] Accessibility: search input has `aria-label="Search tasks"`, dropdowns have `aria-label`, chip dismiss buttons have `aria-label="Remove [filter name] filter"`
+- [x] Task 1: Build `FilterBar` component (AC: #1, #2, #3, #4, #5)
+  - [x] Replace `export {}` stub in `src/features/filters/components/FilterBar.tsx`
+  - [x] Call `useFilters()` (read state) and `useFilterAPI()` (dispatch)
+  - [x] Render search input — `value={filters.searchQuery}`, `onChange` calls `filterAPI.setSearch()`
+  - [x] Render Assignee `Select` dropdown with options: `All`, `Alice`, `Bob`, `Carol`, `Dave`
+  - [x] Render Priority `Select` dropdown with options: `All`, `High`, `Medium`, `Low`
+  - [x] Render active chip for assignee when `filters.assignee !== null`
+  - [x] Render active chip for priority when `filters.priority !== null`
+  - [x] Render active chip for searchQuery when `filters.searchQuery !== ''`
+  - [x] Each chip: violet-100 bg + violet-300 border + label + `×` button that calls the appropriate clear function
+  - [x] Render "Clear all" ghost button — only visible when any filter is active; calls `filterAPI.resetFilters()`
+  - [x] Chips container uses `flex flex-wrap gap-2` for wrapping (AC: #4)
+  - [x] Accessibility: search input has `aria-label="Search tasks"`, dropdowns have `aria-label`, chip dismiss buttons have `aria-label="Remove [filter name] filter"`
 
-- [ ] Task 2: Update `BoardColumn` filtered empty state (AC: #6)
-  - [ ] Detect when column has no tasks AND filters are active: `columnTasks.length === 0 && isFiltered`
-  - [ ] `isFiltered = filters.assignee !== null || filters.priority !== null || filters.searchQuery !== ''`
-  - [ ] If filtered empty: show Filter icon + "No matches" + "No tasks match the current filter" + "Clear filter" link (`onClick` → `filterAPI.resetFilters()`)
-  - [ ] If truly empty (no filters): keep existing empty state unchanged (Inbox icon + "No tasks" + "Drag a task here or add one" + "Add task" ghost button)
-  - [ ] Import `useFilters` and `useFilterAPI` (already used in 4.1 for useMemo)
+- [x] Task 2: Update `BoardColumn` filtered empty state (AC: #6)
+  - [x] Detect when column has no tasks AND filters are active: `columnTasks.length === 0 && isFiltered`
+  - [x] `isFiltered = filters.assignee !== null || filters.priority !== null || filters.searchQuery !== ''`
+  - [x] If filtered empty: show Filter icon + "No matches" + "No tasks match the current filter" + "Clear filter" link (`onClick` → `filterAPI.resetFilters()`)
+  - [x] If truly empty (no filters): keep existing empty state unchanged (Inbox icon + "No tasks" + "Drag a task here or add one" + "Add task" ghost button)
+  - [x] Import `useFilters` and `useFilterAPI` (already used in 4.1 for useMemo)
 
-- [ ] Task 3: Mount `FilterBar` in `KanbanBoard` (AC: #1)
-  - [ ] Import `FilterBar` from `@/features/filters/components/FilterBar`
-  - [ ] Replace `{/* FilterBar — Story 4.2 */}` comment with `<FilterBar />`
-  - [ ] FilterBar renders between `<header>` and the `<DndContext>` main area
+- [x] Task 3: Mount `FilterBar` in `KanbanBoard` (AC: #1)
+  - [x] Import `FilterBar` from `@/features/filters/components/FilterBar`
+  - [x] Replace `{/* FilterBar — Story 4.2 */}` comment with `<FilterBar />`
+  - [x] FilterBar renders between `<header>` and the `<DndContext>` main area
 
-- [ ] Task 4: Write tests (AC: all)
-  - [ ] Create `src/features/filters/components/FilterBar.test.tsx`
-  - [ ] Test: renders without active chips when filters are empty
-  - [ ] Test: Assignee Select renders all 4 assignee options + "All"
-  - [ ] Test: selecting an assignee renders an active chip with dismiss button
-  - [ ] Test: clicking chip dismiss calls `setAssignee(null)`
-  - [ ] Test: "Clear all" button only visible when filters are active
-  - [ ] Test: "Clear all" calls `resetFilters()`
-  - [ ] Test: search input onChange calls `setSearch`
-  - [ ] Update `BoardColumn.test.tsx`: filtered empty state renders when columnTasks is empty + filters active
+- [x] Task 4: Write tests (AC: all)
+  - [x] Create `src/features/filters/components/FilterBar.test.tsx`
+  - [x] Test: renders without active chips when filters are empty
+  - [x] Test: Assignee Select renders all 4 assignee options + "All"
+  - [x] Test: selecting an assignee renders an active chip with dismiss button
+  - [x] Test: clicking chip dismiss calls `setAssignee(null)`
+  - [x] Test: "Clear all" button only visible when filters are active
+  - [x] Test: "Clear all" calls `resetFilters()`
+  - [x] Test: search input onChange calls `setSearch`
+  - [x] Update `BoardColumn.test.tsx`: filtered empty state renders when columnTasks is empty + filters active
 
 ---
 
@@ -302,12 +302,30 @@ src/features/board/components/KanbanBoard.tsx       ← mount FilterBar
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+claude-sonnet-4-6
 
 ### Debug Log References
 
+- Exported `FilterContext` and `FilterAPIContext` context objects from their respective files to enable direct context injection in tests (matching the pattern used by `BoardAPIContext`).
+
 ### Completion Notes List
+
+- Built full `FilterBar` component with search input, Assignee/Priority dropdowns, active chips, and Clear all button
+- Updated `BoardColumn` with filtered empty state (Filter icon + "No matches" + "Clear filter" link)
+- Mounted `FilterBar` in `KanbanBoard` between header and DndContext area
+- Wrote 10 FilterBar tests + 3 new BoardColumn tests; all 124 tests pass; 0 TypeScript errors
+- Exported `FilterContext` and `FilterAPIContext` context objects for test injection
 
 ### File List
 
+- src/features/filters/components/FilterBar.tsx
+- src/features/filters/components/FilterBar.test.tsx
+- src/features/board/components/BoardColumn.tsx
+- src/features/board/components/BoardColumn.test.tsx
+- src/features/board/components/KanbanBoard.tsx
+- src/store/FilterContext.tsx
+- src/store/FilterAPIContext.tsx
+
 ### Change Log
+
+- 2026-04-24: Implemented FilterBar, filtered empty state, KanbanBoard wiring, 13 new tests (all pass)
