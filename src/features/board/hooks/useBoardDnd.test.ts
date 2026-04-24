@@ -122,7 +122,8 @@ describe('useBoardDnd', () => {
     })
 
     expect(toast.error).toHaveBeenCalledWith(
-      'Move failed — "Fix login bug" has been reverted'
+      'Move failed — "Fix login bug" has been reverted',
+      { duration: Infinity }
     )
   })
 

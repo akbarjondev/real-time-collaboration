@@ -2,9 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useSortable } from '@dnd-kit/sortable'
 import { TaskCard } from '@/features/tasks/components/TaskCard'
-import { PendingOpsContext } from '@/store/PendingOpsContext'
 import type { Task } from '@/types/task.types'
-import type { PendingOperation } from '@/types/common.types'
 
 vi.mock('@dnd-kit/sortable', () => ({
   useSortable: vi.fn().mockReturnValue({
@@ -34,14 +32,12 @@ const baseTask: Task = {
 
 function renderCard(
   task: Task,
-  pendingOps = new Map<string, PendingOperation>(),
+  isPending = false,
   onOpen?: (t: Task) => void,
   extra: { isOverlay?: boolean } = {}
 ) {
   return render(
-    <PendingOpsContext.Provider value={pendingOps}>
-      <TaskCard task={task} onOpen={onOpen} isOverlay={extra.isOverlay} />
-    </PendingOpsContext.Provider>
+    <TaskCard task={task} isPending={isPending} onOpen={onOpen} isOverlay={extra.isOverlay} />
   )
 }
 
@@ -105,46 +101,40 @@ describe('TaskCard', () => {
   })
 
   describe('in-flight state', () => {
-    it('applies card-pulse class when a pending op targets this task', () => {
-      const pendingOps = new Map<string, PendingOperation>([
-        ['op-1', { opId: 'op-1', taskId: 'task-1', snapshot: baseTask, opType: 'update' }],
-      ])
-      renderCard(baseTask, pendingOps)
+    it('applies card-pulse class when isPending=true', () => {
+      renderCard(baseTask, true)
       const article = screen.getByRole('article')
       expect(article.className).toContain('card-pulse')
     })
 
-    it('renders CSS spinner when in-flight', () => {
-      const pendingOps = new Map<string, PendingOperation>([
-        ['op-1', { opId: 'op-1', taskId: 'task-1', snapshot: baseTask, opType: 'update' }],
-      ])
-      renderCard(baseTask, pendingOps)
+    it('renders CSS spinner when isPending=true', () => {
+      renderCard(baseTask, true)
       const spinner = document.querySelector('.animate-spin')
       expect(spinner).toBeInTheDocument()
     })
 
-    it('sets aria-busy="true" when in-flight', () => {
-      const pendingOps = new Map<string, PendingOperation>([
-        ['op-1', { opId: 'op-1', taskId: 'task-1', snapshot: baseTask, opType: 'update' }],
-      ])
-      renderCard(baseTask, pendingOps)
+    it('sets aria-busy="true" when isPending=true', () => {
+      renderCard(baseTask, true)
       const article = screen.getByRole('article')
       expect(article).toHaveAttribute('aria-busy', 'true')
     })
 
-    it('does NOT apply card-pulse when no matching pending op', () => {
-      const pendingOps = new Map<string, PendingOperation>([
-        ['op-1', { opId: 'op-1', taskId: 'other-task', snapshot: baseTask, opType: 'update' }],
-      ])
-      renderCard(baseTask, pendingOps)
+    it('does NOT apply card-pulse when isPending=false', () => {
+      renderCard(baseTask, false)
       const article = screen.getByRole('article')
       expect(article.className).not.toContain('card-pulse')
     })
 
-    it('does NOT render spinner when not in-flight', () => {
+    it('does NOT render spinner when isPending=false', () => {
       renderCard(baseTask)
       const spinner = document.querySelector('.animate-spin')
       expect(spinner).not.toBeInTheDocument()
+    })
+
+    it('sets aria-busy="false" when isPending=false', () => {
+      renderCard(baseTask, false)
+      const article = screen.getByRole('article')
+      expect(article).toHaveAttribute('aria-busy', 'false')
     })
   })
 
@@ -179,21 +169,21 @@ describe('TaskCard', () => {
   describe('interaction', () => {
     it('calls onOpen with task when clicked', () => {
       const onOpen = vi.fn()
-      renderCard(baseTask, new Map(), onOpen)
+      renderCard(baseTask, false, onOpen)
       fireEvent.click(screen.getByRole('article'))
       expect(onOpen).toHaveBeenCalledWith(baseTask)
     })
 
     it('calls onOpen with task when Enter is pressed', () => {
       const onOpen = vi.fn()
-      renderCard(baseTask, new Map(), onOpen)
+      renderCard(baseTask, false, onOpen)
       fireEvent.keyDown(screen.getByRole('article'), { key: 'Enter' })
       expect(onOpen).toHaveBeenCalledWith(baseTask)
     })
 
     it('does NOT call onOpen on other keys', () => {
       const onOpen = vi.fn()
-      renderCard(baseTask, new Map(), onOpen)
+      renderCard(baseTask, false, onOpen)
       fireEvent.keyDown(screen.getByRole('article'), { key: 'Space' })
       expect(onOpen).not.toHaveBeenCalled()
     })
@@ -207,7 +197,6 @@ describe('TaskCard', () => {
 
   describe('React.memo', () => {
     it('renders without error', () => {
-      // Memoization verified structurally; functional correctness covered by other tests
       expect(() => renderCard(baseTask)).not.toThrow()
     })
   })
@@ -215,26 +204,22 @@ describe('TaskCard', () => {
 
 describe('TaskCard — sibling re-render isolation', () => {
   it('does not re-render when a different task changes (React.memo)', () => {
-    const renderCount = { count: 0 }
     const task1: Task = { ...baseTask, id: 'task-1', title: 'Task 1' }
     const task2: Task = { ...baseTask, id: 'task-2', title: 'Task 2' }
 
     const { rerender } = render(
-      <PendingOpsContext.Provider value={new Map()}>
-        <TaskCard task={task1} />
-        <TaskCard task={task2} />
-      </PendingOpsContext.Provider>
+      <>
+        <TaskCard task={task1} isPending={false} />
+        <TaskCard task={task2} isPending={false} />
+      </>
     )
 
-    renderCount.count = 0
-
-    // Re-render with updated task2 only — task1 should not re-render
     const updatedTask2: Task = { ...task2, title: 'Task 2 Updated' }
     rerender(
-      <PendingOpsContext.Provider value={new Map()}>
-        <TaskCard task={task1} />
-        <TaskCard task={updatedTask2} />
-      </PendingOpsContext.Provider>
+      <>
+        <TaskCard task={task1} isPending={false} />
+        <TaskCard task={updatedTask2} isPending={false} />
+      </>
     )
 
     expect(screen.getByText('Task 2 Updated')).toBeInTheDocument()
@@ -266,7 +251,7 @@ describe('TaskCard — drag and drop', () => {
   })
 
   it('uses tabIndex=-1 when isOverlay=true', () => {
-    renderCard(baseTask, new Map(), undefined, { isOverlay: true })
+    renderCard(baseTask, false, undefined, { isOverlay: true })
     const article = screen.getByRole('article')
     expect(article).toHaveAttribute('tabIndex', '-1')
   })
@@ -301,20 +286,20 @@ describe('TaskCard — drag and drop', () => {
       attributes: {},
       listeners: {},
     })
-    renderCard(baseTask, new Map(), undefined, { isOverlay: true })
+    renderCard(baseTask, false, undefined, { isOverlay: true })
     const article = screen.getByRole('article')
     expect(article.className).not.toContain('opacity-0')
   })
 
   it('does not call onOpen when isOverlay=true and clicked', () => {
     const onOpen = vi.fn()
-    renderCard(baseTask, new Map(), onOpen, { isOverlay: true })
+    renderCard(baseTask, false, onOpen, { isOverlay: true })
     fireEvent.click(screen.getByRole('article'))
     expect(onOpen).not.toHaveBeenCalled()
   })
 
   it('applies cursor-grabbing class when isOverlay=true', () => {
-    renderCard(baseTask, new Map(), undefined, { isOverlay: true })
+    renderCard(baseTask, false, undefined, { isOverlay: true })
     const article = screen.getByRole('article')
     expect(article.className).toContain('cursor-grabbing')
   })

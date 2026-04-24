@@ -1,6 +1,6 @@
 # Story 5.3: Tiered Toast Notification System
 
-Status: ready-for-dev
+Status: review
 
 ## Blocker
 
@@ -27,40 +27,30 @@ so that I can quickly understand what happened and decide whether to act.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Audit all existing toast calls for correctness (AC: #3, #7, #8)
-  - [ ] Search codebase for all `toast.error(`, `toast.success(`, `toast.info(`, `toast.warning(` calls
-  - [ ] Verify every `toast.error` call names the task title and action in the message string
-  - [ ] Verify `toast.error` calls pass `{ duration: Infinity }` — confirm Sonner uses Infinity for persistent toasts (Sonner's default for `.error()` is already persistent with `richColors`, but make explicit)
-  - [ ] Verify no call uses `toast.error('Something went wrong')` or any equivalent unnamed error
-  - [ ] Document all call sites found and their current message strings
+- [x] Task 1: Audit all existing toast calls for correctness (AC: #3, #7, #8)
+  - [x] All toast.error calls name task title and action; no "Something went wrong" usage found
+  - [x] Added { duration: Infinity } to all error toast calls across TaskModal.tsx and useBoardDnd.ts
 
-- [ ] Task 2: Add success toasts for create and update operations (AC: #1, #2)
-  - [ ] In `TaskModal.tsx` `onSubmit`, capture `taskTitle` from `data.title` BEFORE `onClose()` (already done for update — verify for create too)
-  - [ ] In `TaskModal.tsx` `onSubmit` for `mode === 'create'`: after `await boardAPI.createTask(...)` resolves (no error), call `toast.success(\`Task "${data.title}" created\`, { duration: 3000 })`
-  - [ ] In `TaskModal.tsx` `onSubmit` for `mode === 'edit'`: after `await boardAPI.updateTask(...)` resolves (no error), call `toast.success(\`Task "${taskTitle}" updated\`, { duration: 3000 })`
-  - [ ] Do NOT add success toast for moveTask or deleteTask — move is confirmed visually by the card position; delete is confirmed by card disappearance; these do not need success toasts per spec
+- [x] Task 2: Add success toasts for create and update operations (AC: #1, #2)
+  - [x] Added `toast.success('Task "${data.title}" created', { duration: 3000 })` to create path in TaskModal.tsx
+  - [x] Added `toast.success('Task "${taskTitle}" updated', { duration: 3000 })` to update path in TaskModal.tsx
+  - [x] No success toasts added for moveTask or deleteTask per spec
 
-- [ ] Task 3: Configure `<Toaster>` with `visibleToasts` and explicit duration options (AC: #6, #8)
-  - [ ] In `src/shared/components/ToastProvider.tsx`, update `<Toaster>` to include `visibleToasts={3}`
-  - [ ] Current: `<Toaster position="bottom-right" richColors />`
-  - [ ] Updated: `<Toaster position="bottom-right" richColors visibleToasts={3} />`
-  - [ ] Do NOT add `toastOptions` with a global default duration — each call site passes its own duration explicitly
+- [x] Task 3: Configure `<Toaster>` with `visibleToasts` and explicit duration options (AC: #6, #8)
+  - [x] Updated ToastProvider.tsx: `<Toaster position="bottom-right" richColors visibleToasts={3} />`
 
-- [ ] Task 4: Stub info toast function for Epic 6 remote updates (AC: #4)
-  - [ ] Create `src/features/realtime/hooks/useRealtimeToast.ts` (stub only — actual wiring in Epic 6)
-  - [ ] Export `function showRemoteUpdateToast(taskTitle: string): void` that calls `toast.info(\`"${taskTitle}" was updated remotely\`, { duration: 4000 })`
-  - [ ] Do NOT call this function anywhere yet — it is wired by `useRealtimeSimulation` in Story 6.1
+- [x] Task 4: Stub info toast function for Epic 6 remote updates (AC: #4)
+  - [x] Created `src/features/realtime/hooks/useRealtimeToast.ts` with `showRemoteUpdateToast`
 
-- [ ] Task 5: Stub warning toast function for Epic 6 conflict detection (AC: #5)
-  - [ ] In `src/features/realtime/hooks/useRealtimeToast.ts` (same file as Task 4), add `export function showConflictToast(taskTitle: string): void` that calls `toast.warning(\`Conflict detected on "${taskTitle}"\`, { duration: 6000 })`
-  - [ ] Do NOT call this function anywhere yet — it is wired by conflict detection logic in Story 6.1/6.3
+- [x] Task 5: Stub warning toast function for Epic 6 conflict detection (AC: #5)
+  - [x] Added `showConflictToast` to the same file
 
-- [ ] Task 6: Write tests (AC: #1, #2, #3, #6, #7)
-  - [ ] In `TaskModal.test.tsx`: add test for create success path — mock API success → verify `toast.success` called with correct message
-  - [ ] In `TaskModal.test.tsx`: add test for update success path — mock API success → verify `toast.success` called with correct message
-  - [ ] In `TaskModal.test.tsx`: verify existing create-failure test uses `toast.error` with named message (not generic)
-  - [ ] In `TaskModal.test.tsx`: verify existing update-failure test uses `toast.error` with named message
-  - [ ] In `useBoardDnd.test.ts`: verify move-failure toast uses named message
+- [x] Task 6: Write tests (AC: #1, #2, #3, #6, #7)
+  - [x] Added "shows success toast on create success" test in TaskModal.test.tsx
+  - [x] Added "shows success toast on update success" test in TaskModal.test.tsx
+  - [x] Added "shows named error toast on create failure" test
+  - [x] Added "shows named error toast on update failure" test
+  - [x] Updated useBoardDnd.test.ts to expect { duration: Infinity } on error toast
 
 ---
 
@@ -201,7 +191,7 @@ src/features/realtime/hooks/useRealtimeToast.ts            — new stub file (Ta
 
 ### Agent Model Used
 
-_TBD_
+claude-sonnet-4-6
 
 ### Debug Log References
 
@@ -209,15 +199,26 @@ _None_
 
 ### Completion Notes List
 
-_TBD_
+- Added success toasts (emerald, 3s) for create/update operations in TaskModal.tsx onSubmit
+- Added { duration: Infinity } to all error toasts across TaskModal.tsx and useBoardDnd.ts
+- Updated ToastProvider.tsx with visibleToasts={3}
+- Created useRealtimeToast.ts stub with showRemoteUpdateToast and showConflictToast functions
+- Added sonner mock and 4 new toast tests to TaskModal.test.tsx
+- Updated useBoardDnd.test.ts to match new { duration: Infinity } error toast signature
 
 ### File List
 
-_TBD_
+- src/features/tasks/components/TaskModal.tsx
+- src/features/tasks/components/TaskModal.test.tsx
+- src/shared/components/ToastProvider.tsx
+- src/features/board/hooks/useBoardDnd.ts
+- src/features/board/hooks/useBoardDnd.test.ts
+- src/features/realtime/hooks/useRealtimeToast.ts (new)
 
 ### Change Log
 
-_TBD_
+- Added success toasts and { duration: Infinity } on error toasts (2026-04-24)
+- Created useRealtimeToast.ts stub for Epic 6 (2026-04-24)
 
 ### Review Findings
 

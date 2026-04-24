@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'sonner'
 import { AlertCircle } from 'lucide-react'
@@ -53,7 +53,6 @@ export function TaskModal({
   const isMountedRef = useRef(true)
 
   useEffect(() => {
-    isMountedRef.current = true
     return () => { isMountedRef.current = false }
   }, [])
 
@@ -153,7 +152,7 @@ export function TaskModal({
     }
   })
 
-  const handleStatusChange = useCallback(async (newStatus: TaskStatus) => {
+  async function handleStatusChange(newStatus: TaskStatus) {
     if (!task || newStatus === task.status) return
 
     const taskTitle = task.title
@@ -166,9 +165,9 @@ export function TaskModal({
         toast.error(`Move failed — "${taskTitle}" has been reverted`, { duration: Infinity })
       }
     }
-  }, [task, onClose, boardAPI])
+  }
 
-  const handleDelete = useCallback(async () => {
+  async function handleDelete() {
     if (!task) return
     const taskTitle = task.title
     onClose()
@@ -179,7 +178,7 @@ export function TaskModal({
         toast.error(`Delete failed — "${taskTitle}" has been restored`, { duration: Infinity })
       }
     }
-  }, [task, onClose, boardAPI])
+  }
 
   return (
     <>

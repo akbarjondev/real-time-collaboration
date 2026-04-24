@@ -136,3 +136,9 @@
 .card-pulse {
   animation: cardPulse 1.8s ease-in-out infinite;
 }
+@media (prefers-reduced-motion: reduce) {
+  .card-pulse {
+    animation: none;
+    box-shadow: 0 0 0 2px rgb(124 58 237 / 0.5);
+  }
+}

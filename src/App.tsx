@@ -3,7 +3,7 @@ import { KanbanBoard } from '@/features/board/components/KanbanBoard'
 
 export default function App() {
   return (
-    <ErrorBoundary>
+    <ErrorBoundary fallbackMessage="App failed to load">
       <KanbanBoard />
     </ErrorBoundary>
   )

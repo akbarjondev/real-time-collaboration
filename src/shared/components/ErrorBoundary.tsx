@@ -3,6 +3,8 @@ import React from 'react'
 type ErrorBoundaryProps = {
   children: React.ReactNode
   fallback?: React.ReactNode
+  fallbackMessage?: string
+  onReset?: () => void
 }
 
 type ErrorBoundaryState = {
@@ -27,6 +29,11 @@ export class ErrorBoundary extends React.Component<
     console.error('[ErrorBoundary] Caught render error:', error, info)
   }
 
+  handleReset = () => {
+    this.setState({ hasError: false, error: null })
+    this.props.onReset?.()
+  }
+
   render(): React.ReactNode {
     if (this.state.hasError) {
       if (this.props.fallback != null) {
@@ -35,21 +42,23 @@ export class ErrorBoundary extends React.Component<
       return (
         <div
           role="alert"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '2rem',
-            textAlign: 'center',
-          }}
+          className="flex flex-col items-center justify-center p-8 text-center gap-4"
         >
-          <h2>Something went wrong</h2>
-          {import.meta.env.DEV && this.state.error != null && (
-            <pre style={{ color: 'red', marginTop: '1rem', fontSize: '0.875rem' }}>
+          {import.meta.env.DEV && this.state.error != null ? (
+            <pre className="text-zinc-700 text-sm text-left whitespace-pre-wrap">
               {this.state.error.message}
             </pre>
+          ) : (
+            <p className="text-zinc-700 font-medium">
+              {this.props.fallbackMessage ?? 'Something went wrong'}
+            </p>
           )}
+          <button
+            onClick={this.handleReset}
+            className="bg-violet-600 hover:bg-violet-700 text-white rounded-lg px-4 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none min-h-[44px]"
+          >
+            Try again
+          </button>
         </div>
       )
     }

@@ -5,9 +5,11 @@ import { BoardColumn } from '@/features/board/components/BoardColumn'
 import { BoardStateContext } from '@/store/BoardStateContext'
 import { FilterContext, initialFilterState } from '@/store/FilterContext'
 import { FilterAPIContext } from '@/store/FilterAPIContext'
+import { PendingOpsContext } from '@/store/PendingOpsContext'
 import type { Task } from '@/types/task.types'
 import type { FilterState } from '@/store/FilterContext'
 import type { FilterAPIContextType } from '@/store/FilterAPIContext'
+import type { PendingOperation } from '@/types/common.types'
 
 vi.mock('@dnd-kit/core', () => ({
   useDroppable: vi.fn(),
@@ -19,7 +21,9 @@ vi.mock('@dnd-kit/sortable', () => ({
 }))
 
 vi.mock('@/features/tasks/components/TaskCard', () => ({
-  TaskCard: ({ task }: { task: Task }) => <div data-testid="task-card">{task.title}</div>,
+  TaskCard: ({ task, isPending }: { task: Task; isPending: boolean }) => (
+    <div data-testid="task-card" aria-busy={isPending}>{task.title}</div>
+  ),
 }))
 
 const mockSetNodeRef = vi.fn()
@@ -45,19 +49,22 @@ const mockFilterAPI: FilterAPIContextType = {
 function renderColumn(
   tasks: Task[] = [],
   isOver = false,
-  filterState: FilterState = initialFilterState
+  filterState: FilterState = initialFilterState,
+  pendingOps: Map<string, PendingOperation> = new Map()
 ) {
   vi.mocked(useDroppable).mockReturnValue({ isOver, setNodeRef: mockSetNodeRef } as ReturnType<typeof useDroppable>)
   return render(
     <BoardStateContext.Provider value={tasks}>
       <FilterContext.Provider value={filterState}>
         <FilterAPIContext.Provider value={mockFilterAPI}>
-          <BoardColumn
-            status="todo"
-            title="Todo"
-            onOpenCreate={vi.fn()}
-            onOpenEdit={vi.fn()}
-          />
+          <PendingOpsContext.Provider value={pendingOps}>
+            <BoardColumn
+              status="todo"
+              title="Todo"
+              onOpenCreate={vi.fn()}
+              onOpenEdit={vi.fn()}
+            />
+          </PendingOpsContext.Provider>
         </FilterAPIContext.Provider>
       </FilterContext.Provider>
     </BoardStateContext.Provider>
@@ -140,5 +147,21 @@ describe('BoardColumn', () => {
     renderColumn([], false, { assignee: 'Carol', priority: null, searchQuery: '' })
     fireEvent.click(screen.getByText('Clear filter'))
     expect(mockFilterAPI.resetFilters).toHaveBeenCalled()
+  })
+
+  it('passes isPending=true only to the card whose task is in pendingOps', () => {
+    const task1: Task = { ...mockTask, id: 'task-1', title: 'Task One' }
+    const task2: Task = { ...mockTask, id: 'task-2', title: 'Task Two' }
+    const pendingOps = new Map<string, PendingOperation>([
+      ['op-1', { opId: 'op-1', taskId: 'task-1', snapshot: task1, opType: 'update' }],
+    ])
+    renderColumn([task1, task2], false, initialFilterState, pendingOps)
+
+    const cards = screen.getAllByTestId('task-card')
+    const pendingCard = cards.find(c => c.textContent === 'Task One')
+    const nonPendingCard = cards.find(c => c.textContent === 'Task Two')
+
+    expect(pendingCard).toHaveAttribute('aria-busy', 'true')
+    expect(nonPendingCard).toHaveAttribute('aria-busy', 'false')
   })
 })

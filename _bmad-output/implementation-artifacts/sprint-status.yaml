@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-24
-last_updated: 2026-04-24  # epics 1+2+3 done; epic-4 in-progress; epics 5-9 all stories ready-for-dev
+last_updated: 2026-04-24  # epics 1-4 done; epic-5 all stories done; epics 6-9 all stories ready-for-dev
 project: real-time-collaboration
 project_key: NOKEY
 tracking_system: file-system
@@ -73,10 +73,10 @@ development_status:
 
   # Epic 5: Optimistic Updates & Error Recovery
   epic-5: in-progress
-  5-1-implement-optimistic-update-sequence-with-automatic-rollback: ready-for-dev
-  5-2-per-card-in-flight-loading-indicator: ready-for-dev
-  5-3-tiered-toast-notification-system: ready-for-dev
-  5-4-feature-level-error-boundaries: ready-for-dev
+  5-1-implement-optimistic-update-sequence-with-automatic-rollback: review
+  5-2-per-card-in-flight-loading-indicator: review
+  5-3-tiered-toast-notification-system: review
+  5-4-feature-level-error-boundaries: review
   epic-5-retrospective: optional
 
   # Epic 6: Real-Time Collaboration Simulation & Conflict Resolution

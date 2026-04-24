@@ -1,9 +1,19 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
+import { toast } from 'sonner'
 import { TaskModal } from '@/features/tasks/components/TaskModal'
 import { BoardAPIContext, type BoardAPIContextType } from '@/store/BoardAPIContext'
 import type { Task } from '@/types/task.types'
+
+vi.mock('sonner', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+  },
+}))
 
 const SelectCtx = React.createContext<{ value?: string; onChange?: (v: string) => void }>({})
 
@@ -275,6 +285,72 @@ describe('TaskModal — closed state', () => {
   it('does not render dialog when isOpen=false', () => {
     renderModal({ isOpen: false })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+})
+
+describe('TaskModal — toast notifications', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    ;(mockBoardAPI.createTask as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+    ;(mockBoardAPI.updateTask as ReturnType<typeof vi.fn>).mockResolvedValue(undefined)
+  })
+
+  it('shows success toast on create success', async () => {
+    renderModal()
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'New task title' } })
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Create' }))
+    })
+    await waitFor(() => {
+      expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
+        'Task "New task title" created',
+        { duration: 3000 }
+      )
+    })
+  })
+
+  it('shows success toast on update success', async () => {
+    renderModal({ mode: 'edit', task: mockTask })
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Updated title' } })
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    })
+    await waitFor(() => {
+      expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
+        'Task "Fix login bug" updated',
+        { duration: 3000 }
+      )
+    })
+  })
+
+  it('shows named error toast on create failure', async () => {
+    ;(mockBoardAPI.createTask as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('fail'))
+    renderModal()
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Failing task' } })
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Create' }))
+    })
+    await waitFor(() => {
+      expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
+        'Create failed — "Failing task" could not be saved',
+        { duration: Infinity }
+      )
+    })
+  })
+
+  it('shows named error toast on update failure', async () => {
+    ;(mockBoardAPI.updateTask as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('fail'))
+    renderModal({ mode: 'edit', task: mockTask })
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Updated' } })
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    })
+    await waitFor(() => {
+      expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
+        'Update failed — "Fix login bug" has been reverted',
+        { duration: Infinity }
+      )
+    })
   })
 })
 
