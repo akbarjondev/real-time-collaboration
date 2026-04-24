@@ -1,0 +1,107 @@
+# generated: 2026-04-24
+# last_updated: 2026-04-24
+# project: real-time-collaboration
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-04-24
+last_updated: 2026-04-24
+project: real-time-collaboration
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # Epic 1: Project Foundation & Runnable Board Shell
+  epic-1: backlog
+  1-1-initialize-project-with-dependencies-and-configuration: backlog
+  1-2-implement-core-state-architecture: backlog
+  1-3-implement-mock-api-layer-shared-utilities-and-seed-data: backlog
+  1-4-build-kanban-board-shell-with-three-columns: backlog
+  epic-1-retrospective: optional
+
+  # Epic 2: Task CRUD & Full Task Display
+  epic-2: backlog
+  2-1-display-full-task-card-with-all-visual-states: backlog
+  2-2-create-new-task-via-modal: backlog
+  2-3-edit-existing-task-via-modal: backlog
+  2-4-delete-task: backlog
+  epic-2-retrospective: optional
+
+  # Epic 3: Task Movement — Drag-and-Drop & Status Changes
+  epic-3: backlog
+  3-1-desktop-drag-and-drop-task-movement: backlog
+  3-2-mobile-status-dropdown-for-task-movement: backlog
+  epic-3-retrospective: optional
+
+  # Epic 4: Filtering & Search
+  epic-4: backlog
+  4-1-implement-filtertasks-logic-and-filter-state: backlog
+  4-2-build-direction-d-filter-bar-with-active-chips: backlog
+  4-3-implement-cmdk-search-overlay: backlog
+  epic-4-retrospective: optional
+
+  # Epic 5: Optimistic Updates & Error Recovery
+  epic-5: backlog
+  5-1-implement-optimistic-update-sequence-with-automatic-rollback: backlog
+  5-2-per-card-in-flight-loading-indicator: backlog
+  5-3-tiered-toast-notification-system: backlog
+  5-4-feature-level-error-boundaries: backlog
+  epic-5-retrospective: optional
+
+  # Epic 6: Real-Time Collaboration Simulation & Conflict Resolution
+  epic-6: backlog
+  6-1-implement-real-time-simulation-hook: backlog
+  6-2-remote-update-notifications: backlog
+  6-3-conflict-detection-and-resolution-modal: backlog
+  epic-6-retrospective: optional
+
+  # Epic 7: Undo/Redo History System
+  epic-7: backlog
+  7-1-implement-usehistory-hook-with-command-stack: backlog
+  7-2-keyboard-shortcuts-for-undo-and-redo: backlog
+  7-3-undo-hint-bar-component: backlog
+  epic-7-retrospective: optional
+
+  # Epic 8: Performance & Scale
+  epic-8: backlog
+  8-1-virtualized-task-list-per-column: backlog
+  8-2-performance-optimizations-memoization-and-render-isolation: backlog
+  epic-8-retrospective: optional
+
+  # Epic 9: Responsive Design & Accessibility
+  epic-9: backlog
+  9-1-responsive-layout-and-mobile-first-design: backlog
+  9-2-keyboard-navigation-and-aria-labeling: backlog
+  9-3-focus-management-screen-reader-support-and-reduced-motion: backlog
+  epic-9-retrospective: optional
