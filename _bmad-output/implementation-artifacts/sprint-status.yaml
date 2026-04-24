@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-24
-last_updated: 2026-04-24  # epics 1+2+3 done; epic-4 next
+last_updated: 2026-04-24  # epics 1+2 done; epic-3 in-progress; epic-4 in-progress, all 3 stories ready-for-dev
 project: real-time-collaboration
 project_key: NOKEY
 tracking_system: file-system
@@ -65,10 +65,10 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Filtering & Search
-  epic-4: backlog
-  4-1-implement-filtertasks-logic-and-filter-state: backlog
-  4-2-build-direction-d-filter-bar-with-active-chips: backlog
-  4-3-implement-cmdk-search-overlay: backlog
+  epic-4: in-progress
+  4-1-implement-filtertasks-logic-and-filter-state: ready-for-dev
+  4-2-build-direction-d-filter-bar-with-active-chips: ready-for-dev
+  4-3-implement-cmdk-search-overlay: ready-for-dev
   epic-4-retrospective: optional
 
   # Epic 5: Optimistic Updates & Error Recovery
