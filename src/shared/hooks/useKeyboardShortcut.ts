@@ -1,6 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export function useKeyboardShortcut(key: string, handler: () => void): void {
+  const handlerRef = useRef(handler)
+  useEffect(() => { handlerRef.current = handler })
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (
@@ -9,10 +12,10 @@ export function useKeyboardShortcut(key: string, handler: () => void): void {
         !e.metaKey &&
         !e.altKey
       ) {
-        handler()
+        handlerRef.current()
       }
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [key, handler])
+  }, [key])
 }

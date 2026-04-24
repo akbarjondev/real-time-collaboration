@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'sonner'
 import { AlertCircle } from 'lucide-react'
@@ -48,6 +48,14 @@ export function TaskModal({
 }: TaskModalProps) {
   const boardAPI = useBoardAPI()
   const [showGuard, setShowGuard] = useState(false)
+  const titleInputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      const id = setTimeout(() => titleInputRef.current?.focus(), 0)
+      return () => clearTimeout(id)
+    }
+  }, [isOpen])
 
   const {
     register,
@@ -60,6 +68,9 @@ export function TaskModal({
     defaultValues: DEFAULT_VALUES,
   })
 
+  // reset() sets isDirty=false. If onClose() fires before this effect runs (e.g. rollback
+  // re-open path), there is a brief render cycle where isDirty reads stale. This is benign —
+  // the guard won't fire since the modal is already closed at that point.
   useEffect(() => {
     if (isOpen && mode === 'create') {
       reset({ ...DEFAULT_VALUES, ...prefillValues })
@@ -90,6 +101,8 @@ export function TaskModal({
     setShowGuard(false)
     onClose()
   }
+
+  const { ref: rhfTitleRef, ...titleRegisterRest } = register('title', { required: 'Title is required' })
 
   const onSubmit = handleSubmit(async (data) => {
     const savedValues = { ...data }
@@ -156,12 +169,12 @@ export function TaskModal({
                 </label>
                 <input
                   id="task-title"
-                  autoFocus
                   className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive"
                   placeholder="Task title"
                   aria-invalid={!!errors.title}
                   aria-describedby={errors.title ? 'title-error' : undefined}
-                  {...register('title', { required: 'Title is required' })}
+                  ref={(el) => { rhfTitleRef(el); titleInputRef.current = el }}
+                  {...titleRegisterRest}
                 />
                 {errors.title && (
                   <p id="title-error" className="mt-1 flex items-center gap-1 text-xs text-rose-600" role="alert">
