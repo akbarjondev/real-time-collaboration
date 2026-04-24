@@ -1,4 +1,6 @@
 import { memo } from 'react'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { Badge } from '@/components/ui/badge'
 import { usePendingOps } from '@/store/PendingOpsContext'
 import { cn } from '@/lib/utils'
@@ -7,6 +9,7 @@ import type { Task, Priority } from '@/types/task.types'
 type TaskCardProps = {
   task: Task
   onOpen?: (task: Task) => void
+  isOverlay?: boolean
 }
 
 const PRIORITY_CONFIG: Record<Priority, { dot: string; badge: string; label: string }> = {
@@ -19,27 +22,39 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export const TaskCard = memo(function TaskCard({ task, onOpen }: TaskCardProps) {
+export const TaskCard = memo(function TaskCard({ task, onOpen, isOverlay }: TaskCardProps) {
   const pendingOps = usePendingOps()
   const isPending = [...pendingOps.values()].some(op => op.taskId === task.id)
   const priority = PRIORITY_CONFIG[task.priority]
   const isDone = task.status === 'done'
 
+  const { setNodeRef, transform, transition, isDragging, attributes, listeners } = useSortable({ id: task.id })
+
+  const style = isOverlay
+    ? { transform: 'scale(1.02)', boxShadow: '0 10px 30px rgba(0,0,0,0.18)' }
+    : { transform: CSS.Transform.toString(transform), transition }
+
   return (
     <article
+      ref={isOverlay ? undefined : setNodeRef}
+      style={style}
+      {...(isOverlay ? {} : attributes)}
       role="article"
       aria-label={`${task.title}, ${task.priority} priority, assigned to ${task.assignee ?? 'Unassigned'}`}
       aria-busy={isPending}
-      tabIndex={0}
+      tabIndex={isOverlay ? -1 : 0}
       className={cn(
-        'relative rounded-lg border bg-white p-4 cursor-pointer transition-shadow',
+        'relative rounded-lg border bg-white p-4 transition-shadow',
         'hover:border-zinc-300 hover:shadow-md',
         'focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none',
         isPending ? 'border-violet-600 card-pulse' : 'border-zinc-200',
         isDone && 'opacity-[0.65]',
+        isDragging && !isOverlay ? 'opacity-0 pointer-events-none' : '',
+        isOverlay ? 'cursor-grabbing' : 'cursor-grab',
       )}
-      onClick={() => onOpen?.(task)}
-      onKeyDown={(e) => { if (e.key === 'Enter') onOpen?.(task) }}
+      {...(isOverlay ? {} : listeners)}
+      onClick={isOverlay ? undefined : () => onOpen?.(task)}
+      onKeyDown={isOverlay ? undefined : (e) => { if (e.key === 'Enter') onOpen?.(task) }}
     >
       {isPending && (
         <div

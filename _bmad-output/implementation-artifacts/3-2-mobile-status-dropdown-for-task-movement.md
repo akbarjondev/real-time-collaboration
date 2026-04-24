@@ -1,6 +1,6 @@
 # Story 3.2: Mobile Status Dropdown for Task Movement
 
-Status: ready-for-dev
+Status: in-progress
 
 ## Blocker
 
@@ -31,22 +31,22 @@ so that I can move tasks between columns without needing drag-and-drop.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add Status Select field to `TaskModal.tsx` (AC: #1, #2, #5, #6)
-  - [ ] Import `TaskStatus` from `@/types/task.types`
-  - [ ] Add `statusTriggerRef = useRef<HTMLButtonElement | null>(null)` (for focus management)
-  - [ ] Update the existing focus `useEffect` (line ~53): when `isOpen && mode === 'edit'` and `window.innerWidth < 768`, focus `statusTriggerRef.current` instead of `titleInputRef.current`
-  - [ ] Add `handleStatusChange(newStatus: TaskStatus)` async function — see Dev Notes for implementation
-  - [ ] Render Status Select as the **first field inside the form** in edit mode (`mode === 'edit' && task`) — ABOVE the Title field
-  - [ ] Select `value={task.status}`, `onValueChange={(v) => handleStatusChange(v as TaskStatus)}`
-  - [ ] Attach `ref={statusTriggerRef}` to `<SelectTrigger>` (the trigger is a `<button>` element)
-  - [ ] Status options: `<SelectItem value="todo">Todo</SelectItem>`, `in-progress` → "In Progress", `done` → "Done"
+- [x] Task 1: Add Status Select field to `TaskModal.tsx` (AC: #1, #2, #5, #6)
+  - [x] Import `TaskStatus` from `@/types/task.types`
+  - [x] Add `statusTriggerRef = useRef<HTMLButtonElement | null>(null)` (for focus management)
+  - [x] Update the existing focus `useEffect` (line ~53): when `isOpen && mode === 'edit'` and `window.innerWidth < 768`, focus `statusTriggerRef.current` instead of `titleInputRef.current`
+  - [x] Add `handleStatusChange(newStatus: TaskStatus)` async function — see Dev Notes for implementation
+  - [x] Render Status Select as the **first field inside the form** in edit mode (`mode === 'edit' && task`) — ABOVE the Title field
+  - [x] Select `value={task.status}`, `onValueChange={(v) => handleStatusChange(v as TaskStatus)}`
+  - [x] Attach `ref={statusTriggerRef}` to `<SelectTrigger>` (the trigger is a `<button>` element)
+  - [x] Status options: `<SelectItem value="todo">Todo</SelectItem>`, `in-progress` → "In Progress", `done` → "Done"
 
-- [ ] Task 2: Update sprint-status.yaml
-  - [ ] Set `3-2-mobile-status-dropdown-for-task-movement` to `ready-for-dev` (already done by this file creation)
+- [x] Task 2: Update sprint-status.yaml
+  - [x] Set `3-2-mobile-status-dropdown-for-task-movement` to `ready-for-dev` (already done by this file creation)
 
-- [ ] Task 3: Write tests (AC: all)
-  - [ ] `TaskModal.test.tsx`: Status Select renders in edit mode; selecting a different status calls `boardAPI.moveTask` and closes modal; selecting same status does nothing; toast shown on `moveTask` rejection
-  - [ ] Test focus: on mobile viewport (`window.innerWidth < 768`), status trigger receives focus on open in edit mode
+- [x] Task 3: Write tests (AC: all)
+  - [x] `TaskModal.test.tsx`: Status Select renders in edit mode; selecting a different status calls `boardAPI.moveTask` and closes modal; selecting same status does nothing; toast shown on `moveTask` rejection
+  - [x] Test focus: on mobile viewport (`window.innerWidth < 768`), status trigger receives focus on open in edit mode
 
 ---
 
@@ -194,10 +194,32 @@ src/features/tasks/components/TaskModal.test.tsx  ← extend tests
 
 ### Agent Model Used
 
-_to be filled by dev agent_
+claude-sonnet-4-6
 
 ### Debug Log References
 
+None — single-file change following Dev Notes exactly.
+
 ### Completion Notes List
 
+- Added `statusTriggerRef` and updated focus useEffect to target the status trigger on mobile (< 768px) in edit mode, adding `mode` to the dependency array.
+- Added `handleStatusChange` async function: no-op on same status, calls `onClose()` optimistically before `boardAPI.moveTask`, shows error toast on rejection.
+- Rendered Status Select as first form field in edit mode only, wired with `ref={statusTriggerRef}` on SelectTrigger.
+- All 100 tests pass; `tsc --noEmit` reports zero errors.
+
 ### File List
+
+src/features/tasks/components/TaskModal.tsx
+src/features/tasks/components/TaskModal.test.tsx
+_bmad-output/implementation-artifacts/sprint-status.yaml
+
+### Change Log
+
+- 2026-04-24: Story 3.2 implemented — mobile status dropdown added to TaskModal; focus management updated for mobile edit mode; 6 new tests added (100 total passing).
+
+### Review Findings
+
+- [x] [Review][Defer] Status Select rendered on all viewports, not just mobile — accepted as intentional; desktop users can use either drag-and-drop or Status Select [src/features/tasks/components/TaskModal.tsx:186-203] — deferred, accepted by reviewer
+- [ ] [Review][Patch] Concurrent moves corrupt task status (shared issue with 3.1): a second `moveTask` call while the first is in-flight captures the optimistic snapshot as its rollback target; rollback ordering can leave the card at the wrong status [src/store/BoardAPIContext.tsx:28-37]
+- [x] [Review][Defer] No unmount guard in `handleStatusChange`: `dispatch`/`toast` fire after modal/board unmount during the 2s delay [src/features/tasks/components/TaskModal.tsx:154-158] — deferred, pre-existing pattern
+- [x] [Review][Defer] `window.innerWidth < 768` focus check is sampled once on open and not reactive to orientation change or DevTools resize while modal is open [src/features/tasks/components/TaskModal.tsx:57] — deferred, minor UX edge case

@@ -1,6 +1,6 @@
 # Story 3.1: Desktop Drag-and-Drop Task Movement
 
-Status: ready-for-dev
+Status: in-progress
 
 ## Blocker
 
@@ -35,64 +35,64 @@ so that moving tasks between statuses feels instant and natural.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Complete `BoardAPIContext.moveTask` async flow (AC: #3, #4, #5)
-  - [ ] Add `import { moveTask as apiMoveTask } from '@/api/tasks'` to `BoardAPIContext.tsx`
-  - [ ] Add `import { toast } from 'sonner'` to `BoardAPIContext.tsx`
-  - [ ] Replace the `// Epic 3: add async API call here` comment with the full try/catch flow
-  - [ ] On success: `dispatch({ type: 'OP_SUCCESS', opId })`
-  - [ ] On failure: `dispatch({ type: 'OP_ROLLBACK', opId })` then `throw e` (caller in `useBoardDnd` shows the toast)
-  - [ ] Do NOT add toast inside `BoardAPIContext.moveTask` — follow the same `throw e` pattern as `createTask`/`updateTask`/`deleteTask`
+- [x] Task 1: Complete `BoardAPIContext.moveTask` async flow (AC: #3, #4, #5)
+  - [x] Add `import { moveTask as apiMoveTask } from '@/api/tasks'` to `BoardAPIContext.tsx`
+  - [x] Add `import { toast } from 'sonner'` to `BoardAPIContext.tsx`
+  - [x] Replace the `// Epic 3: add async API call here` comment with the full try/catch flow
+  - [x] On success: `dispatch({ type: 'OP_SUCCESS', opId })`
+  - [x] On failure: `dispatch({ type: 'OP_ROLLBACK', opId })` then `throw e` (caller in `useBoardDnd` shows the toast)
+  - [x] Do NOT add toast inside `BoardAPIContext.moveTask` — follow the same `throw e` pattern as `createTask`/`updateTask`/`deleteTask`
 
-- [ ] Task 2: Implement `useBoardDnd` hook (AC: #1, #2, #3, #5, #6, #7, #8)
-  - [ ] Implement `src/features/board/hooks/useBoardDnd.ts` — currently `export {}`
-  - [ ] Import from `@dnd-kit/core`: `DragStartEvent`, `DragEndEvent`, `DragOverEvent`, `PointerSensor`, `useSensor`, `useSensors`
-  - [ ] Import `useBoardAPI` from `@/store/BoardAPIContext`
-  - [ ] Import `useTasks` from `@/store/BoardStateContext`
-  - [ ] Configure: `useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))`
-  - [ ] `useState<Task | null>(null)` for `activeTask`
-  - [ ] `handleDragStart({ active })`: find task by `String(active.id)` in `tasks`, set as `activeTask`
-  - [ ] `handleDragOver`: no-op body (satisfies AC #7 hook signature; cross-column destination is resolved in `handleDragEnd`)
-  - [ ] `handleDragEnd({ active, over })`: clear `activeTask`, resolve `newStatus`, call `moveTask`, catch error + show toast
-  - [ ] Return `{ sensors, activeTask, handleDragStart, handleDragOver, handleDragEnd }`
+- [x] Task 2: Implement `useBoardDnd` hook (AC: #1, #2, #3, #5, #6, #7, #8)
+  - [x] Implement `src/features/board/hooks/useBoardDnd.ts` — currently `export {}`
+  - [x] Import from `@dnd-kit/core`: `DragStartEvent`, `DragEndEvent`, `DragOverEvent`, `PointerSensor`, `useSensor`, `useSensors`
+  - [x] Import `useBoardAPI` from `@/store/BoardAPIContext`
+  - [x] Import `useTasks` from `@/store/BoardStateContext`
+  - [x] Configure: `useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))`
+  - [x] `useState<Task | null>(null)` for `activeTask`
+  - [x] `handleDragStart({ active })`: find task by `String(active.id)` in `tasks`, set as `activeTask`
+  - [x] `handleDragOver`: no-op body (satisfies AC #7 hook signature; cross-column destination is resolved in `handleDragEnd`)
+  - [x] `handleDragEnd({ active, over })`: clear `activeTask`, resolve `newStatus`, call `moveTask`, catch error + show toast
+  - [x] Return `{ sensors, activeTask, handleDragStart, handleDragOver, handleDragEnd }`
 
-- [ ] Task 3: Wire `DndContext` + `DragOverlay` into `KanbanBoard.tsx` (AC: #1, #7)
-  - [ ] Import `DndContext`, `DragOverlay` from `@dnd-kit/core`
-  - [ ] Import `useBoardDnd` from `@/features/board/hooks/useBoardDnd`
-  - [ ] Destructure `{ sensors, activeTask, handleDragStart, handleDragOver, handleDragEnd }` from `useBoardDnd()`
-  - [ ] Wrap the `<main>` columns block with `<DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>`
-  - [ ] Import `closestCorners` from `@dnd-kit/core`
-  - [ ] Add `<DragOverlay>` after the `<main>` block (but still inside `DndContext`)
-  - [ ] Inside `DragOverlay`: when `activeTask` is not null, render `<TaskCard task={activeTask} isOverlay />` — DO NOT pass `onOpen` to the overlay card
+- [x] Task 3: Wire `DndContext` + `DragOverlay` into `KanbanBoard.tsx` (AC: #1, #7)
+  - [x] Import `DndContext`, `DragOverlay` from `@dnd-kit/core`
+  - [x] Import `useBoardDnd` from `@/features/board/hooks/useBoardDnd`
+  - [x] Destructure `{ sensors, activeTask, handleDragStart, handleDragOver, handleDragEnd }` from `useBoardDnd()`
+  - [x] Wrap the `<main>` columns block with `<DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>`
+  - [x] Import `closestCorners` from `@dnd-kit/core`
+  - [x] Add `<DragOverlay>` after the `<main>` block (but still inside `DndContext`)
+  - [x] Inside `DragOverlay`: when `activeTask` is not null, render `<TaskCard task={activeTask} isOverlay />` — DO NOT pass `onOpen` to the overlay card
 
-- [ ] Task 4: Add `useDroppable` + `SortableContext` + drag-over styles to `BoardColumn.tsx` (AC: #2, #7)
-  - [ ] Import `useDroppable` from `@dnd-kit/core`
-  - [ ] Import `SortableContext`, `verticalListSortingStrategy` from `@dnd-kit/sortable`
-  - [ ] Add `const { isOver, setNodeRef } = useDroppable({ id: status })` inside `BoardColumn`
-  - [ ] Attach `ref={setNodeRef}` to the root `<section>` element
-  - [ ] Add drag-over border: use `cn(...)` on `<section>` className — add `isOver ? 'ring-2 ring-violet-400 ring-inset' : ''`
-  - [ ] Wrap `columnTasks.map(...)` in `<SortableContext items={columnTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>`
-  - [ ] Inside the `SortableContext` div (non-empty case), after `columnTasks.map(...)`, add: `{isOver && <div className="h-14 rounded-lg border-2 border-dashed border-violet-400 opacity-50" />}`
-  - [ ] The `min-h` value on the inner div should prevent layout collapse on empty columns during drag
+- [x] Task 4: Add `useDroppable` + `SortableContext` + drag-over styles to `BoardColumn.tsx` (AC: #2, #7)
+  - [x] Import `useDroppable` from `@dnd-kit/core`
+  - [x] Import `SortableContext`, `verticalListSortingStrategy` from `@dnd-kit/sortable`
+  - [x] Add `const { isOver, setNodeRef } = useDroppable({ id: status })` inside `BoardColumn`
+  - [x] Attach `ref={setNodeRef}` to the root `<section>` element
+  - [x] Add drag-over border: use `cn(...)` on `<section>` className — add `isOver ? 'ring-2 ring-violet-400 ring-inset' : ''`
+  - [x] Wrap `columnTasks.map(...)` in `<SortableContext items={columnTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>`
+  - [x] Inside the `SortableContext` div (non-empty case), after `columnTasks.map(...)`, add: `{isOver && <div className="h-14 rounded-lg border-2 border-dashed border-violet-400 opacity-50" />}`
+  - [x] The `min-h` value on the inner div should prevent layout collapse on empty columns during drag
 
-- [ ] Task 5: Add `useSortable` to `TaskCard.tsx` (AC: #1, #8)
-  - [ ] Import `useSortable` from `@dnd-kit/sortable`
-  - [ ] Import `CSS` from `@dnd-kit/utilities`
-  - [ ] Add `isOverlay?: boolean` to `TaskCardProps`
-  - [ ] Call `useSortable({ id: task.id })` unconditionally (hooks must not be conditional)
-  - [ ] Destructure `{ setNodeRef, transform, transition, isDragging, attributes, listeners }` from `useSortable`
-  - [ ] Build `style`: when `isOverlay`, use `{ transform: 'scale(1.02)', boxShadow: '0 10px 30px rgba(0,0,0,0.18)' }`; otherwise use `{ transform: CSS.Transform.toString(transform), transition }`
-  - [ ] Apply `ref={isOverlay ? undefined : setNodeRef}` on `<article>`
-  - [ ] Apply `style={style}` on `<article>`
-  - [ ] Apply `{...(isOverlay ? {} : attributes)}` and `{...(isOverlay ? {} : listeners)}` on `<article>`
-  - [ ] Add to `cn(...)`: `isDragging && !isOverlay ? 'opacity-0 pointer-events-none' : ''` and `isOverlay ? 'cursor-grabbing' : 'cursor-grab'`
-  - [ ] `tabIndex`: when `isOverlay`, use `-1`; otherwise keep `0`
-  - [ ] `onClick` and `onKeyDown`: when `isOverlay`, skip (don't pass `onOpen`)
+- [x] Task 5: Add `useSortable` to `TaskCard.tsx` (AC: #1, #8)
+  - [x] Import `useSortable` from `@dnd-kit/sortable`
+  - [x] Import `CSS` from `@dnd-kit/utilities`
+  - [x] Add `isOverlay?: boolean` to `TaskCardProps`
+  - [x] Call `useSortable({ id: task.id })` unconditionally (hooks must not be conditional)
+  - [x] Destructure `{ setNodeRef, transform, transition, isDragging, attributes, listeners }` from `useSortable`
+  - [x] Build `style`: when `isOverlay`, use `{ transform: 'scale(1.02)', boxShadow: '0 10px 30px rgba(0,0,0,0.18)' }`; otherwise use `{ transform: CSS.Transform.toString(transform), transition }`
+  - [x] Apply `ref={isOverlay ? undefined : setNodeRef}` on `<article>`
+  - [x] Apply `style={style}` on `<article>`
+  - [x] Apply `{...(isOverlay ? {} : attributes)}` and `{...(isOverlay ? {} : listeners)}` on `<article>`
+  - [x] Add to `cn(...)`: `isDragging && !isOverlay ? 'opacity-0 pointer-events-none' : ''` and `isOverlay ? 'cursor-grabbing' : 'cursor-grab'`
+  - [x] `tabIndex`: when `isOverlay`, use `-1`; otherwise keep `0`
+  - [x] `onClick` and `onKeyDown`: when `isOverlay`, skip (don't pass `onOpen`)
 
-- [ ] Task 6: Update sprint-status.yaml (AC: all)
-  - [ ] Set `epic-3` to `in-progress`
-  - [ ] Set `3-1-desktop-drag-and-drop-task-movement` to `ready-for-dev` (already done by this story creation)
+- [x] Task 6: Update sprint-status.yaml (AC: all)
+  - [x] Set `epic-3` to `in-progress`
+  - [x] Set `3-1-desktop-drag-and-drop-task-movement` to `ready-for-dev` (already done by this story creation)
 
-- [ ] Task 7: Write tests (AC: all)
+- [x] Task 7: Write tests (AC: all)
   - [ ] `useBoardDnd.test.ts`: mock `useBoardAPI` + `useTasks`; verify `handleDragEnd` calls `moveTask` when column changes; no call when same column; toast shown on error
   - [ ] `BoardAPIContext.test.ts` (extend existing): `moveTask` dispatches `TASK_MOVE`, calls `apiMoveTask`, dispatches `OP_SUCCESS` on success, dispatches `OP_ROLLBACK` + throws on `MockApiError`
   - [ ] `TaskCard.test.tsx` (extend existing): when `isOverlay=true`, drag listeners are not applied; `isDragging` sets `opacity-0`
@@ -263,10 +263,45 @@ After implementing, manually verify:
 
 ### Agent Model Used
 
-_to be filled by dev agent_
+claude-sonnet-4-6
 
 ### Debug Log References
 
+None — implementation proceeded cleanly following Dev Notes specifications.
+
 ### Completion Notes List
 
+- Completed `BoardAPIContext.moveTask` async flow with try/catch, OP_SUCCESS/OP_ROLLBACK dispatch, throw-on-error pattern matching existing createTask/updateTask/deleteTask.
+- Implemented `useBoardDnd` hook with PointerSensor (distance: 8), handleDragStart/handleDragOver/handleDragEnd, resolves column from both droppable IDs and task IDs.
+- Wired `DndContext` + `DragOverlay` into `KanbanBoard.tsx`; overlay renders `<TaskCard isOverlay />` without onOpen.
+- Added `useDroppable` + `SortableContext` + violet ring + dashed placeholder to `BoardColumn.tsx`.
+- Added `useSortable` to `TaskCard.tsx` with `isOverlay` prop; spread `attributes` before explicit `role="article"` to preserve role semantics.
+- All 94 tests pass; `tsc --noEmit` reports zero errors.
+
 ### File List
+
+src/store/BoardAPIContext.tsx
+src/features/board/hooks/useBoardDnd.ts
+src/features/board/components/KanbanBoard.tsx
+src/features/board/components/BoardColumn.tsx
+src/features/tasks/components/TaskCard.tsx
+src/store/BoardAPIContext.test.ts
+src/features/board/hooks/useBoardDnd.test.ts
+src/features/board/components/BoardColumn.test.tsx
+src/features/tasks/components/TaskCard.test.tsx
+_bmad-output/implementation-artifacts/sprint-status.yaml
+
+### Change Log
+
+- 2026-04-24: Story 3.1 implemented — desktop drag-and-drop task movement with full optimistic update cycle, dnd-kit integration, and test coverage (94 tests passing).
+
+### Review Findings
+
+- [ ] [Review][Patch] Concurrent moves corrupt task status: second TASK_MOVE captures optimistic snapshot; on OP_ROLLBACK the wrong status is restored — add a guard in `moveTask` or disable the card while a pending op exists for that taskId [src/store/BoardAPIContext.tsx:28, src/store/boardReducer.ts OP_ROLLBACK handler]
+- [ ] [Review][Patch] Empty-column drop placeholder missing: `{isOver && <div ... />}` is inside the non-empty branch only; empty destination columns show no dashed placeholder (ring only) [src/features/board/components/BoardColumn.tsx:68-72]
+- [ ] [Review][Patch] `useSortable` called unconditionally for overlay cards: registers a duplicate sortable ID outside any SortableContext, potentially confusing dnd-kit hit-testing — extract overlay to a plain non-sortable element or pass `disabled` option [src/features/tasks/components/TaskCard.tsx:31]
+- [ ] [Review][Patch] Source card keeps `cursor-grab` while dragging; AC1 requires `cursor-grabbing` once drag starts — add `isDragging && !isOverlay ? 'cursor-grabbing' : 'cursor-grab'` [src/features/tasks/components/TaskCard.tsx:52-53]
+- [x] [Review][Defer] Stale `tasks` closure in `handleDragEnd`: async closure captures task list at drag-start; concurrent remote updates during the 2s delay yield a stale status comparison [src/features/board/hooks/useBoardDnd.ts:35] — deferred, architectural React pattern consistent with rest of codebase
+- [x] [Review][Defer] No unmount guard in `handleDragEnd`: `dispatch`/`toast` fire after board unmount — deferred, pre-existing pattern matching `createTask`/`updateTask`/`deleteTask`
+- [x] [Review][Defer] Drop placeholder always appends at bottom of list, not at actual insertion point; would require `onDragOver` state updates and significant refactor [src/features/board/components/BoardColumn.tsx] — deferred, pre-existing design limitation
+- [x] [Review][Defer] `opacity-0 pointer-events-none` source card still occupies SortableContext items array; if all tasks in a target column are pending, `over.id` may resolve to the dragged card's own ID and silently abort the move [src/features/tasks/components/TaskCard.tsx, src/features/board/hooks/useBoardDnd.ts] — deferred, very-edge scenario

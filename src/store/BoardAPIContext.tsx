@@ -6,6 +6,7 @@ import {
   createTask as apiCreateTask,
   updateTask as apiUpdateTask,
   deleteTask as apiDeleteTask,
+  moveTask as apiMoveTask,
 } from '@/api/tasks'
 
 export type BoardAPIContextType = {
@@ -27,7 +28,13 @@ export function BoardAPIProvider({ dispatch, children }: BoardAPIProviderProps) 
     moveTask: async (taskId: string, newStatus: TaskStatus) => {
       const opId = nanoid()
       dispatch({ type: 'TASK_MOVE', taskId, newStatus, opId })
-      // Epic 3: add async API call here
+      try {
+        await apiMoveTask(taskId, newStatus)
+        dispatch({ type: 'OP_SUCCESS', opId })
+      } catch (e) {
+        dispatch({ type: 'OP_ROLLBACK', opId })
+        throw e
+      }
     },
 
     createTask: async (task: Omit<Task, 'id' | 'createdAt'>) => {

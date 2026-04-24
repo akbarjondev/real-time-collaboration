@@ -1,9 +1,12 @@
 import { LayoutGrid, Plus } from "lucide-react";
+import { DndContext, DragOverlay, closestCorners } from "@dnd-kit/core";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { BoardColumn } from "@/features/board/components/BoardColumn";
+import { TaskCard } from "@/features/tasks/components/TaskCard";
 import { TaskModal } from "@/features/tasks/components/TaskModal";
 import { useTaskModal } from "@/features/tasks/hooks/useTaskModal";
+import { useBoardDnd } from "@/features/board/hooks/useBoardDnd";
 import type { TaskStatus } from "@/types/task.types";
 import type { Task } from "@/types/task.types";
 
@@ -15,6 +18,7 @@ const COLUMNS: { status: TaskStatus; title: string }[] = [
 
 export function KanbanBoard() {
   const { isOpen, mode, editingTask, prefillValues, openCreate, openEdit, close } = useTaskModal()
+  const { sensors, activeTask, handleDragStart, handleDragOver, handleDragEnd } = useBoardDnd()
 
   function handleOpenEdit(task: Task) {
     openEdit(task)
@@ -46,20 +50,32 @@ export function KanbanBoard() {
         </TooltipProvider>
       </header>
 
-      {/* FilterBar — Story 3.2 */}
-      {/* UndoHintBar — Epic 4 */}
+      {/* FilterBar — Story 4.2 */}
+      {/* UndoHintBar — Epic 7 */}
 
-      <main className="flex gap-4 p-4 overflow-x-auto items-start">
-        {COLUMNS.map((col) => (
-          <BoardColumn
-            key={col.status}
-            status={col.status}
-            title={col.title}
-            onOpenCreate={openCreate}
-            onOpenEdit={handleOpenEdit}
-          />
-        ))}
-      </main>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <main className="flex gap-4 p-4 overflow-x-auto items-start">
+          {COLUMNS.map((col) => (
+            <BoardColumn
+              key={col.status}
+              status={col.status}
+              title={col.title}
+              onOpenCreate={openCreate}
+              onOpenEdit={handleOpenEdit}
+            />
+          ))}
+        </main>
+
+        <DragOverlay>
+          {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
+        </DragOverlay>
+      </DndContext>
 
       <TaskModal
         isOpen={isOpen}

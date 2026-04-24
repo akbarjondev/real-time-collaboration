@@ -6,7 +6,8 @@
       "Bash(npx tsc *)",
       "Bash(npx shadcn@latest add dialog badge select tooltip --overwrite)",
       "Bash(python *)",
-      "Bash(npx vitest *)"
+      "Bash(npx vitest *)",
+      "Bash(python3 *)"
     ]
   }
 }

@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { Task } from '@/types/task.types'
+import type { Task, TaskStatus } from '@/types/task.types'
 import type { CreateTaskForm } from '@/features/tasks/hooks/useTaskModal'
 
 const DEFAULT_VALUES: CreateTaskForm = {
@@ -49,13 +49,20 @@ export function TaskModal({
   const boardAPI = useBoardAPI()
   const [showGuard, setShowGuard] = useState(false)
   const titleInputRef = useRef<HTMLInputElement | null>(null)
+  const statusTriggerRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
     if (isOpen) {
-      const id = setTimeout(() => titleInputRef.current?.focus(), 0)
+      const id = setTimeout(() => {
+        if (mode === 'edit' && window.innerWidth < 768) {
+          statusTriggerRef.current?.focus()
+        } else {
+          titleInputRef.current?.focus()
+        }
+      }, 0)
       return () => clearTimeout(id)
     }
-  }, [isOpen])
+  }, [isOpen, mode])
 
   const {
     register,
@@ -138,6 +145,19 @@ export function TaskModal({
     }
   })
 
+  async function handleStatusChange(newStatus: TaskStatus) {
+    if (!task || newStatus === task.status) return
+
+    const taskTitle = task.title
+    onClose()
+
+    try {
+      await boardAPI.moveTask(task.id, newStatus)
+    } catch {
+      toast.error(`Move failed — "${taskTitle}" has been reverted`)
+    }
+  }
+
   async function handleDelete() {
     if (!task) return
     const taskTitle = task.title
@@ -162,6 +182,26 @@ export function TaskModal({
 
           <form id="task-form" onSubmit={onSubmit} noValidate>
             <div className="flex flex-col gap-4">
+              {/* Status — edit mode only, focused on mobile */}
+              {mode === 'edit' && task && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-zinc-700">Status</label>
+                  <Select
+                    value={task.status}
+                    onValueChange={(v) => handleStatusChange(v as TaskStatus)}
+                  >
+                    <SelectTrigger ref={statusTriggerRef} className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todo">Todo</SelectItem>
+                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="done">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               {/* Title */}
               <div className="flex flex-col gap-1">
                 <label htmlFor="task-title" className="text-sm font-medium text-zinc-700">

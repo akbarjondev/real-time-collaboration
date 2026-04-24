@@ -1,9 +1,25 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { useSortable } from '@dnd-kit/sortable'
 import { TaskCard } from '@/features/tasks/components/TaskCard'
 import { PendingOpsContext } from '@/store/PendingOpsContext'
 import type { Task } from '@/types/task.types'
 import type { PendingOperation } from '@/types/common.types'
+
+vi.mock('@dnd-kit/sortable', () => ({
+  useSortable: vi.fn().mockReturnValue({
+    setNodeRef: vi.fn(),
+    transform: null,
+    transition: null,
+    isDragging: false,
+    attributes: {},
+    listeners: {},
+  }),
+}))
+
+vi.mock('@dnd-kit/utilities', () => ({
+  CSS: { Transform: { toString: vi.fn().mockReturnValue(null) } },
+}))
 
 const baseTask: Task = {
   id: 'task-1',
@@ -16,10 +32,15 @@ const baseTask: Task = {
   createdAt: '2026-01-15T10:00:00.000Z',
 }
 
-function renderCard(task: Task, pendingOps = new Map<string, PendingOperation>(), onOpen?: (t: Task) => void) {
+function renderCard(
+  task: Task,
+  pendingOps = new Map<string, PendingOperation>(),
+  onOpen?: (t: Task) => void,
+  extra: { isOverlay?: boolean } = {}
+) {
   return render(
     <PendingOpsContext.Provider value={pendingOps}>
-      <TaskCard task={task} onOpen={onOpen} />
+      <TaskCard task={task} onOpen={onOpen} isOverlay={extra.isOverlay} />
     </PendingOpsContext.Provider>
   )
 }
@@ -229,5 +250,78 @@ describe('TaskCard — beforeEach cleanup', () => {
   it('renders high priority badge correctly', () => {
     renderCard({ ...baseTask, priority: 'high' })
     expect(screen.getByText('High')).toBeInTheDocument()
+  })
+})
+
+describe('TaskCard — drag and drop', () => {
+  beforeEach(() => {
+    vi.mocked(useSortable).mockReturnValue({
+      setNodeRef: vi.fn(),
+      transform: null,
+      transition: null,
+      isDragging: false,
+      attributes: {},
+      listeners: {},
+    })
+  })
+
+  it('uses tabIndex=-1 when isOverlay=true', () => {
+    renderCard(baseTask, new Map(), undefined, { isOverlay: true })
+    const article = screen.getByRole('article')
+    expect(article).toHaveAttribute('tabIndex', '-1')
+  })
+
+  it('uses tabIndex=0 when isOverlay=false', () => {
+    renderCard(baseTask)
+    const article = screen.getByRole('article')
+    expect(article).toHaveAttribute('tabIndex', '0')
+  })
+
+  it('applies opacity-0 class when isDragging=true and not overlay', () => {
+    vi.mocked(useSortable).mockReturnValue({
+      setNodeRef: vi.fn(),
+      transform: null,
+      transition: null,
+      isDragging: true,
+      attributes: {},
+      listeners: {},
+    })
+    renderCard(baseTask)
+    const article = screen.getByRole('article')
+    expect(article.className).toContain('opacity-0')
+    expect(article.className).toContain('pointer-events-none')
+  })
+
+  it('does NOT apply opacity-0 when isOverlay=true even if isDragging', () => {
+    vi.mocked(useSortable).mockReturnValue({
+      setNodeRef: vi.fn(),
+      transform: null,
+      transition: null,
+      isDragging: true,
+      attributes: {},
+      listeners: {},
+    })
+    renderCard(baseTask, new Map(), undefined, { isOverlay: true })
+    const article = screen.getByRole('article')
+    expect(article.className).not.toContain('opacity-0')
+  })
+
+  it('does not call onOpen when isOverlay=true and clicked', () => {
+    const onOpen = vi.fn()
+    renderCard(baseTask, new Map(), onOpen, { isOverlay: true })
+    fireEvent.click(screen.getByRole('article'))
+    expect(onOpen).not.toHaveBeenCalled()
+  })
+
+  it('applies cursor-grabbing class when isOverlay=true', () => {
+    renderCard(baseTask, new Map(), undefined, { isOverlay: true })
+    const article = screen.getByRole('article')
+    expect(article.className).toContain('cursor-grabbing')
+  })
+
+  it('applies cursor-grab class when not overlay', () => {
+    renderCard(baseTask)
+    const article = screen.getByRole('article')
+    expect(article.className).toContain('cursor-grab')
   })
 })
