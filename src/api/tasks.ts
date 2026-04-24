@@ -16,7 +16,7 @@ export async function updateTask(id: string, changes: Partial<Task>): Promise<Ta
   return mockRequest<Task>(() => ({ id, ...changes } as Task))
 }
 
-export async function deleteTask(_taskId: string): Promise<void> {
+export async function deleteTask(_: string): Promise<void> {
   return mockRequest<void>(() => undefined)
 }
 

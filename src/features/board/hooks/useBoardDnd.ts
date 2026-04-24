@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   type DragStartEvent,
   type DragEndEvent,
-  type DragOverEvent,
   PointerSensor,
   useSensor,
   useSensors,
@@ -28,7 +27,7 @@ export function useBoardDnd() {
     if (found) setActiveTask(found)
   }
 
-  function handleDragOver(_event: DragOverEvent) {
+  function handleDragOver() {
     // no-op: cross-column destination is resolved in handleDragEnd
   }
 

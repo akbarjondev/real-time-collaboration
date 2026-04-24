@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-24
-last_updated: 2026-04-24  # epic-3 in-progress, 3-1 in-progress (review findings), 3-2 in-progress (review findings)
+last_updated: 2026-04-24  # epics 1+2 done; epic-3 in-progress, 3-1 in-progress (review findings), 3-2 in-progress (review findings)
 project: real-time-collaboration
 project_key: NOKEY
 tracking_system: file-system
@@ -43,19 +43,19 @@ story_location: _bmad-output/implementation-artifacts
 
 development_status:
   # Epic 1: Project Foundation & Runnable Board Shell
-  epic-1: in-progress
+  epic-1: done
   1-1-initialize-project-with-dependencies-and-configuration: done
-  1-2-implement-core-state-architecture: review
-  1-3-implement-mock-api-layer-shared-utilities-and-seed-data: review
-  1-4-build-kanban-board-shell-with-three-columns: review
+  1-2-implement-core-state-architecture: done
+  1-3-implement-mock-api-layer-shared-utilities-and-seed-data: done
+  1-4-build-kanban-board-shell-with-three-columns: done
   epic-1-retrospective: optional
 
   # Epic 2: Task CRUD & Full Task Display
-  epic-2: in-progress
-  2-1-display-full-task-card-with-all-visual-states: review
-  2-2-create-new-task-via-modal: review
-  2-3-edit-existing-task-via-modal: review
-  2-4-delete-task: review
+  epic-2: done
+  2-1-display-full-task-card-with-all-visual-states: done
+  2-2-create-new-task-via-modal: done
+  2-3-edit-existing-task-via-modal: done
+  2-4-delete-task: done
   epic-2-retrospective: optional
 
   # Epic 3: Task Movement — Drag-and-Drop & Status Changes
