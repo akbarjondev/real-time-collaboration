@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-24
-last_updated: 2026-04-24  # updated by create-story for 1-1
+last_updated: 2026-04-24  # updated by create-story for all Epic 2 stories
 project: real-time-collaboration
 project_key: NOKEY
 tracking_system: file-system
@@ -51,11 +51,11 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: Task CRUD & Full Task Display
-  epic-2: backlog
-  2-1-display-full-task-card-with-all-visual-states: backlog
-  2-2-create-new-task-via-modal: backlog
-  2-3-edit-existing-task-via-modal: backlog
-  2-4-delete-task: backlog
+  epic-2: in-progress
+  2-1-display-full-task-card-with-all-visual-states: ready-for-dev
+  2-2-create-new-task-via-modal: ready-for-dev
+  2-3-edit-existing-task-via-modal: ready-for-dev
+  2-4-delete-task: ready-for-dev
   epic-2-retrospective: optional
 
   # Epic 3: Task Movement — Drag-and-Drop & Status Changes
