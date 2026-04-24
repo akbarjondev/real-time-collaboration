@@ -128,3 +128,11 @@
     @apply font-sans;
     }
 }
+
+@keyframes cardPulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgb(124 58 237 / 0.3); }
+  50%       { box-shadow: 0 0 0 4px rgb(124 58 237 / 0.6); }
+}
+.card-pulse {
+  animation: cardPulse 1.8s ease-in-out infinite;
+}

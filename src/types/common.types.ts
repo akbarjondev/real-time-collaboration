@@ -12,6 +12,7 @@ export type PendingOperation = {
   opId: string
   taskId: string
   snapshot: Task
+  opType: 'create' | 'update' | 'move' | 'delete'
 }
 
 export type ConflictState = {

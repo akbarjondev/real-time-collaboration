@@ -1,13 +1,15 @@
 import { memo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { usePendingOps } from '@/store/PendingOpsContext'
+import { cn } from '@/lib/utils'
 import type { Task, Priority } from '@/types/task.types'
 
 type TaskCardProps = {
   task: Task
+  onOpen?: (task: Task) => void
 }
 
-const PRIORITY_BADGE: Record<Priority, { dot: string; badge: string; label: string }> = {
+const PRIORITY_CONFIG: Record<Priority, { dot: string; badge: string; label: string }> = {
   high:   { dot: 'bg-rose-500',  badge: 'bg-rose-100 text-rose-700 border-rose-200',    label: 'High' },
   medium: { dot: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 border-amber-200', label: 'Medium' },
   low:    { dot: 'bg-sky-500',   badge: 'bg-sky-100 text-sky-700 border-sky-200',       label: 'Low' },
@@ -17,23 +19,35 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export const TaskCard = memo(function TaskCard({ task }: TaskCardProps) {
+export const TaskCard = memo(function TaskCard({ task, onOpen }: TaskCardProps) {
   const pendingOps = usePendingOps()
-  const isInFlight = [...pendingOps.values()].some(op => op.taskId === task.id)
-  const priority = PRIORITY_BADGE[task.priority]
+  const isPending = [...pendingOps.values()].some(op => op.taskId === task.id)
+  const priority = PRIORITY_CONFIG[task.priority]
+  const isDone = task.status === 'done'
 
   return (
     <article
       role="article"
-      aria-label={`${task.title}, priority ${priority.label}${task.assignee ? `, assigned to ${task.assignee}` : ''}`}
-      className={[
-        'bg-white border rounded-lg p-4 cursor-pointer',
-        'hover:border-zinc-300 hover:shadow-sm transition-all',
-        'focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none',
-        isInFlight ? 'border-violet-600 ring-2 ring-violet-600' : 'border-zinc-200',
-      ].join(' ')}
+      aria-label={`${task.title}, ${task.priority} priority, assigned to ${task.assignee ?? 'Unassigned'}`}
+      aria-busy={isPending}
       tabIndex={0}
+      className={cn(
+        'relative rounded-lg border bg-white p-4 cursor-pointer transition-shadow',
+        'hover:border-zinc-300 hover:shadow-md',
+        'focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none',
+        isPending ? 'border-violet-600 card-pulse' : 'border-zinc-200',
+        isDone && 'opacity-[0.65]',
+      )}
+      onClick={() => onOpen?.(task)}
+      onKeyDown={(e) => { if (e.key === 'Enter') onOpen?.(task) }}
     >
+      {isPending && (
+        <div
+          className="absolute top-2 right-2 h-3 w-3 animate-spin rounded-full border-2 border-violet-600 border-t-transparent"
+          aria-hidden="true"
+        />
+      )}
+
       <div className="mb-2">
         <Badge
           className={`${priority.badge} border text-xs font-medium px-2 py-0.5`}
@@ -47,7 +61,9 @@ export const TaskCard = memo(function TaskCard({ task }: TaskCardProps) {
         </Badge>
       </div>
 
-      <p className="text-sm font-medium text-zinc-900 leading-snug">{task.title}</p>
+      <p className={cn('text-sm font-medium text-zinc-900 leading-snug', isDone && 'line-through')}>
+        {task.title}
+      </p>
 
       <div className="flex items-center justify-between mt-3">
         <span className="text-xs text-zinc-500 truncate max-w-[60%]">

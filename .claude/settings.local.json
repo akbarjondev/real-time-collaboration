@@ -4,7 +4,9 @@
       "Bash(npm install *)",
       "Bash(npm run *)",
       "Bash(npx tsc *)",
-      "Bash(npx shadcn@latest add dialog badge select tooltip --overwrite)"
+      "Bash(npx shadcn@latest add dialog badge select tooltip --overwrite)",
+      "Bash(python *)",
+      "Bash(npx vitest *)"
     ]
   }
 }

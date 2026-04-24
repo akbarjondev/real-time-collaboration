@@ -2,15 +2,20 @@ import { createContext, useContext, useMemo } from 'react'
 import { nanoid } from 'nanoid'
 import type { Task, TaskStatus } from '@/types/task.types'
 import type { BoardAction } from '@/store/boardReducer'
+import {
+  createTask as apiCreateTask,
+  updateTask as apiUpdateTask,
+  deleteTask as apiDeleteTask,
+} from '@/api/tasks'
 
 export type BoardAPIContextType = {
-  moveTask: (taskId: string, newStatus: TaskStatus) => void
-  createTask: (task: Omit<Task, 'id' | 'createdAt'>) => void
-  updateTask: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => void
-  deleteTask: (taskId: string) => void
+  moveTask: (taskId: string, newStatus: TaskStatus) => Promise<void>
+  createTask: (task: Omit<Task, 'id' | 'createdAt'>) => Promise<void>
+  updateTask: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => Promise<void>
+  deleteTask: (taskId: string) => Promise<void>
 }
 
-const BoardAPIContext = createContext<BoardAPIContextType | null>(null)
+export const BoardAPIContext = createContext<BoardAPIContextType | null>(null)
 
 type BoardAPIProviderProps = {
   dispatch: React.Dispatch<BoardAction>
@@ -19,11 +24,13 @@ type BoardAPIProviderProps = {
 
 export function BoardAPIProvider({ dispatch, children }: BoardAPIProviderProps) {
   const boardAPI = useMemo<BoardAPIContextType>(() => ({
-    moveTask: (taskId: string, newStatus: TaskStatus) => {
+    moveTask: async (taskId: string, newStatus: TaskStatus) => {
       const opId = nanoid()
       dispatch({ type: 'TASK_MOVE', taskId, newStatus, opId })
+      // Epic 3: add async API call here
     },
-    createTask: (task: Omit<Task, 'id' | 'createdAt'>) => {
+
+    createTask: async (task: Omit<Task, 'id' | 'createdAt'>) => {
       const opId = nanoid()
       const newTask: Task = {
         ...task,
@@ -31,14 +38,37 @@ export function BoardAPIProvider({ dispatch, children }: BoardAPIProviderProps) 
         createdAt: new Date().toISOString(),
       }
       dispatch({ type: 'TASK_CREATE', task: newTask, opId })
+      try {
+        await apiCreateTask(task)
+        dispatch({ type: 'OP_SUCCESS', opId })
+      } catch (e) {
+        dispatch({ type: 'OP_ROLLBACK', opId })
+        throw e
+      }
     },
-    updateTask: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => {
+
+    updateTask: async (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => {
       const opId = nanoid()
       dispatch({ type: 'TASK_UPDATE', taskId, changes, opId })
+      try {
+        await apiUpdateTask(taskId, changes as Partial<Task>)
+        dispatch({ type: 'OP_SUCCESS', opId })
+      } catch (e) {
+        dispatch({ type: 'OP_ROLLBACK', opId })
+        throw e
+      }
     },
-    deleteTask: (taskId: string) => {
+
+    deleteTask: async (taskId: string) => {
       const opId = nanoid()
       dispatch({ type: 'TASK_DELETE', taskId, opId })
+      try {
+        await apiDeleteTask(taskId)
+        dispatch({ type: 'OP_SUCCESS', opId })
+      } catch (e) {
+        dispatch({ type: 'OP_ROLLBACK', opId })
+        throw e
+      }
     },
   }), [dispatch])
 

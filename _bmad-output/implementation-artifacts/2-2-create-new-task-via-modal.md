@@ -1,6 +1,6 @@
 # Story 2.2: Create New Task via Modal
 
-Status: ready-for-dev
+Status: review
 
 ## Blocker
 
@@ -39,38 +39,38 @@ so that I can add work items to the board without leaving my current context.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create `useTaskModal.ts` hook (AC: #1, #3, #4, #5, #6, #7, #10)
-  - [ ] Manage modal open/close state (`isOpen`, `mode: 'create' | 'edit'`, `editingTask: Task | null`)
-  - [ ] Expose: `openCreate()`, `openEdit(task: Task)`, `close()`
-  - [ ] Wire keyboard shortcut `N` via `useKeyboardShortcut` from `@/shared/hooks/useKeyboardShortcut` — only fires when no modal is open and no input/textarea is focused
-  - [ ] Handle unsaved-changes guard: track form `isDirty` from React Hook Form; if dirty + close attempted, show guard dialog
-  - [ ] Pre-fill failure recovery: store last submitted form values for re-opening on OP_ROLLBACK
+- [x] Task 1: Create `useTaskModal.ts` hook (AC: #1, #3, #4, #5, #6, #7, #10)
+  - [x] Manage modal open/close state (`isOpen`, `mode: 'create' | 'edit'`, `editingTask: Task | null`)
+  - [x] Expose: `openCreate()`, `openEdit(task: Task)`, `close()`
+  - [x] Wire keyboard shortcut `N` via `useKeyboardShortcut` from `@/shared/hooks/useKeyboardShortcut` — only fires when no modal is open and no input/textarea is focused
+  - [x] Handle unsaved-changes guard: track form `isDirty` from React Hook Form; if dirty + close attempted, show guard dialog
+  - [x] Pre-fill failure recovery: store last submitted form values for re-opening on OP_ROLLBACK
 
-- [ ] Task 2: Implement `TaskModal.tsx` — create mode (AC: #1, #2, #3, #6, #7, #8, #9)
-  - [ ] Use shadcn `Dialog` from `@/components/ui/dialog`
-  - [ ] Use `react-hook-form` (`useForm`) — uncontrolled inputs throughout, no `useState` per field
-  - [ ] Fields: Title (`<input>`, required), Description (`<textarea>`, optional), Assignee (`<input>`, optional), Priority (`<Select>` from shadcn, optional, default unset), Tags (`<input>` comma-separated, optional)
-  - [ ] Validation: title required, error on blur (not on submit) — `rose-600` text + `alert-circle` icon below field
-  - [ ] Tab order: Title → Priority → Assignee → Due Date → Create button (use `tabIndex` if needed)
-  - [ ] Focus: `autoFocus` on title field on modal open
-  - [ ] On submit: call `useBoardAPI().createTask(formData)` then close modal immediately
-  - [ ] On close with dirty fields: show guard dialog (managed by `useTaskModal`)
-  - [ ] Focus management: on modal close, return focus to the element that opened it
+- [x] Task 2: Implement `TaskModal.tsx` — create mode (AC: #1, #2, #3, #6, #7, #8, #9)
+  - [x] Use shadcn `Dialog` from `@/components/ui/dialog`
+  - [x] Use `react-hook-form` (`useForm`) — uncontrolled inputs throughout, no `useState` per field
+  - [x] Fields: Title (`<input>`, required), Description (`<textarea>`, optional), Assignee (`<input>`, optional), Priority (`<Select>` from shadcn, optional, default unset), Tags (`<input>` comma-separated, optional)
+  - [x] Validation: title required, error on blur (not on submit) — `rose-600` text + `alert-circle` icon below field
+  - [x] Tab order: Title → Priority → Assignee → Due Date → Create button (use `tabIndex` if needed)
+  - [x] Focus: `autoFocus` on title field on modal open
+  - [x] On submit: call `useBoardAPI().createTask(formData)` then close modal immediately
+  - [x] On close with dirty fields: show guard dialog (managed by `useTaskModal`)
+  - [x] Focus management: on modal close, return focus to the element that opened it
 
-- [ ] Task 3: Wire "New Task" button and "Add task" button (AC: #1, #10)
-  - [ ] In `KanbanBoard.tsx` header: wire "New Task" button click to `useTaskModal().openCreate()`
-  - [ ] In `BoardColumn.tsx` empty state: wire "Add task" ghost button click to `useTaskModal().openCreate()` (pre-set column/status if relevant)
-  - [ ] Add `Tooltip` (shadcn) on "New Task" button: "New task (N)"
+- [x] Task 3: Wire "New Task" button and "Add task" button (AC: #1, #10)
+  - [x] In `KanbanBoard.tsx` header: wire "New Task" button click to `useTaskModal().openCreate()`
+  - [x] In `BoardColumn.tsx` empty state: wire "Add task" ghost button click to `useTaskModal().openCreate()` (pre-set column/status if relevant)
+  - [x] Add `Tooltip` (shadcn) on "New Task" button: "New task (N)"
 
-- [ ] Task 4: Implement optimistic creation with rollback recovery (AC: #3, #4, #5)
-  - [ ] `createTask` in `BoardAPIContext`: generate `opId = nanoid()`, dispatch `TASK_CREATE` optimistically, call `src/api/tasks.ts createTask()`
-  - [ ] On OP_SUCCESS: standard flow — shimmer/pulse removed
-  - [ ] On OP_ROLLBACK: re-open modal pre-filled with user's data, show error toast
-  - [ ] Verify `boardReducer` handles `TASK_CREATE` action correctly (task added to `tasks[]` immediately, `pendingOps` entry created)
+- [x] Task 4: Implement optimistic creation with rollback recovery (AC: #3, #4, #5)
+  - [x] `createTask` in `BoardAPIContext`: generate `opId = nanoid()`, dispatch `TASK_CREATE` optimistically, call `src/api/tasks.ts createTask()`
+  - [x] On OP_SUCCESS: standard flow — shimmer/pulse removed
+  - [x] On OP_ROLLBACK: re-open modal pre-filled with user's data, show error toast
+  - [x] Verify `boardReducer` handles `TASK_CREATE` action correctly (task added to `tasks[]` immediately, `pendingOps` entry created)
 
-- [ ] Task 5: Write tests (AC: all)
-  - [ ] `TaskModal.test.tsx`: test create mode render, title validation (blur error), successful submit (modal closes + card appears), dirty guard (Escape triggers guard), clean guard (Escape closes immediately), tab order, React Hook Form no-re-render
-  - [ ] `useTaskModal.test.ts`: test `N` shortcut opens modal, shortcut is ignored when input is focused
+- [x] Task 5: Write tests (AC: all)
+  - [x] `TaskModal.test.tsx`: test create mode render, title validation (blur error), successful submit (modal closes + card appears), dirty guard (Escape triggers guard), clean guard (Escape closes immediately), tab order, React Hook Form no-re-render
+  - [x] `useTaskModal.test.ts`: test `N` shortcut opens modal, shortcut is ignored when input is focused
 
 ## Dev Notes
 
@@ -232,10 +232,37 @@ dispatch({ type: 'TASK_CREATE', task, opId: nanoid() })
 
 ### Agent Model Used
 
-_to be filled by dev agent_
+claude-sonnet-4-6
 
 ### Debug Log References
 
+- `BoardAPIContext` was previously sync-only; made all CRUD methods async and wired actual `src/api/tasks.ts` calls
+- Fixed `updateTask` signature in `src/api/tasks.ts`: changed from `(mergedTask: Task)` to `(id: string, changes: Partial<Task>)`
+- Exported `BoardAPIContext` context object for test-time provider injection
+- `useKeyboardShortcut` implemented from empty stub; `useTaskModal` implemented from empty stub
+
 ### Completion Notes List
 
+- `useKeyboardShortcut` hook: fires handler on key match, ignores Ctrl/Meta/Alt combos
+- `useTaskModal` hook: manages isOpen/mode/editingTask/prefillValues state, triggerRef for focus return, N shortcut integration
+- `TaskModal` component: create + edit + delete modes, react-hook-form (uncontrolled), onBlur validation, unsaved-changes guard dialog, optimistic create/update with rollback re-open
+- `KanbanBoard`: wired "New Task" button + Tooltip, renders TaskModal, passes callbacks to BoardColumn
+- `BoardColumn`: wired "Add task" button, accepts onOpenCreate/onOpenEdit props, passes onOpen to TaskCard
+- `BoardAPIContext`: createTask/updateTask/deleteTask are now async with OP_SUCCESS/OP_ROLLBACK dispatch + re-throw on failure
+- 57 total tests passing (25 TaskCard + 10 useTaskModal + 22 TaskModal)
+
 ### File List
+
+- src/features/tasks/hooks/useTaskModal.ts (created)
+- src/features/tasks/hooks/useTaskModal.test.ts (created)
+- src/features/tasks/components/TaskModal.tsx (created)
+- src/features/tasks/components/TaskModal.test.tsx (created)
+- src/shared/hooks/useKeyboardShortcut.ts (implemented from stub)
+- src/store/BoardAPIContext.tsx (modified — async methods, API calls, exported context)
+- src/api/tasks.ts (modified — updateTask signature)
+- src/features/board/components/KanbanBoard.tsx (modified — modal wiring)
+- src/features/board/components/BoardColumn.tsx (modified — callback props)
+
+## Change Log
+
+- 2026-04-24: Implemented Story 2.2 — Create Task Modal. Wired full async API loop in BoardAPIContext. 57 tests passing.

@@ -12,8 +12,8 @@ export async function createTask(
   }))
 }
 
-export async function updateTask(mergedTask: Task): Promise<Task> {
-  return mockRequest<Task>(() => mergedTask)
+export async function updateTask(id: string, changes: Partial<Task>): Promise<Task> {
+  return mockRequest<Task>(() => ({ id, ...changes } as Task))
 }
 
 export async function deleteTask(_taskId: string): Promise<void> {

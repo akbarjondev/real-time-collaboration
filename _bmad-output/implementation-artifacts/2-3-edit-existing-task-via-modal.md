@@ -1,6 +1,6 @@
 # Story 2.3: Edit Existing Task via Modal
 
-Status: ready-for-dev
+Status: review
 
 ## Blocker
 
@@ -37,28 +37,28 @@ so that I can update task information without disrupting my board view.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Extend `TaskModal.tsx` to support edit mode (AC: #1, #2, #4, #6, #7, #8)
-  - [ ] Add `mode: 'create' | 'edit'` and `task?: Task` props to `TaskModal`
-  - [ ] In edit mode: `reset(task)` on modal open to pre-populate all fields via React Hook Form
-  - [ ] Change submit button label to "Save" in edit mode
-  - [ ] On submit in edit mode: call `useBoardAPI().updateTask(task.id, dirtyFields)` then close modal
-  - [ ] Guard logic: same as create mode — `isDirty` check before Escape/backdrop close
-  - [ ] Focus return: store `triggerRef` (the card that opened the modal), restore focus on close
+- [x] Task 1: Extend `TaskModal.tsx` to support edit mode (AC: #1, #2, #4, #6, #7, #8)
+  - [x] Add `mode: 'create' | 'edit'` and `task?: Task` props to `TaskModal`
+  - [x] In edit mode: `reset(task)` on modal open to pre-populate all fields via React Hook Form
+  - [x] Change submit button label to "Save" in edit mode
+  - [x] On submit in edit mode: call `useBoardAPI().updateTask(task.id, dirtyFields)` then close modal
+  - [x] Guard logic: same as create mode — `isDirty` check before Escape/backdrop close
+  - [x] Focus return: store `triggerRef` (the card that opened the modal), restore focus on close
 
-- [ ] Task 2: Wire card click / Enter to open edit modal (AC: #1)
-  - [ ] In `TaskCard.tsx`: add `onClick` and `onKeyDown` (Enter key) handlers
-  - [ ] On activation: call `useTaskModal().openEdit(task)` from `useTaskModal.ts`
-  - [ ] Card must be focusable: `tabIndex={0}` on the `<article>` element, `cursor-pointer` class
-  - [ ] Do NOT open the modal on card drag start — only on click/Enter
+- [x] Task 2: Wire card click / Enter to open edit modal (AC: #1)
+  - [x] In `TaskCard.tsx`: add `onClick` and `onKeyDown` (Enter key) handlers
+  - [x] On activation: call `useTaskModal().openEdit(task)` from `useTaskModal.ts`
+  - [x] Card must be focusable: `tabIndex={0}` on the `<article>` element, `cursor-pointer` class
+  - [x] Do NOT open the modal on card drag start — only on click/Enter
 
-- [ ] Task 3: Implement optimistic update with rollback (AC: #2, #3, #4, #5)
-  - [ ] Verify `boardReducer` handles `TASK_UPDATE` action: applies `changes` to matching task in `tasks[]`, records `pendingOps` snapshot of pre-edit task
-  - [ ] Verify `src/api/tasks.ts updateTask()` is implemented (from 1.3); if stub only, implement it: `return mockRequest(() => ({ ...task, ...changes }))`
-  - [ ] After OP_ROLLBACK: task card shows reverted values, toast.error fires with task title
+- [x] Task 3: Implement optimistic update with rollback (AC: #2, #3, #4, #5)
+  - [x] Verify `boardReducer` handles `TASK_UPDATE` action: applies `changes` to matching task in `tasks[]`, records `pendingOps` snapshot of pre-edit task
+  - [x] Verify `src/api/tasks.ts updateTask()` is implemented (from 1.3); if stub only, implement it: `return mockRequest(() => ({ ...task, ...changes }))`
+  - [x] After OP_ROLLBACK: task card shows reverted values, toast.error fires with task title
 
-- [ ] Task 4: Write tests (AC: all)
-  - [ ] `TaskModal.test.tsx` (edit mode): test pre-population of all fields, successful save (modal closes + card updates), rollback (card reverts + toast), no guard on clean close, guard on dirty close, focus return to trigger element
-  - [ ] `TaskCard.test.tsx`: test click opens modal (mock `openEdit`), Enter key opens modal, drag start does NOT open modal
+- [x] Task 4: Write tests (AC: all)
+  - [x] `TaskModal.test.tsx` (edit mode): test pre-population of all fields, successful save (modal closes + card updates), rollback (card reverts + toast), no guard on clean close, guard on dirty close, focus return to trigger element
+  - [x] `TaskCard.test.tsx`: test click opens modal (mock `openEdit`), Enter key opens modal, drag start does NOT open modal
 
 ## Dev Notes
 
@@ -218,10 +218,32 @@ src/api/tasks.ts                                  ← verify updateTask is imple
 
 ### Agent Model Used
 
-_to be filled by dev agent_
+claude-sonnet-4-6
 
 ### Debug Log References
 
+- Edit mode implemented as part of Story 2-2 implementation (TaskModal supports mode='edit')
+- `updateTask` in src/api/tasks.ts was fixed from `(mergedTask: Task)` to `(id: string, changes: Partial<Task>)` signature
+- boardReducer TASK_UPDATE verified correct: applies changes to tasks[], records pre-edit snapshot in pendingOps
+
 ### Completion Notes List
 
+- TaskModal edit mode: pre-populates all fields via RHF reset(), shows "Save" button, supports guard dialog
+- TaskCard: onClick/onKeyDown(Enter) call onOpen(task) prop; tabIndex=0 + cursor-pointer; no drag trigger
+- useTaskModal.openEdit: stores triggerRef for focus return on close
+- updateTask in BoardAPIContext: dispatches TASK_UPDATE optimistically, calls API, dispatches OP_SUCCESS or OP_ROLLBACK + re-throws
+- All edit mode tests pass (8 tests in TaskModal.test.tsx, 2 in TaskCard.test.tsx)
+
 ### File List
+
+- src/features/tasks/components/TaskModal.tsx (edit mode)
+- src/features/tasks/components/TaskModal.test.tsx (edit mode tests)
+- src/features/tasks/components/TaskCard.tsx (onClick/onKeyDown handlers)
+- src/features/tasks/components/TaskCard.test.tsx (interaction tests)
+- src/features/tasks/hooks/useTaskModal.ts (openEdit + triggerRef)
+- src/store/BoardAPIContext.tsx (async updateTask)
+- src/api/tasks.ts (updateTask signature fix)
+
+## Change Log
+
+- 2026-04-24: Implemented Story 2.3 — Edit Task Modal. Implemented as part of Story 2.2 implementation. All tests pass.

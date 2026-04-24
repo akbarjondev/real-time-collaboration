@@ -3,14 +3,17 @@ import { Inbox, Plus } from 'lucide-react'
 import { useTasks } from '@/store/BoardStateContext'
 import { TaskCard } from '@/features/tasks/components/TaskCard'
 import { Button } from '@/components/ui/button'
-import type { TaskStatus } from '@/types/task.types'
+import type { Task, TaskStatus } from '@/types/task.types'
+import type { CreateTaskForm } from '@/features/tasks/hooks/useTaskModal'
 
 type BoardColumnProps = {
   status: TaskStatus
   title: string
+  onOpenCreate: (prefill?: Partial<CreateTaskForm>) => void
+  onOpenEdit: (task: Task) => void
 }
 
-export function BoardColumn({ status, title }: BoardColumnProps) {
+export function BoardColumn({ status, title, onOpenCreate, onOpenEdit }: BoardColumnProps) {
   const tasks = useTasks()
   const columnTasks = useMemo(
     () => tasks.filter(t => t.status === status),
@@ -43,7 +46,7 @@ export function BoardColumn({ status, title }: BoardColumnProps) {
             variant="outline"
             size="sm"
             className="mt-1 border-dashed border-zinc-300 text-zinc-400 hover:text-zinc-600 hover:border-zinc-400 focus-visible:ring-2 focus-visible:ring-violet-500 min-h-[44px]"
-            onClick={() => { /* noop — implemented in Story 2.2 */ }}
+            onClick={() => onOpenCreate({ })}
             aria-label={`Add task to ${title}`}
           >
             <Plus className="h-3 w-3 mr-1" aria-hidden="true" />
@@ -53,7 +56,7 @@ export function BoardColumn({ status, title }: BoardColumnProps) {
       ) : (
         <div className="flex flex-col gap-2">
           {columnTasks.map(task => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard key={task.id} task={task} onOpen={onOpenEdit} />
           ))}
         </div>
       )}

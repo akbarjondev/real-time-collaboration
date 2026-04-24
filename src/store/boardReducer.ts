@@ -49,6 +49,7 @@ export function boardReducer(
         opId: action.opId,
         taskId: action.taskId,
         snapshot,
+        opType: "move",
       });
       return {
         ...state,
@@ -65,6 +66,7 @@ export function boardReducer(
         opId: action.opId,
         taskId: action.task.id,
         snapshot: action.task,
+        opType: "create",
       });
       return {
         ...state,
@@ -81,6 +83,7 @@ export function boardReducer(
         opId: action.opId,
         taskId: action.taskId,
         snapshot,
+        opType: "update",
       });
       return {
         ...state,
@@ -99,6 +102,7 @@ export function boardReducer(
         opId: action.opId,
         taskId: action.taskId,
         snapshot,
+        opType: "delete",
       });
       return {
         ...state,
@@ -118,10 +122,21 @@ export function boardReducer(
       if (!op) return state;
       const newPendingOps = new Map(state.pendingOps);
       newPendingOps.delete(action.opId);
-      const taskExists = state.tasks.some((t) => t.id === op.taskId);
-      const restoredTasks = taskExists
-        ? state.tasks.map((t) => (t.id === op.taskId ? op.snapshot : t))
-        : state.tasks.filter((t) => t.id !== op.taskId);
+
+      let restoredTasks: Task[];
+      if (op.opType === "create") {
+        // Remove the optimistically added task
+        restoredTasks = state.tasks.filter((t) => t.id !== op.taskId);
+      } else if (op.opType === "delete") {
+        // Restore the deleted task to end of list
+        restoredTasks = [...state.tasks, op.snapshot];
+      } else {
+        // Restore pre-edit snapshot (update / move)
+        restoredTasks = state.tasks.map((t) =>
+          t.id === op.taskId ? op.snapshot : t,
+        );
+      }
+
       return { ...state, tasks: restoredTasks, pendingOps: newPendingOps };
     }
 
@@ -161,7 +176,6 @@ export function boardReducer(
     }
 
     case "HISTORY_APPLY": {
-      // TODO: why is this needed? Loophole?
       return boardReducer(state, action.action);
     }
 
