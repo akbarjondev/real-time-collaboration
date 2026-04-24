@@ -1,9 +1,13 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useDroppable } from '@dnd-kit/core'
 import { BoardColumn } from '@/features/board/components/BoardColumn'
 import { BoardStateContext } from '@/store/BoardStateContext'
+import { FilterContext, initialFilterState } from '@/store/FilterContext'
+import { FilterAPIContext } from '@/store/FilterAPIContext'
 import type { Task } from '@/types/task.types'
+import type { FilterState } from '@/store/FilterContext'
+import type { FilterAPIContextType } from '@/store/FilterAPIContext'
 
 vi.mock('@dnd-kit/core', () => ({
   useDroppable: vi.fn(),
@@ -31,16 +35,31 @@ const mockTask: Task = {
   createdAt: '2026-01-01T00:00:00.000Z',
 }
 
-function renderColumn(tasks: Task[] = [], isOver = false) {
+const mockFilterAPI: FilterAPIContextType = {
+  setAssignee: vi.fn(),
+  setPriority: vi.fn(),
+  setSearch: vi.fn(),
+  resetFilters: vi.fn(),
+}
+
+function renderColumn(
+  tasks: Task[] = [],
+  isOver = false,
+  filterState: FilterState = initialFilterState
+) {
   vi.mocked(useDroppable).mockReturnValue({ isOver, setNodeRef: mockSetNodeRef } as ReturnType<typeof useDroppable>)
   return render(
     <BoardStateContext.Provider value={tasks}>
-      <BoardColumn
-        status="todo"
-        title="Todo"
-        onOpenCreate={vi.fn()}
-        onOpenEdit={vi.fn()}
-      />
+      <FilterContext.Provider value={filterState}>
+        <FilterAPIContext.Provider value={mockFilterAPI}>
+          <BoardColumn
+            status="todo"
+            title="Todo"
+            onOpenCreate={vi.fn()}
+            onOpenEdit={vi.fn()}
+          />
+        </FilterAPIContext.Provider>
+      </FilterContext.Provider>
     </BoardStateContext.Provider>
   )
 }
@@ -101,5 +120,25 @@ describe('BoardColumn', () => {
   it('calls setNodeRef with the section element', () => {
     renderColumn([mockTask])
     expect(mockSetNodeRef).toHaveBeenCalled()
+  })
+
+  it('renders filtered empty state when column has no tasks and filters are active', () => {
+    renderColumn([], false, { assignee: 'Carol', priority: null, searchQuery: '' })
+    expect(screen.getByText('No matches')).toBeInTheDocument()
+    expect(screen.getByText('No tasks match the current filter')).toBeInTheDocument()
+    expect(screen.getByText('Clear filter')).toBeInTheDocument()
+    expect(screen.queryByText('No tasks')).not.toBeInTheDocument()
+  })
+
+  it('renders original empty state when column is empty and no filters are active', () => {
+    renderColumn([], false, initialFilterState)
+    expect(screen.getByText('No tasks')).toBeInTheDocument()
+    expect(screen.queryByText('No matches')).not.toBeInTheDocument()
+  })
+
+  it('Clear filter link calls filterAPI.resetFilters', () => {
+    renderColumn([], false, { assignee: 'Carol', priority: null, searchQuery: '' })
+    fireEvent.click(screen.getByText('Clear filter'))
+    expect(mockFilterAPI.resetFilters).toHaveBeenCalled()
   })
 })

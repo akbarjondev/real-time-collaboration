@@ -9,7 +9,7 @@ export type FilterAPIContextType = {
   resetFilters: () => void
 }
 
-const FilterAPIContext = createContext<FilterAPIContextType | null>(null)
+export const FilterAPIContext = createContext<FilterAPIContextType | null>(null)
 
 type FilterAPIProviderProps = {
   dispatch: React.Dispatch<FilterAction>

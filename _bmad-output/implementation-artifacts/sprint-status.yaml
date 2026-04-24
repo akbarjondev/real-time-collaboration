@@ -65,10 +65,10 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Filtering & Search
-  epic-4: in-progress
+  epic-4: done
   4-1-implement-filtertasks-logic-and-filter-state: done
   4-2-build-direction-d-filter-bar-with-active-chips: done
-  4-3-implement-cmdk-search-overlay: in-progress
+  4-3-implement-cmdk-search-overlay: done
   epic-4-retrospective: optional
 
   # Epic 5: Optimistic Updates & Error Recovery

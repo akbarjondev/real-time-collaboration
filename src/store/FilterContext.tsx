@@ -36,7 +36,7 @@ export function filterReducer(state: FilterState, action: FilterAction): FilterS
   }
 }
 
-const FilterContext = createContext<FilterState>(initialFilterState)
+export const FilterContext = createContext<FilterState>(initialFilterState)
 
 type FilterProviderProps = {
   filterState: FilterState

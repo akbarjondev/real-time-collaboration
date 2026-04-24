@@ -2,12 +2,12 @@ import { memo } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Badge } from '@/components/ui/badge'
-import { usePendingOps } from '@/store/PendingOpsContext'
 import { cn } from '@/lib/utils'
 import type { Task, Priority } from '@/types/task.types'
 
 type TaskCardProps = {
   task: Task
+  isPending: boolean
   onOpen?: (task: Task) => void
   isOverlay?: boolean
 }
@@ -22,9 +22,7 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-export const TaskCard = memo(function TaskCard({ task, onOpen, isOverlay }: TaskCardProps) {
-  const pendingOps = usePendingOps()
-  const isPending = [...pendingOps.values()].some(op => op.taskId === task.id)
+export const TaskCard = memo(function TaskCard({ task, isPending, onOpen, isOverlay }: TaskCardProps) {
   const priority = PRIORITY_CONFIG[task.priority]
   const isDone = task.status === 'done'
 
@@ -36,6 +34,7 @@ export const TaskCard = memo(function TaskCard({ task, onOpen, isOverlay }: Task
 
   return (
     <article
+      id={`task-${task.id}`}
       ref={isOverlay ? undefined : setNodeRef}
       style={style}
       {...(isOverlay ? {} : attributes)}

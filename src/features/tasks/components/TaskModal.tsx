@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'sonner'
 import { AlertCircle } from 'lucide-react'
@@ -50,6 +50,12 @@ export function TaskModal({
   const [showGuard, setShowGuard] = useState(false)
   const titleInputRef = useRef<HTMLInputElement | null>(null)
   const statusTriggerRef = useRef<HTMLButtonElement | null>(null)
+  const isMountedRef = useRef(true)
+
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => { isMountedRef.current = false }
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
@@ -125,9 +131,10 @@ export function TaskModal({
           status: 'todo',
           tags: [],
         })
+        toast.success(`Task "${data.title}" created`, { duration: 3000 })
       } catch {
         onOpenCreate(savedValues)
-        toast.error(`Create failed — "${data.title}" could not be saved`)
+        toast.error(`Create failed — "${data.title}" could not be saved`, { duration: Infinity })
       }
     } else if (mode === 'edit' && task) {
       const taskTitle = task.title
@@ -139,13 +146,14 @@ export function TaskModal({
           priority: data.priority ?? task.priority,
           tags: task.tags,
         })
+        toast.success(`Task "${taskTitle}" updated`, { duration: 3000 })
       } catch {
-        toast.error(`Update failed — "${taskTitle}" has been reverted`)
+        toast.error(`Update failed — "${taskTitle}" has been reverted`, { duration: Infinity })
       }
     }
   })
 
-  async function handleStatusChange(newStatus: TaskStatus) {
+  const handleStatusChange = useCallback(async (newStatus: TaskStatus) => {
     if (!task || newStatus === task.status) return
 
     const taskTitle = task.title
@@ -154,20 +162,24 @@ export function TaskModal({
     try {
       await boardAPI.moveTask(task.id, newStatus)
     } catch {
-      toast.error(`Move failed — "${taskTitle}" has been reverted`)
+      if (isMountedRef.current) {
+        toast.error(`Move failed — "${taskTitle}" has been reverted`, { duration: Infinity })
+      }
     }
-  }
+  }, [task, onClose, boardAPI])
 
-  async function handleDelete() {
+  const handleDelete = useCallback(async () => {
     if (!task) return
     const taskTitle = task.title
     onClose()
     try {
       await boardAPI.deleteTask(task.id)
     } catch {
-      toast.error(`Delete failed — "${taskTitle}" has been restored`)
+      if (isMountedRef.current) {
+        toast.error(`Delete failed — "${taskTitle}" has been restored`, { duration: Infinity })
+      }
     }
-  }
+  }, [task, onClose, boardAPI])
 
   return (
     <>

@@ -150,3 +150,106 @@ describe('boardReducer — TASK_CREATE', () => {
     expect(op?.taskId).toBe('task-1')
   })
 })
+
+describe('boardReducer — concurrent mutation isolation', () => {
+  const task2: Task = {
+    id: 'task-2',
+    title: 'Add dark mode',
+    assignee: 'Bob',
+    status: 'in-progress',
+    priority: 'medium',
+    tags: [],
+    createdAt: '2026-01-16T10:00:00.000Z',
+  }
+
+  it('rolling back opId-2 (different task) leaves opId-1 pending entry intact', () => {
+    // Two concurrent TASK_MOVE ops on different tasks
+    const stateWith2Tasks = { ...initialBoardState, tasks: [mockTask, task2] }
+
+    const afterMove1 = boardReducer(stateWith2Tasks, {
+      type: 'TASK_MOVE',
+      taskId: 'task-1',
+      newStatus: 'in-progress',
+      opId: 'op-1',
+    })
+    const afterMove2 = boardReducer(afterMove1, {
+      type: 'TASK_MOVE',
+      taskId: 'task-2',
+      newStatus: 'done',
+      opId: 'op-2',
+    })
+
+    expect(afterMove2.pendingOps.size).toBe(2)
+
+    // Roll back op-2 only
+    const afterRollback = boardReducer(afterMove2, {
+      type: 'OP_ROLLBACK',
+      opId: 'op-2',
+    })
+
+    // op-1 entry must still be present
+    expect(afterRollback.pendingOps.get('op-1')).toBeDefined()
+    expect(afterRollback.pendingOps.get('op-2')).toBeUndefined()
+    expect(afterRollback.pendingOps.size).toBe(1)
+
+    // task-2 reverted; task-1 still at optimistic status
+    const t1 = afterRollback.tasks.find(t => t.id === 'task-1')
+    const t2 = afterRollback.tasks.find(t => t.id === 'task-2')
+    expect(t1?.status).toBe('in-progress')
+    expect(t2?.status).toBe('in-progress')
+  })
+
+  it('rolling back opId-2 on the same task restores opId-2 snapshot (post-opId-1 state)', () => {
+    // Two concurrent TASK_UPDATE ops on the same task
+    const afterUpdate1 = boardReducer(stateWithTask, {
+      type: 'TASK_UPDATE',
+      taskId: 'task-1',
+      changes: { title: 'After op-1' },
+      opId: 'op-1',
+    })
+    const afterUpdate2 = boardReducer(afterUpdate1, {
+      type: 'TASK_UPDATE',
+      taskId: 'task-1',
+      changes: { title: 'After op-2' },
+      opId: 'op-2',
+    })
+
+    // op-2 snapshot is the post-op-1 state
+    const op2Snapshot = afterUpdate2.pendingOps.get('op-2')?.snapshot
+    expect(op2Snapshot?.title).toBe('After op-1')
+
+    // Roll back op-2 → restores post-op-1 title, not original
+    const afterRollback = boardReducer(afterUpdate2, {
+      type: 'OP_ROLLBACK',
+      opId: 'op-2',
+    })
+    expect(afterRollback.tasks[0]?.title).toBe('After op-1')
+    expect(afterRollback.pendingOps.get('op-1')).toBeDefined()
+  })
+
+  it('OP_SUCCESS for opId-1 does not affect opId-2 pending entry', () => {
+    const stateWith2Tasks = { ...initialBoardState, tasks: [mockTask, task2] }
+
+    const afterMove1 = boardReducer(stateWith2Tasks, {
+      type: 'TASK_MOVE',
+      taskId: 'task-1',
+      newStatus: 'done',
+      opId: 'op-1',
+    })
+    const afterMove2 = boardReducer(afterMove1, {
+      type: 'TASK_MOVE',
+      taskId: 'task-2',
+      newStatus: 'done',
+      opId: 'op-2',
+    })
+
+    const afterSuccess1 = boardReducer(afterMove2, {
+      type: 'OP_SUCCESS',
+      opId: 'op-1',
+    })
+
+    expect(afterSuccess1.pendingOps.get('op-1')).toBeUndefined()
+    expect(afterSuccess1.pendingOps.get('op-2')).toBeDefined()
+    expect(afterSuccess1.pendingOps.size).toBe(1)
+  })
+})

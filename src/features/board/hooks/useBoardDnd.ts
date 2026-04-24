@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   type DragStartEvent,
   type DragEndEvent,
@@ -17,6 +17,11 @@ export function useBoardDnd() {
   const tasks = useTasks()
   const { moveTask } = useBoardAPI()
   const [activeTask, setActiveTask] = useState<Task | null>(null)
+  const isMountedRef = useRef(true)
+
+  useEffect(() => {
+    return () => { isMountedRef.current = false }
+  }, [])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -52,7 +57,9 @@ export function useBoardDnd() {
     try {
       await moveTask(draggedTask.id, newStatus)
     } catch {
-      toast.error(`Move failed — "${draggedTask.title}" has been reverted`)
+      if (isMountedRef.current) {
+        toast.error(`Move failed — "${draggedTask.title}" has been reverted`, { duration: Infinity })
+      }
     }
   }
 

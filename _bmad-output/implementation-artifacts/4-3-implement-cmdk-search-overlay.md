@@ -1,6 +1,6 @@
 # Story 4.3: Implement ⌘K Search Overlay
 
-Status: ready-for-dev
+Status: review
 
 ## Blocker
 
@@ -45,42 +45,42 @@ so that power users can find tasks faster than using the visible filter bar.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Install shadcn Command component (AC: #5)
-  - [ ] Run `npx shadcn@latest add command` — installs `cmdk` + `src/components/ui/command.tsx`
-  - [ ] Verify `src/components/ui/command.tsx` exists after install
+- [x] Task 1: Install shadcn Command component (AC: #5)
+  - [x] Run `npx shadcn@latest add command` — installs `cmdk` + `src/components/ui/command.tsx`
+  - [x] Verify `src/components/ui/command.tsx` exists after install
 
-- [ ] Task 2: Extend `useKeyboardShortcut` to support modifier keys (AC: #1)
-  - [ ] Add optional `options` parameter: `{ ctrl?: boolean; shift?: boolean }`
-  - [ ] When `options.ctrl === true`, require `e.ctrlKey || e.metaKey` (cross-platform ⌘/Ctrl)
-  - [ ] When `options.ctrl` is falsy, keep existing behavior (block modifier combos)
-  - [ ] Backward-compatible: all existing callers pass no options and are unaffected
+- [x] Task 2: Extend `useKeyboardShortcut` to support modifier keys (AC: #1)
+  - [x] Add optional `options` parameter: `{ ctrl?: boolean; shift?: boolean }`
+  - [x] When `options.ctrl === true`, require `e.ctrlKey || e.metaKey` (cross-platform ⌘/Ctrl)
+  - [x] When `options.ctrl` is falsy, keep existing behavior (block modifier combos)
+  - [x] Backward-compatible: all existing callers pass no options and are unaffected
 
-- [ ] Task 3: Build `CmdKOverlay` component (AC: #1–#5)
-  - [ ] Create `src/features/filters/components/CmdKOverlay.tsx`
-  - [ ] Use `CommandDialog`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandItem` from `@/components/ui/command`
-  - [ ] Track `isOpen` state locally (`useState`)
-  - [ ] Use extended `useKeyboardShortcut('k', openOverlay, { ctrl: true })` to open overlay
-  - [ ] On open: focus managed automatically by `CommandDialog` (radix Dialog)
-  - [ ] Search query drives two things: (1) `commandValue` state for filtering results in the overlay, (2) `filterAPI.setSearch(query)` so the board updates live
-  - [ ] Derive visible results: `filterTasks(allTasks, { ...emptyFilters, searchQuery: commandValue })`
-  - [ ] MRU: track last 5 viewed task IDs in `useRef<string[]>`; update on task selection; show MRU tasks first when query is empty
-  - [ ] On result select: call `handleSelect(task)` — see Dev Notes
-  - [ ] On close (Escape or backdrop): call `handleClose()` — see Dev Notes
-  - [ ] Add `id={`task-${task.id}`}` to the `<article>` element in `TaskCard` for scroll-to support
+- [x] Task 3: Build `CmdKOverlay` component (AC: #1–#5)
+  - [x] Create `src/features/filters/components/CmdKOverlay.tsx`
+  - [x] Use `CommandDialog`, `CommandInput`, `CommandList`, `CommandEmpty`, `CommandItem` from `@/components/ui/command`
+  - [x] Track `isOpen` state locally (`useState`)
+  - [x] Use extended `useKeyboardShortcut('k', openOverlay, { ctrl: true })` to open overlay
+  - [x] On open: focus managed automatically by `CommandDialog` (radix Dialog)
+  - [x] Search query drives two things: (1) `commandValue` state for filtering results in the overlay, (2) `filterAPI.setSearch(query)` so the board updates live
+  - [x] Derive visible results: `filterTasks(allTasks, { ...emptyFilters, searchQuery: commandValue })`
+  - [x] MRU: track last 5 viewed task IDs in `useState<string[]>`; update on task selection; show MRU tasks first when query is empty
+  - [x] On result select: call `handleSelect(task)` — see Dev Notes
+  - [x] On close (Escape or backdrop): call `handleClose()` — see Dev Notes
+  - [x] Add `id={`task-${task.id}`}` to the `<article>` element in `TaskCard` for scroll-to support
 
-- [ ] Task 4: Mount `CmdKOverlay` in `KanbanBoard` (AC: #1)
-  - [ ] Import and render `<CmdKOverlay />` inside `KanbanBoard` (after `<FilterBar />`)
-  - [ ] No props needed — overlay manages its own open state
+- [x] Task 4: Mount `CmdKOverlay` in `KanbanBoard` (AC: #1)
+  - [x] Import and render `<CmdKOverlay />` inside `KanbanBoard` (after `<FilterBar />`)
+  - [x] No props needed — overlay manages its own open state
 
-- [ ] Task 5: Write tests (AC: all)
-  - [ ] Create `src/features/filters/components/CmdKOverlay.test.tsx`
-  - [ ] Test: overlay opens when ⌘K/Ctrl+K pressed (simulate keydown with `ctrlKey: true, key: 'k'`)
-  - [ ] Test: overlay does not open when plain 'k' pressed (no modifier)
-  - [ ] Test: typing in input calls `filterAPI.setSearch`
-  - [ ] Test: results list shows tasks matching the query
-  - [ ] Test: selecting a result closes the overlay and calls `filterAPI.resetFilters`
-  - [ ] Test: Escape closes overlay and calls `filterAPI.resetFilters`
-  - [ ] Test `useKeyboardShortcut` extension: `{ ctrl: true }` fires on ctrlKey combo; does NOT fire without modifier
+- [x] Task 5: Write tests (AC: all)
+  - [x] Create `src/features/filters/components/CmdKOverlay.test.tsx`
+  - [x] Test: overlay opens when ⌘K/Ctrl+K pressed (simulate keydown with `ctrlKey: true, key: 'k'`)
+  - [x] Test: overlay does not open when plain 'k' pressed (no modifier)
+  - [x] Test: typing in input calls `filterAPI.setSearch`
+  - [x] Test: results list shows tasks matching the query
+  - [x] Test: selecting a result closes the overlay and calls `filterAPI.resetFilters`
+  - [x] Test: Escape closes overlay and calls `filterAPI.resetFilters`
+  - [x] Test `useKeyboardShortcut` extension: `{ ctrl: true }` fires on ctrlKey combo; does NOT fire without modifier
 
 ---
 
@@ -314,12 +314,36 @@ src/features/board/components/KanbanBoard.tsx         ← mount <CmdKOverlay />
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+claude-sonnet-4-6
 
 ### Debug Log References
 
+- `npx shadcn@latest add command` placed files in a literal `@/` folder (bug with path alias resolution). Manually created `src/components/ui/command.tsx`, `input.tsx`, `textarea.tsx`, `input-group.tsx` with correct content.
+- `react-hooks/refs` ESLint rule disallows reading `useRef.current` during render. Changed MRU tracking from `useRef<string[]>` to `useState<string[]>` — acceptable since overlay re-renders are cheap.
+- `input-group.tsx` had unused `size` param in `InputGroupButton` — removed it.
+- Pre-existing `react-refresh/only-export-components` warnings in badge.tsx, button.tsx, store/*.tsx were already present before this story. Zero errors introduced.
+
 ### Completion Notes List
+
+- Installed `cmdk` package; manually placed `command.tsx` + supporting UI files in `src/components/ui/`
+- Extended `useKeyboardShortcut` with `ShortcutOptions = { ctrl?, shift? }` — backward-compatible
+- Built `CmdKOverlay` with Ctrl+K shortcut, live search, MRU, scroll-to-task on select
+- Added `id={task-${task.id}}` to TaskCard article for scroll targeting
+- Mounted `CmdKOverlay` in `KanbanBoard` after `FilterBar`
+- 10 CmdKOverlay tests written; all 134 tests pass; 0 TS errors; 0 lint errors
 
 ### File List
 
+- src/components/ui/command.tsx
+- src/components/ui/input.tsx
+- src/components/ui/textarea.tsx
+- src/components/ui/input-group.tsx
+- src/shared/hooks/useKeyboardShortcut.ts
+- src/features/filters/components/CmdKOverlay.tsx
+- src/features/filters/components/CmdKOverlay.test.tsx
+- src/features/tasks/components/TaskCard.tsx
+- src/features/board/components/KanbanBoard.tsx
+
 ### Change Log
+
+- 2026-04-24: Implemented CmdK overlay, extended useKeyboardShortcut, installed cmdk, 10 tests added (all pass)
