@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { useTasks } from '@/store/BoardStateContext'
 import { useBoardDispatch } from '@/store/BoardDispatchContext'
@@ -12,7 +12,9 @@ export function useRealtimeSimulation(editingTaskId: string | null) {
   // Ref keeps the current editingTaskId accessible inside the stale closure
   // without restarting the timer on every prop change.
   const editingTaskIdRef = useRef(editingTaskId)
-  editingTaskIdRef.current = editingTaskId
+  useLayoutEffect(() => {
+    editingTaskIdRef.current = editingTaskId
+  })
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>
