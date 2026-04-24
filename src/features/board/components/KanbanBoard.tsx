@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { LayoutGrid, Plus } from "lucide-react";
 import { DndContext, DragOverlay, closestCorners } from "@dnd-kit/core";
 import { Button } from "@/components/ui/button";
@@ -10,13 +11,20 @@ import {
 import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 import { BoardColumn } from "@/features/board/components/BoardColumn";
 import { TaskCard } from "@/features/tasks/components/TaskCard";
-import { TaskModal } from "@/features/tasks/components/TaskModal";
 import { FilterBar } from "@/features/filters/components/FilterBar";
 import { CmdKOverlay } from "@/features/filters/components/CmdKOverlay";
 import { useTaskModal } from "@/features/tasks/hooks/useTaskModal";
 import { useBoardDnd } from "@/features/board/hooks/useBoardDnd";
+import { useRealtimeSimulation } from "@/features/realtime/hooks/useRealtimeSimulation";
+import { useUndoRedoShortcuts } from "@/features/history/hooks/useUndoRedoShortcuts";
+import { UndoHintBar } from "@/features/history/components/UndoHintBar";
+import { ConflictModal } from "@/features/realtime/components/ConflictModal";
 import type { TaskStatus } from "@/types/task.types";
 import type { Task } from "@/types/task.types";
+
+const TaskModal = lazy(() =>
+  import("@/features/tasks/components/TaskModal").then(m => ({ default: m.TaskModal }))
+)
 
 const COLUMNS: { status: TaskStatus; title: string }[] = [
   { status: "todo", title: "Todo" },
@@ -42,12 +50,15 @@ export function KanbanBoard() {
     handleDragEnd,
   } = useBoardDnd();
 
+  useRealtimeSimulation(editingTask?.id ?? null);
+  useUndoRedoShortcuts();
+
   function handleOpenEdit(task: Task) {
     openEdit(task);
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="h-screen bg-zinc-50 flex flex-col overflow-hidden">
       <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 bg-white">
         <div className="flex items-center gap-2">
           <LayoutGrid className="h-5 w-5 text-violet-600" aria-hidden="true" />
@@ -74,7 +85,7 @@ export function KanbanBoard() {
 
       <FilterBar />
       <CmdKOverlay />
-      {/* UndoHintBar — Epic 7 */}
+      <UndoHintBar />
 
       <ErrorBoundary fallbackMessage="Board failed to load">
         <DndContext
@@ -84,7 +95,7 @@ export function KanbanBoard() {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <main className="flex gap-4 p-4 overflow-x-auto items-start">
+          <main className="flex flex-1 gap-4 p-4 overflow-x-auto scrollbar-hide">
             {COLUMNS.map((col) => (
               <BoardColumn
                 key={col.status}
@@ -102,14 +113,17 @@ export function KanbanBoard() {
         </DndContext>
       </ErrorBoundary>
 
-      <TaskModal
-        isOpen={isOpen}
-        mode={mode}
-        task={editingTask}
-        prefillValues={prefillValues}
-        onClose={close}
-        onOpenCreate={openCreate}
-      />
+      <Suspense fallback={null}>
+        <TaskModal
+          isOpen={isOpen}
+          mode={mode}
+          task={editingTask}
+          prefillValues={prefillValues}
+          onClose={close}
+          onOpenCreate={openCreate}
+        />
+      </Suspense>
+      <ConflictModal />
     </div>
   );
 }

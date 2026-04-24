@@ -1,4 +1,5 @@
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { Inbox, Plus, Filter } from 'lucide-react'
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
@@ -29,6 +30,10 @@ export function BoardColumn({ status, title, onOpenCreate, onOpenEdit }: BoardCo
     () => filterTasks(tasks.filter(t => t.status === status), filters),
     [tasks, filters, status]
   )
+  const pendingTaskIds = useMemo(
+    () => new Set([...pendingOps.values()].map(op => op.taskId)),
+    [pendingOps]
+  )
   const count = columnTasks.length
   const isFiltered =
     filters.assignee !== null ||
@@ -36,17 +41,26 @@ export function BoardColumn({ status, title, onOpenCreate, onOpenEdit }: BoardCo
     filters.searchQuery !== ''
   const { isOver, setNodeRef } = useDroppable({ id: status })
 
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const virtualizer = useVirtualizer({
+    count: columnTasks.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 120,
+    overscan: 5,
+    measureElement: (el) => el.getBoundingClientRect().height,
+  })
+
   return (
     <section
       ref={setNodeRef}
       role="region"
       aria-label={`${title} column, ${count} task${count !== 1 ? 's' : ''}`}
       className={cn(
-        'bg-zinc-100 rounded-xl p-3 flex flex-col gap-3 w-80 min-w-[280px]',
+        'bg-zinc-100 rounded-xl p-3 flex flex-col w-80 min-w-[280px] self-stretch',
         isOver ? 'ring-2 ring-violet-400 ring-inset' : ''
       )}
     >
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-1 mb-2">
         <h2 className="text-sm font-semibold text-zinc-700">{title}</h2>
         <span
           className="bg-zinc-200 rounded-full px-2 py-0.5 text-xs text-zinc-600 font-medium tabular-nums"
@@ -88,17 +102,37 @@ export function BoardColumn({ status, title, onOpenCreate, onOpenEdit }: BoardCo
         )
       ) : (
         <SortableContext items={columnTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-          <div className="flex flex-col gap-2 min-h-[60px]">
-            {columnTasks.map(task => {
-              const isPending = [...pendingOps.values()].some(op => op.taskId === task.id)
-              return (
-                <TaskCard key={task.id} task={task} isPending={isPending} onOpen={onOpenEdit} />
-              )
-            })}
-            {isOver && (
-              <div className="h-14 rounded-lg border-2 border-dashed border-violet-400 opacity-50" />
-            )}
+          {/* flex-1 min-h-0: without min-h-0, flexbox ignores flex-1 on overflow containers */}
+          <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">
+            <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }}>
+              {virtualizer.getVirtualItems().map(virtualItem => {
+                const task = columnTasks[virtualItem.index]
+                if (!task) return null // noUncheckedIndexedAccess guard
+                const isPending = pendingTaskIds.has(task.id)
+                return (
+                  <div
+                    key={virtualItem.key}
+                    data-index={virtualItem.index}
+                    ref={virtualizer.measureElement}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${virtualItem.start}px)`,
+                      paddingBottom: '8px',
+                    }}
+                  >
+                    <TaskCard task={task} onOpen={onOpenEdit} isPending={isPending} />
+                  </div>
+                )
+              })}
+            </div>
           </div>
+          {/* drag-over placeholder outside the virtual scroller — always visible at bottom */}
+          {isOver && (
+            <div className="h-14 rounded-lg border-2 border-dashed border-violet-400 opacity-50 mt-2" />
+          )}
         </SortableContext>
       )}
     </section>

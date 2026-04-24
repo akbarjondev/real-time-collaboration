@@ -17,6 +17,7 @@ describe('ErrorBoundary', () => {
 
   afterEach(() => {
     consoleSpy.mockRestore()
+    vi.unstubAllEnvs()
   })
 
   it('renders children when no error is thrown', () => {

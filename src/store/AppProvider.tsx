@@ -9,6 +9,7 @@ import { ConflictContext } from '@/store/ConflictContext'
 import { BoardAPIProvider } from '@/store/BoardAPIContext'
 import { FilterAPIProvider } from '@/store/FilterAPIContext'
 import { HistoryProvider } from '@/store/HistoryContext'
+import { BoardDispatchContext } from '@/store/BoardDispatchContext'
 
 type AppProviderProps = {
   children: React.ReactNode
@@ -25,20 +26,22 @@ export function AppProvider({ children }: AppProviderProps) {
   const [filterState, filterDispatch] = useReducer(filterReducer, initialFilterState)
 
   return (
-    <BoardStateContext.Provider value={boardState.tasks}>
-      <PendingOpsContext.Provider value={boardState.pendingOps}>
-        <ConflictContext.Provider value={boardState.conflict}>
-          <BoardAPIProvider dispatch={boardDispatch}>
-            <FilterProvider filterState={filterState}>
-              <FilterAPIProvider dispatch={filterDispatch}>
-                <HistoryProvider>
-                  {children}
-                </HistoryProvider>
-              </FilterAPIProvider>
-            </FilterProvider>
-          </BoardAPIProvider>
-        </ConflictContext.Provider>
-      </PendingOpsContext.Provider>
-    </BoardStateContext.Provider>
+    <BoardDispatchContext.Provider value={boardDispatch}>
+      <BoardStateContext.Provider value={boardState.tasks}>
+        <PendingOpsContext.Provider value={boardState.pendingOps}>
+          <ConflictContext.Provider value={boardState.conflict}>
+            <BoardAPIProvider dispatch={boardDispatch}>
+              <FilterProvider filterState={filterState}>
+                <FilterAPIProvider dispatch={filterDispatch}>
+                  <HistoryProvider dispatch={boardDispatch} tasks={boardState.tasks}>
+                    {children}
+                  </HistoryProvider>
+                </FilterAPIProvider>
+              </FilterProvider>
+            </BoardAPIProvider>
+          </ConflictContext.Provider>
+        </PendingOpsContext.Provider>
+      </BoardStateContext.Provider>
+    </BoardDispatchContext.Provider>
   )
 }

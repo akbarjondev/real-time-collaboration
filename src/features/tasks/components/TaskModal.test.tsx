@@ -4,6 +4,7 @@ import React from 'react'
 import { toast } from 'sonner'
 import { TaskModal } from '@/features/tasks/components/TaskModal'
 import { BoardAPIContext, type BoardAPIContextType } from '@/store/BoardAPIContext'
+import { BoardStateContext } from '@/store/BoardStateContext'
 import type { Task } from '@/types/task.types'
 
 vi.mock('sonner', () => ({
@@ -63,7 +64,7 @@ const mockBoardAPI: BoardAPIContextType = {
   deleteTask: vi.fn().mockResolvedValue(undefined),
 }
 
-function renderModal(props: Partial<Parameters<typeof TaskModal>[0]> = {}) {
+function renderModal(props: Partial<Parameters<typeof TaskModal>[0]> = {}, tasks: Task[] = [mockTask]) {
   const defaults = {
     isOpen: true,
     mode: 'create' as const,
@@ -74,9 +75,11 @@ function renderModal(props: Partial<Parameters<typeof TaskModal>[0]> = {}) {
     ...props,
   }
   return render(
-    <BoardAPIContext.Provider value={mockBoardAPI}>
-      <TaskModal {...defaults} />
-    </BoardAPIContext.Provider>
+    <BoardStateContext.Provider value={tasks}>
+      <BoardAPIContext.Provider value={mockBoardAPI}>
+        <TaskModal {...defaults} />
+      </BoardAPIContext.Provider>
+    </BoardStateContext.Provider>
   )
 }
 
@@ -430,5 +433,56 @@ describe('TaskModal — Status Select (Story 3.2)', () => {
     // Focus effect would call statusTriggerRef.current?.focus() on mobile
     // Verified by absence of errors during render with mobile viewport
     expect(true).toBe(true)
+  })
+})
+
+describe('TaskModal — CONFLICT_RESOLVE_THEIRS re-population', () => {
+  it('re-populates the form when liveTask changes after "Take theirs"', async () => {
+    const remoteTask: Task = {
+      ...mockTask,
+      title: 'Remote updated title',
+      priority: 'low',
+    }
+
+    const { rerender } = render(
+      <BoardStateContext.Provider value={[mockTask]}>
+        <BoardAPIContext.Provider value={mockBoardAPI}>
+          <TaskModal
+            isOpen
+            mode="edit"
+            task={mockTask}
+            prefillValues={null}
+            onClose={vi.fn()}
+            onOpenCreate={vi.fn()}
+          />
+        </BoardAPIContext.Provider>
+      </BoardStateContext.Provider>
+    )
+
+    // Initial state: form shows original title
+    expect((screen.getByLabelText(/title/i) as HTMLInputElement).value).toBe('Fix login bug')
+
+    // Simulate CONFLICT_RESOLVE_THEIRS: live tasks now contain remote version
+    await act(async () => {
+      rerender(
+        <BoardStateContext.Provider value={[remoteTask]}>
+          <BoardAPIContext.Provider value={mockBoardAPI}>
+            <TaskModal
+              isOpen
+              mode="edit"
+              task={mockTask}
+              prefillValues={null}
+              onClose={vi.fn()}
+              onOpenCreate={vi.fn()}
+            />
+          </BoardAPIContext.Provider>
+        </BoardStateContext.Provider>
+      )
+    })
+
+    // Form should re-populate with the remote task's title
+    await waitFor(() => {
+      expect((screen.getByLabelText(/title/i) as HTMLInputElement).value).toBe('Remote updated title')
+    })
   })
 })

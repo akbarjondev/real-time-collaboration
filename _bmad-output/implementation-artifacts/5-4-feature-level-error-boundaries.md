@@ -1,6 +1,6 @@
 # Story 5.4: Feature-Level Error Boundaries
 
-Status: review
+Status: done
 
 ## Blocker
 
@@ -349,4 +349,5 @@ _None_
 
 ### Review Findings
 
-_TBD_
+- [x] [Review][Patch] Fragile `vi.stubEnv` restore in production-mode test — if the assertion on line 91 throws before the restore line (93), `import.meta.env.DEV` stays `false` for subsequent tests, silently breaking any test that assumes DEV mode. Fix: move cleanup to `afterEach(() => vi.unstubAllEnvs())` (already have an `afterEach` block — add it there). [src/shared/components/ErrorBoundary.test.tsx:81-94] ✅ fixed
+- [x] [Review][Defer] Story 5-4 subtask checkboxes (Tasks 1–3 sub-items) are unchecked in the story file despite the implementation being complete per Completion Notes — pre-existing tracking inconsistency, docs only [_bmad-output/implementation-artifacts/5-4-feature-level-error-boundaries.md] — deferred, pre-existing

@@ -13,7 +13,23 @@ vi.mock('@/api/tasks', () => ({
   moveTask: vi.fn(),
 }))
 
-describe('BoardAPIContext — moveTask', () => {
+describe('BoardAPIContext — context stability', () => {
+  it('boardAPI reference is stable across re-renders with the same dispatch', () => {
+    const mockDispatch = vi.fn()
+
+    function wrapper({ children }: { children: React.ReactNode }) {
+      return createElement(BoardAPIProvider, { dispatch: mockDispatch }, children)
+    }
+
+    const { result, rerender } = renderHook(() => useBoardAPI(), { wrapper })
+    const firstRef = result.current
+
+    rerender()
+
+    expect(result.current).toBe(firstRef)
+  })
+})
+
   const mockDispatch = vi.fn()
 
   function wrapper({ children }: { children: React.ReactNode }) {

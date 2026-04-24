@@ -1,6 +1,6 @@
 # Story 7.3: Undo Hint Bar Component
 
-Status: ready-for-dev
+Status: done
 
 ## Blocker
 
@@ -31,30 +31,30 @@ so that I can see at a glance what action is available to undo or redo and trigg
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Implement `UndoHintBar` component in `src/features/history/components/UndoHintBar.tsx` (AC: #1–#10)
-  - [ ] Call `useHistory()` to get `{ canUndo, undoLabel, canRedo, redoLabel, undo, redo }`
-  - [ ] Render a single `<div>` container with `aria-live="polite"` and `aria-atomic="false"`
-  - [ ] Fixed layout: `flex items-center justify-between px-4 py-1 border-b border-zinc-200 bg-white min-h-[44px]`
-  - [ ] Left side: when `canUndo = false`, render `<span className="text-xs text-zinc-500">Nothing to undo</span>`; when `canUndo = true`, render an Undo ghost button
-  - [ ] Right side: when `canRedo = true`, render a Redo ghost button; when `canRedo = false`, render nothing (no placeholder)
-  - [ ] Undo button: `<button>` with `undo-2` icon (lucide-react) + text `Undo: {undoLabel}`, `onClick={undo}`, ghost styling, min 44×44px touch target, `aria-label={`Undo: ${undoLabel}`}`
-  - [ ] Redo button: `<button>` with `redo-2` icon (lucide-react) + text `Redo: {redoLabel}`, `onClick={redo}`, ghost styling, min 44×44px touch target, `aria-label={`Redo: ${redoLabel}`}`
-  - [ ] Apply `focus-visible:ring-2 focus-visible:ring-violet-500 rounded` on both buttons; never `focus:outline-none` alone
-  - [ ] Use `cn()` helper for all conditional className composition
+- [x] Task 1: Implement `UndoHintBar` component in `src/features/history/components/UndoHintBar.tsx` (AC: #1–#10)
+  - [x] Call `useHistory()` to get `{ canUndo, undoLabel, canRedo, redoLabel, undo, redo }`
+  - [x] Render a single `<div>` container with `aria-live="polite"` and `aria-atomic="false"`
+  - [x] Fixed layout: `flex items-center justify-between px-4 py-1 border-b border-zinc-200 bg-white min-h-[44px]`
+  - [x] Left side: when `canUndo = false`, render `<span className="text-xs text-zinc-500">Nothing to undo</span>`; when `canUndo = true`, render an Undo ghost button
+  - [x] Right side: when `canRedo = true`, render a Redo ghost button; when `canRedo = false`, render nothing (no placeholder)
+  - [x] Undo button: `<button>` with `undo-2` icon (lucide-react) + text `Undo: {undoLabel}`, `onClick={undo}`, ghost styling, min 44×44px touch target, `aria-label={`Undo: ${undoLabel}`}`
+  - [x] Redo button: `<button>` with `redo-2` icon (lucide-react) + text `Redo: {redoLabel}`, `onClick={redo}`, ghost styling, min 44×44px touch target, `aria-label={`Redo: ${redoLabel}`}`
+  - [x] Apply `focus-visible:ring-2 focus-visible:ring-violet-500 rounded` on both buttons; never `focus:outline-none` alone
+  - [x] Use `cn()` helper for all conditional className composition
 
-- [ ] Task 2: Place `UndoHintBar` in `KanbanBoard.tsx` (AC: #11)
-  - [ ] Add `<UndoHintBar />` between the `{/* FilterBar — Story 4.2 */}` comment and the `<DndContext>` block
-  - [ ] No props needed — `UndoHintBar` reads context directly
+- [x] Task 2: Place `UndoHintBar` in `KanbanBoard.tsx` (AC: #11)
+  - [x] Add `<UndoHintBar />` between the `{/* FilterBar — Story 4.2 */}` comment and the `<DndContext>` block
+  - [x] No props needed — `UndoHintBar` reads context directly
 
-- [ ] Task 3: Write component tests in `src/features/history/components/UndoHintBar.test.tsx` (AC: #1–#8)
-  - [ ] Test: renders "Nothing to undo" when `canUndo = false`
-  - [ ] Test: renders undo button with correct label when `canUndo = true`
-  - [ ] Test: clicking undo button calls `undo()`
-  - [ ] Test: renders redo button with correct label when `canRedo = true`
-  - [ ] Test: clicking redo button calls `redo()`
-  - [ ] Test: redo button absent when `canRedo = false`
-  - [ ] Test: container has `aria-live="polite"`
-  - [ ] Inject `HistoryContext` via test wrapper providing mock `{ canUndo, undoLabel, canRedo, redoLabel, undo, redo }`
+- [x] Task 3: Write component tests in `src/features/history/components/UndoHintBar.test.tsx` (AC: #1–#8)
+  - [x] Test: renders "Nothing to undo" when `canUndo = false`
+  - [x] Test: renders undo button with correct label when `canUndo = true`
+  - [x] Test: clicking undo button calls `undo()`
+  - [x] Test: renders redo button with correct label when `canRedo = true`
+  - [x] Test: clicking redo button calls `redo()`
+  - [x] Test: redo button absent when `canRedo = false`
+  - [x] Test: container has `aria-live="polite"`
+  - [x] Inject `HistoryContext` via test wrapper providing mock `{ canUndo, undoLabel, canRedo, redoLabel, undo, redo }`
 
 ---
 
@@ -200,19 +200,28 @@ These are the correct lucide-react v1.x names. `Undo` and `Redo` also exist but 
 ## Dev Agent Record
 
 ### Agent Model Used
-_TBD_
+Claude Sonnet 4.6
 
 ### Debug Log References
 _None_
 
 ### Completion Notes List
-_TBD_
+- Used `cn()` from `@/lib/utils` (project convention) rather than `@/shared/utils/cn` as noted in story (that path doesn't exist in this project).
+- `HistoryContext` (raw context object) exported from `HistoryContext.tsx` to enable test injection.
+- `fireEvent` from `@testing-library/react` used instead of `userEvent` (`@testing-library/user-event` not installed).
 
 ### File List
-_TBD_
+- `src/features/history/components/UndoHintBar.tsx` — replaced stub with full implementation
+- `src/features/history/components/UndoHintBar.test.tsx` — new
+- `src/features/board/components/KanbanBoard.tsx` — `<UndoHintBar />` placed after `<CmdKOverlay />`, `useUndoRedoShortcuts()` added (also serves Story 7.2)
 
 ### Change Log
-_TBD_
+- Implemented `UndoHintBar` with always-visible layout, conditional undo/redo buttons, `aria-live="polite"`, `Undo2`/`Redo2` lucide icons, 44px touch targets
+- Added 7 component tests covering all ACs
+- Placed `<UndoHintBar />` in `KanbanBoard.tsx`
 
 ### Review Findings
-_TBD_
+
+- [x] [Review][Patch] ~~Container height shifts when undo state toggles~~ — **Fixed**: removed `py-1` from container and added `min-h-[44px]` to both inner wrapper divs so the bar is always exactly 44px regardless of undo state. [`src/features/history/components/UndoHintBar.tsx`]
+
+- [x] [Review][Patch] ~~Redo button `aria-label` renders `"Redo: null"` when `redoLabel` is null while `canRedo=true`~~ — **Fixed**: both `aria-label` now use `${redoLabel ?? ''}` to coerce null to empty string. [`src/features/history/components/UndoHintBar.tsx`]

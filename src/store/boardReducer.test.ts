@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { boardReducer, initialBoardState } from '@/store/boardReducer'
 import type { BoardState } from '@/store/boardReducer'
 import type { Task } from '@/types/task.types'
+import type { PendingOperation } from '@/types/common.types'
 
 const mockTask: Task = {
   id: 'task-1',
@@ -253,3 +254,88 @@ describe('boardReducer — concurrent mutation isolation', () => {
     expect(afterSuccess1.pendingOps.size).toBe(1)
   })
 })
+
+describe('boardReducer — object reference preservation', () => {
+  const taskA: Task = { ...mockTask, id: 'task-a', title: 'Task A', status: 'todo' }
+  const taskB: Task = { ...mockTask, id: 'task-b', title: 'Task B', status: 'todo' }
+  const stateWith2: BoardState = { ...initialBoardState, tasks: [taskA, taskB] }
+
+  it('TASK_MOVE: unchanged task keeps exact object reference', () => {
+    const next = boardReducer(stateWith2, {
+      type: 'TASK_MOVE',
+      taskId: 'task-a',
+      newStatus: 'done',
+      opId: 'op-1',
+    })
+    expect(next.tasks.find(t => t.id === 'task-b')).toBe(taskB)
+    expect(next.tasks.find(t => t.id === 'task-a')).not.toBe(taskA)
+  })
+
+  it('TASK_UPDATE: unchanged task keeps exact object reference', () => {
+    const next = boardReducer(stateWith2, {
+      type: 'TASK_UPDATE',
+      taskId: 'task-a',
+      changes: { title: 'Updated A' },
+      opId: 'op-1',
+    })
+    expect(next.tasks.find(t => t.id === 'task-b')).toBe(taskB)
+    expect(next.tasks.find(t => t.id === 'task-a')).not.toBe(taskA)
+  })
+
+  it('TASK_CREATE: existing tasks keep exact object references', () => {
+    const newTask: Task = { ...mockTask, id: 'task-new', title: 'New' }
+    const next = boardReducer(stateWith2, {
+      type: 'TASK_CREATE',
+      task: newTask,
+      opId: 'op-1',
+    })
+    expect(next.tasks.find(t => t.id === 'task-a')).toBe(taskA)
+    expect(next.tasks.find(t => t.id === 'task-b')).toBe(taskB)
+  })
+
+  it('TASK_DELETE: remaining tasks keep exact object references', () => {
+    const next = boardReducer(stateWith2, {
+      type: 'TASK_DELETE',
+      taskId: 'task-a',
+      opId: 'op-1',
+    })
+    expect(next.tasks.find(t => t.id === 'task-b')).toBe(taskB)
+  })
+})
+
+  it('changes task status — task appears in new status', () => {
+    const task: Task = { ...mockTask, status: 'todo' }
+    const state: BoardState = { ...initialBoardState, tasks: [task] }
+    const updated = boardReducer(state, {
+      type: 'REMOTE_UPDATE',
+      task: { ...task, status: 'done' },
+    })
+    expect(updated.tasks[0]?.status).toBe('done')
+  })
+
+  it('upserts task by replacing matching entry in place', () => {
+    const state: BoardState = { ...initialBoardState, tasks: [mockTask] }
+    const updated = boardReducer(state, {
+      type: 'REMOTE_UPDATE',
+      task: { ...mockTask, priority: 'low' },
+    })
+    expect(updated.tasks).toHaveLength(1)
+    expect(updated.tasks[0]?.priority).toBe('low')
+  })
+
+  it('on task with pending op — op remains in map and task is updated', () => {
+    const op: PendingOperation = { opId: 'op1', taskId: mockTask.id, snapshot: mockTask, opType: 'move' }
+    const state: BoardState = {
+      ...initialBoardState,
+      tasks: [mockTask],
+      pendingOps: new Map([['op1', op]]),
+    }
+    const updated = boardReducer(state, {
+      type: 'REMOTE_UPDATE',
+      task: { ...mockTask, priority: 'high' },
+    })
+    expect(updated.pendingOps.has('op1')).toBe(true)
+    expect(updated.tasks[0]?.priority).toBe('high')
+  })
+})
+

@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'sonner'
 import { AlertCircle } from 'lucide-react'
-import { useBoardAPI } from '@/store/BoardAPIContext'
+import { useHistory } from '@/store/HistoryContext'
+import { useTasks } from '@/store/BoardStateContext'
 import {
   Dialog,
   DialogContent,
@@ -46,7 +47,12 @@ export function TaskModal({
   onClose,
   onOpenCreate,
 }: TaskModalProps) {
-  const boardAPI = useBoardAPI()
+  const history = useHistory()
+  const liveTasks = useTasks()
+  // Derive the live version of the task so CONFLICT_RESOLVE_THEIRS re-populates the form
+  const liveTask = mode === 'edit' && task
+    ? (liveTasks.find(t => t.id === task.id) ?? task)
+    : task
   const [showGuard, setShowGuard] = useState(false)
   const titleInputRef = useRef<HTMLInputElement | null>(null)
   const statusTriggerRef = useRef<HTMLButtonElement | null>(null)
@@ -90,16 +96,16 @@ export function TaskModal({
   }, [isOpen, mode, prefillValues, reset])
 
   useEffect(() => {
-    if (isOpen && mode === 'edit' && task) {
+    if (isOpen && mode === 'edit' && liveTask) {
       reset({
-        title: task.title,
-        description: task.description ?? '',
-        assignee: task.assignee ?? '',
-        priority: task.priority,
-        tags: task.tags.map(t => t.label).join(', '),
+        title: liveTask.title,
+        description: liveTask.description ?? '',
+        assignee: liveTask.assignee ?? '',
+        priority: liveTask.priority,
+        tags: liveTask.tags.map(t => t.label).join(', '),
       })
     }
-  }, [isOpen, mode, task, reset])
+  }, [isOpen, mode, liveTask, reset])
 
   function handleCloseAttempt() {
     if (isDirty) {
@@ -122,7 +128,7 @@ export function TaskModal({
 
     if (mode === 'create') {
       try {
-        await boardAPI.createTask({
+        await history.createTask({
           title: data.title,
           description: data.description || undefined,
           assignee: data.assignee || undefined,
@@ -138,7 +144,7 @@ export function TaskModal({
     } else if (mode === 'edit' && task) {
       const taskTitle = task.title
       try {
-        await boardAPI.updateTask(task.id, {
+        await history.updateTask(task.id, {
           title: data.title,
           description: data.description || undefined,
           assignee: data.assignee || undefined,
@@ -159,7 +165,7 @@ export function TaskModal({
     onClose()
 
     try {
-      await boardAPI.moveTask(task.id, newStatus)
+      await history.moveTask(task.id, newStatus)
     } catch {
       if (isMountedRef.current) {
         toast.error(`Move failed — "${taskTitle}" has been reverted`, { duration: Infinity })
@@ -172,7 +178,7 @@ export function TaskModal({
     const taskTitle = task.title
     onClose()
     try {
-      await boardAPI.deleteTask(task.id)
+      await history.deleteTask(task.id)
     } catch {
       if (isMountedRef.current) {
         toast.error(`Delete failed — "${taskTitle}" has been restored`, { duration: Infinity })

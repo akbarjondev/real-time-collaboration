@@ -7,7 +7,7 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { toast } from 'sonner'
-import { useBoardAPI } from '@/store/BoardAPIContext'
+import { useHistory } from '@/store/HistoryContext'
 import { useTasks } from '@/store/BoardStateContext'
 import type { Task, TaskStatus } from '@/types/task.types'
 
@@ -15,7 +15,7 @@ const VALID_STATUSES: TaskStatus[] = ['todo', 'in-progress', 'done']
 
 export function useBoardDnd() {
   const tasks = useTasks()
-  const { moveTask } = useBoardAPI()
+  const { moveTask } = useHistory()
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const isMountedRef = useRef(true)
 

@@ -129,16 +129,27 @@
     }
 }
 
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @keyframes cardPulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgb(124 58 237 / 0.3); }
-  50%       { box-shadow: 0 0 0 4px rgb(124 58 237 / 0.6); }
+  0%, 100% { outline-color: rgb(124 58 237 / 0.25); }
+  50%       { outline-color: rgb(124 58 237 / 0.7); }
 }
 .card-pulse {
+  /* outline avoids overriding Tailwind's box-shadow (hover:shadow-md, focus-visible:ring) */
+  /* negative offset draws the ring inside the card border (inset effect) */
+  outline: 2px solid rgb(124 58 237 / 0.25);
+  outline-offset: -2px;
   animation: cardPulse 1.8s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .card-pulse {
     animation: none;
-    box-shadow: 0 0 0 2px rgb(124 58 237 / 0.5);
+    outline-color: rgb(124 58 237 / 0.5);
   }
 }

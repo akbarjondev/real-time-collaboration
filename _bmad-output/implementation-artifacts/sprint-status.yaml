@@ -1,5 +1,5 @@
 # generated: 2026-04-24
-# last_updated: 2026-04-24
+# last_updated: 2026-04-24  # epics 1-7 done; epic 8 both stories done
 # project: real-time-collaboration
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-24
-last_updated: 2026-04-24  # epics 1-4 done; epic-5 all stories done; epics 6-9 all stories ready-for-dev
+last_updated: 2026-04-24  # epics 1-7 done; epic 8 both stories done
 project: real-time-collaboration
 project_key: NOKEY
 tracking_system: file-system
@@ -72,31 +72,31 @@ development_status:
   epic-4-retrospective: optional
 
   # Epic 5: Optimistic Updates & Error Recovery
-  epic-5: in-progress
-  5-1-implement-optimistic-update-sequence-with-automatic-rollback: review
-  5-2-per-card-in-flight-loading-indicator: review
-  5-3-tiered-toast-notification-system: review
-  5-4-feature-level-error-boundaries: review
+  epic-5: done
+  5-1-implement-optimistic-update-sequence-with-automatic-rollback: done
+  5-2-per-card-in-flight-loading-indicator: done
+  5-3-tiered-toast-notification-system: done
+  5-4-feature-level-error-boundaries: done
   epic-5-retrospective: optional
 
   # Epic 6: Real-Time Collaboration Simulation & Conflict Resolution
-  epic-6: in-progress
-  6-1-implement-real-time-simulation-hook: ready-for-dev
-  6-2-remote-update-notifications: ready-for-dev
-  6-3-conflict-detection-and-resolution-modal: ready-for-dev
+  epic-6: done
+  6-1-implement-real-time-simulation-hook: done
+  6-2-remote-update-notifications: done
+  6-3-conflict-detection-and-resolution-modal: done
   epic-6-retrospective: optional
 
   # Epic 7: Undo/Redo History System
-  epic-7: in-progress
-  7-1-implement-usehistory-hook-with-command-stack: ready-for-dev
-  7-2-keyboard-shortcuts-for-undo-and-redo: ready-for-dev
-  7-3-undo-hint-bar-component: ready-for-dev
+  epic-7: done
+  7-1-implement-usehistory-hook-with-command-stack: done
+  7-2-keyboard-shortcuts-for-undo-and-redo: done
+  7-3-undo-hint-bar-component: done
   epic-7-retrospective: optional
 
   # Epic 8: Performance & Scale
-  epic-8: in-progress
-  8-1-virtualized-task-list-per-column: ready-for-dev
-  8-2-performance-optimizations-memoization-and-render-isolation: ready-for-dev
+  epic-8: done
+  8-1-virtualized-task-list-per-column: done
+  8-2-performance-optimizations-memoization-and-render-isolation: done
   epic-8-retrospective: optional
 
   # Epic 9: Responsive Design & Accessibility

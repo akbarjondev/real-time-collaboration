@@ -1,6 +1,6 @@
 # Story 5.2: Per-Card In-Flight Loading Indicator
 
-Status: review
+Status: done
 
 ## Blocker
 
@@ -199,4 +199,4 @@ _None_
 
 ### Review Findings
 
-_TBD_
+✅ Clean — no issues found across all three review layers (Blind Hunter, Edge Case Hunter, Acceptance Auditor).

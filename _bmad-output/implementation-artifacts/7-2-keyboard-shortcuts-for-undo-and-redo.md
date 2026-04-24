@@ -1,6 +1,6 @@
 # Story 7.2: Keyboard Shortcuts for Undo and Redo
 
-Status: ready-for-dev
+Status: done
 
 ## Blocker
 
@@ -28,30 +28,30 @@ so that I can reverse and replay task changes without reaching for the mouse.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create `useUndoRedoShortcuts` hook in `src/features/history/hooks/useUndoRedoShortcuts.ts` (AC: #1–#8)
-  - [ ] Add `document.addEventListener('keydown', handler)` in a `useEffect` with `return () => document.removeEventListener('keydown', handler)` cleanup
-  - [ ] Detect undo: `e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey`
-  - [ ] Detect redo: `e.key === 'z' && (e.ctrlKey || e.metaKey) && e.shiftKey`
-  - [ ] Suppress when modal is open: check `document.activeElement?.closest('[role="dialog"]') !== null`
-  - [ ] Suppress when a form element is focused (input, textarea, select, contenteditable): reuse or inline `isFormElementFocused()` logic
-  - [ ] When undo condition passes: call `undo()` from `useHistory()` and `e.preventDefault()`
-  - [ ] When redo condition passes: call `redo()` from `useHistory()` and `e.preventDefault()`
-  - [ ] Use a stable `handlerRef` pattern (same as existing `useKeyboardShortcut`) — update ref on every render, keep effect deps minimal
+- [x] Task 1: Create `useUndoRedoShortcuts` hook in `src/features/history/hooks/useUndoRedoShortcuts.ts` (AC: #1–#8)
+  - [x] Add `document.addEventListener('keydown', handler)` in a `useEffect` with `return () => document.removeEventListener('keydown', handler)` cleanup
+  - [x] Detect undo: `e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey`
+  - [x] Detect redo: `e.key === 'z' && (e.ctrlKey || e.metaKey) && e.shiftKey`
+  - [x] Suppress when modal is open: check `document.activeElement?.closest('[role="dialog"]') !== null`
+  - [x] Suppress when a form element is focused (input, textarea, select, contenteditable): reuse or inline `isFormElementFocused()` logic
+  - [x] When undo condition passes: call `undo()` from `useHistory()` and `e.preventDefault()`
+  - [x] When redo condition passes: call `redo()` from `useHistory()` and `e.preventDefault()`
+  - [x] Use a stable `handlerRef` pattern (same as existing `useKeyboardShortcut`) — update ref on every render, keep effect deps minimal
 
-- [ ] Task 2: Register `useUndoRedoShortcuts` in `KanbanBoard.tsx` (AC: #1–#8)
-  - [ ] Call `useUndoRedoShortcuts()` at the top of `KanbanBoard` function body — one line, no props needed
-  - [ ] Confirm it does NOT break the N shortcut (which is registered via `useKeyboardShortcut` in `useTaskModal`)
+- [x] Task 2: Register `useUndoRedoShortcuts` in `KanbanBoard.tsx` (AC: #1–#8)
+  - [x] Call `useUndoRedoShortcuts()` at the top of `KanbanBoard` function body — one line, no props needed
+  - [x] Confirm it does NOT break the N shortcut (which is registered via `useKeyboardShortcut` in `useTaskModal`)
 
-- [ ] Task 3: Write unit tests in `src/features/history/hooks/useUndoRedoShortcuts.test.ts` (AC: #1–#8)
-  - [ ] Test: Ctrl+Z fires undo
-  - [ ] Test: Cmd+Z fires undo (metaKey)
-  - [ ] Test: Ctrl+Shift+Z fires redo
-  - [ ] Test: Cmd+Shift+Z fires redo
-  - [ ] Test: Ctrl+Z is suppressed when activeElement is inside a `[role="dialog"]`
-  - [ ] Test: Ctrl+Z is suppressed when an input element is focused
-  - [ ] Test: Ctrl+Z is suppressed when a textarea element is focused
-  - [ ] Test: plain Z key does NOT trigger undo (no modifier)
-  - [ ] Test: event listener is removed on unmount (use `removeEventListener` spy)
+- [x] Task 3: Write unit tests in `src/features/history/hooks/useUndoRedoShortcuts.test.ts` (AC: #1–#8)
+  - [x] Test: Ctrl+Z fires undo
+  - [x] Test: Cmd+Z fires undo (metaKey)
+  - [x] Test: Ctrl+Shift+Z fires redo
+  - [x] Test: Cmd+Shift+Z fires redo
+  - [x] Test: Ctrl+Z is suppressed when activeElement is inside a `[role="dialog"]`
+  - [x] Test: Ctrl+Z is suppressed when an input element is focused
+  - [x] Test: Ctrl+Z is suppressed when a textarea element is focused
+  - [x] Test: plain Z key does NOT trigger undo (no modifier)
+  - [x] Test: event listener is removed on unmount (use `removeEventListener` spy)
 
 ---
 
@@ -164,19 +164,28 @@ Call `e.preventDefault()` before invoking `undo`/`redo` so the browser does not 
 ## Dev Agent Record
 
 ### Agent Model Used
-_TBD_
+Claude Sonnet 4.6
 
 ### Debug Log References
 _None_
 
 ### Completion Notes List
-_TBD_
+- `useUndoRedoShortcuts` uses the stable handlerRef pattern (updates refs on each render, empty `useEffect` deps) to avoid listener re-registration.
+- Suppression checks: `isFormElementFocused()` for input/textarea/select/contenteditable, `isModalFocused()` via `closest('[role="dialog"]')`.
+- `e.key` can be `'z'` or `'Z'` (shift changes case on some OSes), both handled.
 
 ### File List
-_TBD_
+- `src/features/history/hooks/useUndoRedoShortcuts.ts` — new
+- `src/features/history/hooks/useUndoRedoShortcuts.test.ts` — new
+- `src/features/board/components/KanbanBoard.tsx` — added `useUndoRedoShortcuts()` call and `UndoHintBar` import/placement
 
 ### Change Log
-_TBD_
+- Created `useUndoRedoShortcuts` hook with Ctrl+Z/Cmd+Z (undo) and Ctrl+Shift+Z/Cmd+Shift+Z (redo), with modal and form suppression
+- Added 9 unit tests covering all ACs
+- Registered hook in `KanbanBoard.tsx`
 
 ### Review Findings
-_TBD_
+
+- [x] [Review][Patch] ~~`isModalFocused()` falsely returns `true` when `document.activeElement` is `null`~~ — **Fixed**: changed `!== null` to `!= null` (loose inequality catches both `null` and `undefined`). [`src/features/history/hooks/useUndoRedoShortcuts.ts:17`]
+
+- [x] [Review][Patch] ~~Key guard should normalize to `.toLowerCase()` instead of checking `'z'` and `'Z'` separately~~ — **Fixed**: changed to `e.key.toLowerCase() !== 'z'`. [`src/features/history/hooks/useUndoRedoShortcuts.ts:31`]

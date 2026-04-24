@@ -1,6 +1,6 @@
 # Story 5.1: Implement Optimistic Update Sequence with Automatic Rollback
 
-Status: review
+Status: done
 
 ## Blocker
 
@@ -207,4 +207,4 @@ _None_
 
 ### Review Findings
 
-_TBD_
+✅ Clean — no issues found across all three review layers (Blind Hunter, Edge Case Hunter, Acceptance Auditor).
