@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-24
-last_updated: 2026-04-24  # epics 1+2 done; epic-3 in-progress, 3-1 in-progress (review findings), 3-2 in-progress (review findings)
+last_updated: 2026-04-24  # epics 1+2+3 done; epic-4 next
 project: real-time-collaboration
 project_key: NOKEY
 tracking_system: file-system
@@ -59,9 +59,9 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: Task Movement — Drag-and-Drop & Status Changes
-  epic-3: in-progress
-  3-1-desktop-drag-and-drop-task-movement: in-progress
-  3-2-mobile-status-dropdown-for-task-movement: in-progress
+  epic-3: done
+  3-1-desktop-drag-and-drop-task-movement: done
+  3-2-mobile-status-dropdown-for-task-movement: done
   epic-3-retrospective: optional
 
   # Epic 4: Filtering & Search
