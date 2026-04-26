@@ -19,7 +19,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 - React ^19.2.5 (React 19 — NOT React 18; some APIs differ)
 - TypeScript ~6.0.2 strict mode
 - Tailwind CSS ^4.2.4 (v4 — CSS-only setup, no tailwind.config.js)
-- Vite ^8.0.10 + @vitejs/plugin-react-swc ^4.3.0 (SWC compiler)
+- Vite ^8.0.10 + @vitejs/plugin-react ^6.0.1 (Babel compiler)
 - @dnd-kit/core ^6.3.1 + @dnd-kit/sortable ^10.0.0 + @dnd-kit/utilities ^3.2.2
 - @tanstack/react-virtual ^3.13.24
 - Sonner ^2.0.7 (toasts)

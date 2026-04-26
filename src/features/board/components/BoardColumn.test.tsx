@@ -213,7 +213,7 @@ describe('BoardColumn', () => {
     cards.forEach(card => expect(card).toHaveAttribute('aria-busy', 'false'))
   })
 
-
+  it('virtualizer renders only overscan window, not all items', () => {
     // With jsdom (no layout), virtualizer renders only the overscan window (up to ~5 items)
     const manyTasks: Task[] = Array.from({ length: 20 }, (_, i) => ({
       ...mockTask,
