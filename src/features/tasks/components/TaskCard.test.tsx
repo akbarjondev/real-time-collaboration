@@ -256,11 +256,11 @@ describe('TaskCard — drag and drop', () => {
     vi.mocked(useSortable).mockReturnValue({
       setNodeRef: vi.fn(),
       transform: null,
-      transition: null,
+      transition: undefined,
       isDragging: false,
-      attributes: {},
+      attributes: {} as ReturnType<typeof useSortable>['attributes'],
       listeners: {},
-    })
+    } as unknown as ReturnType<typeof useSortable>)
   })
 
   it('uses tabIndex=-1 when isOverlay=true', () => {
@@ -279,11 +279,11 @@ describe('TaskCard — drag and drop', () => {
     vi.mocked(useSortable).mockReturnValue({
       setNodeRef: vi.fn(),
       transform: null,
-      transition: null,
+      transition: undefined,
       isDragging: true,
-      attributes: {},
+      attributes: {} as ReturnType<typeof useSortable>['attributes'],
       listeners: {},
-    })
+    } as unknown as ReturnType<typeof useSortable>)
     renderCard(baseTask)
     const article = screen.getByRole('article')
     expect(article.className).toContain('opacity-0')
@@ -294,11 +294,11 @@ describe('TaskCard — drag and drop', () => {
     vi.mocked(useSortable).mockReturnValue({
       setNodeRef: vi.fn(),
       transform: null,
-      transition: null,
+      transition: undefined,
       isDragging: true,
-      attributes: {},
+      attributes: {} as ReturnType<typeof useSortable>['attributes'],
       listeners: {},
-    })
+    } as unknown as ReturnType<typeof useSortable>)
     renderCard(baseTask, false, undefined, { isOverlay: true })
     const article = screen.getByRole('article')
     expect(article.className).not.toContain('opacity-0')

@@ -18,7 +18,7 @@ describe('BoardAPIContext — context stability', () => {
     const mockDispatch = vi.fn()
 
     function wrapper({ children }: { children: React.ReactNode }) {
-      return createElement(BoardAPIProvider, { dispatch: mockDispatch }, children)
+      return createElement(BoardAPIProvider, { dispatch: mockDispatch, children })
     }
 
     const { result, rerender } = renderHook(() => useBoardAPI(), { wrapper })
@@ -34,7 +34,7 @@ describe('BoardAPIContext — moveTask optimistic flow', () => {
   const mockDispatch = vi.fn()
 
   function wrapper({ children }: { children: React.ReactNode }) {
-    return createElement(BoardAPIProvider, { dispatch: mockDispatch }, children)
+    return createElement(BoardAPIProvider, { dispatch: mockDispatch, children })
   }
 
   beforeEach(() => {

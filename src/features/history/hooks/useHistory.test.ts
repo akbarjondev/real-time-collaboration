@@ -27,7 +27,7 @@ describe('useHistoryImpl', () => {
   const mockTasks: Task[] = [MOCK_TASK]
 
   function wrapper({ children }: { children: React.ReactNode }) {
-    return createElement(BoardAPIProvider, { dispatch: mockDispatch }, children)
+    return createElement(BoardAPIProvider, { dispatch: mockDispatch, children })
   }
 
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe('useHistoryImpl', () => {
     vi.mocked(tasksApi.moveTask).mockResolvedValue({} as Task)
     vi.mocked(tasksApi.createTask).mockResolvedValue({} as Task)
     vi.mocked(tasksApi.updateTask).mockResolvedValue({} as Task)
-    vi.mocked(tasksApi.deleteTask).mockResolvedValue({} as Task)
+    vi.mocked(tasksApi.deleteTask).mockResolvedValue(undefined)
   })
 
   it('starts with empty stack, cursor -1, canUndo=false, canRedo=false', () => {

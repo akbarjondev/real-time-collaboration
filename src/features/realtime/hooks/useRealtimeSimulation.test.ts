@@ -170,7 +170,7 @@ describe('useRealtimeSimulation', () => {
     // Mount with null — simulates component mount before any task is opened
     const { rerender } = renderHook(
       ({ id }: { id: string | null }) => useRealtimeSimulation(id),
-      { initialProps: { id: null } }
+      { initialProps: { id: null } as { id: string | null } }
     )
 
     // Simulate user opening a task edit modal after mount

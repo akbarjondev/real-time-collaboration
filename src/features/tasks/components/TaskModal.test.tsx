@@ -502,7 +502,7 @@ describe('TaskModal — Accessibility (Story 9.2)', () => {
     )
     // Get the button inside the status select area
     const buttons = statusSelect?.querySelectorAll('button') ?? []
-    const statusTrigger = Array.from(buttons).find(btn => 
+    Array.from(buttons).find(btn => 
       btn.textContent?.includes('Todo') || btn.textContent?.includes('In Progress') || btn.textContent?.includes('Done') || btn.textContent === ''
     )
     // In the real component, this would have aria-label="Status"

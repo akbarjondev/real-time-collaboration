@@ -33,7 +33,7 @@ describe('useUndoRedoShortcuts', () => {
   beforeEach(() => {
     undo = vi.fn()
     redo = vi.fn()
-    historyValue = makeHistory({ undo, redo })
+    historyValue = makeHistory({ undo: undo as () => void, redo: redo as () => void })
   })
 
   afterEach(() => {

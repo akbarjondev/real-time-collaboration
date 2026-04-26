@@ -57,7 +57,7 @@ function renderColumn(
   filterState: FilterState = initialFilterState,
   pendingOps: Map<string, PendingOperation> = new Map()
 ) {
-  vi.mocked(useDroppable).mockReturnValue({ isOver, setNodeRef: mockSetNodeRef } as ReturnType<typeof useDroppable>)
+  vi.mocked(useDroppable).mockReturnValue({ isOver, setNodeRef: mockSetNodeRef } as unknown as ReturnType<typeof useDroppable>)
   return render(
     <BoardStateContext.Provider value={tasks}>
       <FilterContext.Provider value={filterState}>
