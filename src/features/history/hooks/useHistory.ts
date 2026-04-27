@@ -4,9 +4,6 @@ import type { Task, TaskStatus } from '@/types/task.types'
 import type { BoardAction } from '@/store/boardReducer'
 import type { HistoryEntry, UserAction } from '@/types/history.types'
 import { useBoardAPI } from '@/store/BoardAPIContext'
-import {
-  createTask as apiCreateTask,
-} from '@/api/tasks'
 
 const MAX_HISTORY = 50
 
@@ -100,19 +97,17 @@ export function useHistoryImpl(
     await boardAPI.moveTask(taskId, newStatus)
   }
 
-  // createTask dispatches directly (not via boardAPI) so we control the task id,
-  // ensuring the history entry's inverse (TASK_DELETE with that id) is consistent
-  // with what lands in board state.
   async function createTask(task: Omit<Task, 'id' | 'createdAt'>): Promise<void> {
+    const taskId = nanoid()
     const newTask: Task = {
       ...task,
-      id: nanoid(),
+      id: taskId,
       createdAt: new Date().toISOString(),
     }
     const opId = nanoid()
     const inverseOpId = nanoid()
     const forward: UserAction = { type: 'TASK_CREATE', task: newTask, opId }
-    const inverse: UserAction = { type: 'TASK_DELETE', taskId: newTask.id, opId: inverseOpId }
+    const inverse: UserAction = { type: 'TASK_DELETE', taskId, opId: inverseOpId }
     const entry: HistoryEntry = {
       id: nanoid(),
       label: `Create task "${task.title}"`,
@@ -120,14 +115,7 @@ export function useHistoryImpl(
       inverse,
     }
     push(entry)
-    dispatch({ type: 'TASK_CREATE', task: newTask, opId })
-    try {
-      await apiCreateTask(task)
-      dispatch({ type: 'OP_SUCCESS', opId })
-    } catch (e) {
-      dispatch({ type: 'OP_ROLLBACK', opId })
-      throw e
-    }
+    await boardAPI.createTask(task, taskId)
   }
 
   async function updateTask(taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>): Promise<void> {

@@ -92,7 +92,7 @@ export function KanbanBoard() {
       </header>
 
       <FilterBar />
-      <CmdKOverlay />
+      <CmdKOverlay onOpenEdit={handleOpenEdit} />
       <UndoHintBar />
 
       <ErrorBoundary fallbackMessage="Board failed to load">

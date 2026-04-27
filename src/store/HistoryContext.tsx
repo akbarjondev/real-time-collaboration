@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useMemo } from 'react'
 import type { Task, TaskStatus } from '@/types/task.types'
 import type { BoardAction } from '@/store/boardReducer'
 import { useHistoryImpl } from '@/features/history/hooks/useHistory'
@@ -27,7 +27,7 @@ type HistoryProviderProps = {
 export function HistoryProvider({ dispatch, tasks, children }: HistoryProviderProps) {
   const history = useHistoryImpl(dispatch, tasks)
 
-  const value: HistoryContextType = {
+  const value = useMemo<HistoryContextType>(() => ({
     undoLabel: history.undoLabel,
     redoLabel: history.redoLabel,
     canUndo: history.canUndo,
@@ -38,7 +38,18 @@ export function HistoryProvider({ dispatch, tasks, children }: HistoryProviderPr
     createTask: history.createTask,
     updateTask: history.updateTask,
     deleteTask: history.deleteTask,
-  }
+  }), [
+    history.undoLabel,
+    history.redoLabel,
+    history.canUndo,
+    history.canRedo,
+    history.undo,
+    history.redo,
+    history.moveTask,
+    history.createTask,
+    history.updateTask,
+    history.deleteTask,
+  ])
 
   return (
     <HistoryContext.Provider value={value}>

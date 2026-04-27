@@ -11,7 +11,7 @@ import {
 
 export type BoardAPIContextType = {
   moveTask: (taskId: string, newStatus: TaskStatus) => Promise<void>
-  createTask: (task: Omit<Task, 'id' | 'createdAt'>) => Promise<void>
+  createTask: (task: Omit<Task, 'id' | 'createdAt'>, taskId?: string) => Promise<void>
   updateTask: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => Promise<void>
   deleteTask: (taskId: string) => Promise<void>
 }
@@ -37,11 +37,11 @@ export function BoardAPIProvider({ dispatch, children }: BoardAPIProviderProps) 
       }
     },
 
-    createTask: async (task: Omit<Task, 'id' | 'createdAt'>) => {
+    createTask: async (task: Omit<Task, 'id' | 'createdAt'>, taskId?: string) => {
       const opId = nanoid()
       const newTask: Task = {
         ...task,
-        id: nanoid(),
+        id: taskId ?? nanoid(),
         createdAt: new Date().toISOString(),
       }
       dispatch({ type: 'TASK_CREATE', task: newTask, opId })

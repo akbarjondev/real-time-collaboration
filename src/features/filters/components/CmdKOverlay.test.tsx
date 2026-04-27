@@ -2,9 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { CmdKOverlay } from './CmdKOverlay'
 import { BoardStateContext } from '@/store/BoardStateContext'
-import { FilterAPIContext } from '@/store/FilterAPIContext'
 import type { Task } from '@/types/task.types'
-import type { FilterAPIContextType } from '@/store/FilterAPIContext'
 
 vi.mock('@/components/ui/command', () => ({
   CommandDialog: ({ open, onOpenChange, children }: {
@@ -60,24 +58,12 @@ const mockTasks = [
   makeTask('3', 'Fix logout flow'),
 ]
 
-function makeFilterAPI(overrides: Partial<FilterAPIContextType> = {}): FilterAPIContextType {
+function renderOverlay(onOpenEdit = vi.fn()) {
   return {
-    setAssignee: vi.fn(),
-    setPriority: vi.fn(),
-    setSearch: vi.fn(),
-    resetFilters: vi.fn(),
-    ...overrides,
-  }
-}
-
-function renderOverlay(filterAPI: FilterAPIContextType = makeFilterAPI()) {
-  return {
-    filterAPI,
+    onOpenEdit,
     ...render(
       <BoardStateContext.Provider value={mockTasks}>
-        <FilterAPIContext.Provider value={filterAPI}>
-          <CmdKOverlay />
-        </FilterAPIContext.Provider>
+        <CmdKOverlay onOpenEdit={onOpenEdit} />
       </BoardStateContext.Provider>
     ),
   }
@@ -117,13 +103,13 @@ describe('CmdKOverlay', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('typing in input calls filterAPI.setSearch', () => {
-    const filterAPI = makeFilterAPI()
-    renderOverlay(filterAPI)
+  it('typing in input does NOT sync to global filters', () => {
+    renderOverlay()
     fireEvent.keyDown(document, { key: 'k', ctrlKey: true, shiftKey: true })
     const input = screen.getByRole('combobox')
     fireEvent.change(input, { target: { value: 'fix' } })
-    expect(filterAPI.setSearch).toHaveBeenCalledWith('fix')
+    // Query stays local — no filterAPI interaction
+    expect(input).toHaveValue('fix')
   })
 
   it('results list shows tasks matching the query', () => {
@@ -134,9 +120,9 @@ describe('CmdKOverlay', () => {
     expect(screen.getAllByRole('option')).toHaveLength(2)
   })
 
-  it('selecting a result closes the overlay and calls filterAPI.resetFilters', async () => {
-    const filterAPI = makeFilterAPI()
-    renderOverlay(filterAPI)
+  it('selecting a result closes the overlay and calls onOpenEdit', async () => {
+    const onOpenEdit = vi.fn()
+    renderOverlay(onOpenEdit)
     fireEvent.keyDown(document, { key: 'k', ctrlKey: true, shiftKey: true })
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'fix' } })
     const results = screen.getAllByRole('option')
@@ -144,30 +130,27 @@ describe('CmdKOverlay', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
-    expect(filterAPI.resetFilters).toHaveBeenCalled()
+    expect(onOpenEdit).toHaveBeenCalledWith(mockTasks[0])
   })
 
-  it('Escape closes the overlay and calls filterAPI.resetFilters', async () => {
-    const filterAPI = makeFilterAPI()
-    renderOverlay(filterAPI)
+  it('Escape closes the overlay without calling onOpenEdit', async () => {
+    const onOpenEdit = vi.fn()
+    renderOverlay(onOpenEdit)
     fireEvent.keyDown(document, { key: 'k', ctrlKey: true, shiftKey: true })
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     fireEvent.click(screen.getByLabelText('close-dialog'))
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
-    expect(filterAPI.resetFilters).toHaveBeenCalled()
+    expect(onOpenEdit).not.toHaveBeenCalled()
   })
 })
 
 describe('useKeyboardShortcut extension', () => {
   it('fires on ctrlKey+shift+k combo', () => {
-    const filterAPI = makeFilterAPI()
     render(
       <BoardStateContext.Provider value={[]}>
-        <FilterAPIContext.Provider value={filterAPI}>
-          <CmdKOverlay />
-        </FilterAPIContext.Provider>
+        <CmdKOverlay onOpenEdit={vi.fn()} />
       </BoardStateContext.Provider>
     )
     fireEvent.keyDown(document, { key: 'k', ctrlKey: true, shiftKey: true })
@@ -175,12 +158,9 @@ describe('useKeyboardShortcut extension', () => {
   })
 
   it('does NOT fire without modifier key', () => {
-    const filterAPI = makeFilterAPI()
     render(
       <BoardStateContext.Provider value={[]}>
-        <FilterAPIContext.Provider value={filterAPI}>
-          <CmdKOverlay />
-        </FilterAPIContext.Provider>
+        <CmdKOverlay onOpenEdit={vi.fn()} />
       </BoardStateContext.Provider>
     )
     fireEvent.keyDown(document, { key: 'k' })

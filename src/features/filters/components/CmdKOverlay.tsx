@@ -8,7 +8,6 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { useTasks } from "@/store/BoardStateContext";
-import { useFilterAPI } from "@/store/FilterAPIContext";
 import { filterTasks } from "@/features/filters/utils/filterTasks";
 import { useKeyboardShortcut } from "@/shared/hooks/useKeyboardShortcut";
 import { isMac } from "@/shared/utils/platform";
@@ -22,12 +21,15 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
   done: "Done",
 };
 
-export function CmdKOverlay() {
+type CmdKOverlayProps = {
+  onOpenEdit: (task: Task) => void;
+};
+
+export function CmdKOverlay({ onOpenEdit }: CmdKOverlayProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [mruIds, setMruIds] = useState<string[]>([]);
   const allTasks = useTasks();
-  const filterAPI = useFilterAPI();
 
   // Mac: ⌘K — Cmd+K has no Chrome conflict on Mac
   // Windows/Linux: Ctrl+Shift+K — avoids Chrome's Ctrl+K address-bar shortcut
@@ -45,7 +47,6 @@ export function CmdKOverlay() {
 
   function handleQueryChange(value: string) {
     setQuery(value);
-    filterAPI.setSearch(value);
   }
 
   function handleSelect(task: Task) {
@@ -55,19 +56,12 @@ export function CmdKOverlay() {
 
     setIsOpen(false);
     setQuery("");
-    filterAPI.resetFilters();
-
-    requestAnimationFrame(() => {
-      document
-        .getElementById(`task-${task.id}`)
-        ?.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
+    onOpenEdit(task);
   }
 
   function handleClose() {
     setIsOpen(false);
     setQuery("");
-    filterAPI.resetFilters();
   }
 
   return (
