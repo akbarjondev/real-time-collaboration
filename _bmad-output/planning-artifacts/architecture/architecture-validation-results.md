@@ -2,7 +2,7 @@
 
 ## Coherence Validation ✅
 
-**Decision Compatibility:** All stack choices verified compatible — React 18, TypeScript 5.x strict, Tailwind v4, Vite 8, SWC, @dnd-kit, @tanstack/react-virtual, Sonner, React Hook Form, Vitest + RTL, nanoid. No version conflicts.
+**Decision Compatibility:** All stack choices verified compatible — React 18, TypeScript 5.x strict, Tailwind v4, Vite 8, `@vitejs/plugin-react` (Babel), @dnd-kit, @tanstack/react-virtual, Sonner, React Hook Form, Vitest + RTL, nanoid. No version conflicts.
 
 **Pattern Consistency:** Context split strategy ↔ stable API pattern ↔ custom hook access → consistent. Action taxonomy ↔ discriminated union state → consistent. Feature-folder structure ↔ co-located tests ↔ no barrel exports → consistent. Optimistic sequence ↔ PendingOpsContext ↔ OP_ROLLBACK → consistent.
 
@@ -49,7 +49,7 @@ BoardState/PendingOps/Conflict (single boardReducer, split read contexts)
 - [x] Project context thoroughly analysed (40 FRs, 17 NFRs, 7 cross-cutting concerns)
 - [x] Scale and complexity assessed (Medium-High)
 - [x] Technical constraints identified and locked
-- [x] Starter template selected with verified version (Vite 8, `react-swc-ts`)
+- [x] Starter template selected with verified version (Vite 8, `react-ts` with `@vitejs/plugin-react`)
 - [x] State machine designed (single boardReducer, split read contexts, stable API contexts)
 - [x] Action taxonomy defined (user / system / undo/redo distinction enforced)
 - [x] Undo/redo integration specified (command pattern, useHistory hook)
@@ -81,6 +81,6 @@ BoardState/PendingOps/Conflict (single boardReducer, split read contexts)
 
 ## Implementation Handoff
 
-**First story:** `npm create vite@latest real-time-collaboration -- --template react-swc-ts`, install all dependencies, configure path alias, configure Vitest with jsdom.
+**First story:** `npm create vite@latest real-time-collaboration -- --template react-ts`, install all dependencies, configure path alias, configure Vitest with jsdom.
 
 **Agent prime directive:** `BoardAPIContext` is the only mutation entry point. `useHistory` is the only wrapper for user-initiated mutations. `OP_ROLLBACK` and `REMOTE_UPDATE` never touch the history stack. Context values are slice references, never object wrappers.

@@ -65,9 +65,9 @@ NFR17: No sensitive data stored in localStorage or sessionStorage
 
 ## Additional Requirements
 
-- **Starter template (Epic 1, Story 1):** Initialize project with `npm create vite@latest real-time-collaboration -- --template react-swc-ts` (SWC Rust compiler, ~10x faster than Babel)
+- **Starter template (Epic 1, Story 1):** Initialize project with `npm create vite@latest real-time-collaboration -- --template react-ts` (`@vitejs/plugin-react` Babel compiler)
 - Install all required dependencies: `tailwindcss @tailwindcss/vite`, `@tanstack/react-virtual`, `@dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities`, `nanoid sonner react-hook-form`, dev: `vitest @testing-library/react @testing-library/jest-dom jsdom`
-- Configure `vite.config.ts` with react-swc + tailwindcss plugins + path alias `@/` → `./src`
+- Configure `vite.config.ts` with react + tailwindcss plugins + path alias `@/` → `./src`
 - Configure `tsconfig.app.json` with `"strict": true`, `"noUncheckedIndexedAccess": true`, `"paths": { "@/*": ["./src/*"] }`
 - Configure `vitest.config.ts` with jsdom environment and `src/test-setup.ts` setup file
 - Implement 7-context split state architecture: BoardStateContext (Task[]), PendingOpsContext (Map<opId, PendingOperation>), ConflictContext (ConflictState | null), BoardAPIContext (stable action creators), FilterContext (FilterState), FilterAPIContext (stable setFilter/setSearch), HistoryContext (read-only view)

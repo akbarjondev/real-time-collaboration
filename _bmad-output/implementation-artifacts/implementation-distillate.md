@@ -18,7 +18,7 @@ parts: 1
 ---
 
 ## Project Setup (Story 1.1 — done)
-- Template: `npm create vite@latest real-time-collaboration -- --template react-swc-ts`; SWC pre-installs `@vitejs/plugin-react-swc` — do not reinstall
+- Template: `npm create vite@latest real-time-collaboration -- --template react-ts`; uses `@vitejs/plugin-react` (Babel compiler)
 - Production deps: `tailwindcss @tailwindcss/vite @tanstack/react-virtual @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities nanoid sonner react-hook-form`
 - Dev deps: `vitest @testing-library/react @testing-library/jest-dom jsdom`
 - Tailwind v4: CSS-only setup via `@import "tailwindcss"` in `src/index.css`; NO `tailwind.config.js`

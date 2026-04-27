@@ -98,6 +98,8 @@ The `useMemo` on the filtered list is the bridge: it absorbs the `FilterContext`
 
 ### Finding 7 — SWC over Babel is a small but meaningful interview signal
 
+> **Note:** This project later switched from `@vitejs/plugin-react-swc` (SWC) to `@vitejs/plugin-react` (Babel) for compatibility reasons.
+
 `react-swc-ts` template vs `react-ts` — the only difference is the compiler. SWC (Rust-based) is ~10x faster at transform time. For a solo dev on an interview project this barely matters in practice, but it signals awareness of the current toolchain ecosystem. An interviewer who notices the template choice gets a data point about the candidate's tooling awareness without any extra explanation needed.
 
 ---

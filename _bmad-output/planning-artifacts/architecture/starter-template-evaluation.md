@@ -1,5 +1,7 @@
 # Starter Template Evaluation
 
+> **Note:** This project later switched from `@vitejs/plugin-react-swc` (SWC) to `@vitejs/plugin-react` (Babel) for compatibility reasons. The analysis below is preserved as historical record.
+
 ## Primary Technology Domain
 
 Frontend SPA — React 18, TypeScript strict, Tailwind CSS, Vite. All mandated by the assignment spec; no discovery needed.

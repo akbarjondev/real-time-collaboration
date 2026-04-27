@@ -10,11 +10,11 @@ so that I can start implementing features on a correctly configured, TypeScript-
 
 ## Acceptance Criteria
 
-1. **Given** a clean working directory **When** the project is initialized using `npm create vite@latest real-time-collaboration -- --template react-swc-ts` **Then** the project compiles with zero TypeScript errors in strict mode **And** `npm run dev` starts the Vite dev server without errors.
+1. **Given** a clean working directory **When** the project is initialized using `npm create vite@latest real-time-collaboration -- --template react-ts` **Then** the project compiles with zero TypeScript errors in strict mode **And** `npm run dev` starts the Vite dev server without errors.
 
 2. **Given** the initialized project **When** all required dependencies are installed **Then** `npm install` completes without errors and all packages are resolvable.
 
-3. **Given** the installed dependencies **When** `vite.config.ts` is configured with `@vitejs/plugin-react-swc`, `@tailwindcss/vite`, and `resolve.alias: { '@': path.resolve(__dirname, './src') }` **Then** imports using the `@/` alias resolve correctly to `src/`.
+3. **Given** the installed dependencies **When** `vite.config.ts` is configured with `@vitejs/plugin-react`, `@tailwindcss/vite`, and `resolve.alias: { '@': path.resolve(__dirname, './src') }` **Then** imports using the `@/` alias resolve correctly to `src/`.
 
 4. **Given** `tsconfig.app.json` **When** configured with `"strict": true`, `"noUncheckedIndexedAccess": true`, and `"paths": { "@/*": ["./src/*"] }` **Then** `tsc --noEmit` passes with zero errors.
 
@@ -26,8 +26,8 @@ so that I can start implementing features on a correctly configured, TypeScript-
 
 ## Tasks / Subtasks
 
-- [x] Task 1: Initialize Vite project with React SWC TypeScript template (AC: #1)
-  - [ ] Run `npm create vite@latest real-time-collaboration -- --template react-swc-ts`
+- [x] Task 1: Initialize Vite project with React TypeScript template (AC: #1)
+  - [ ] Run `npm create vite@latest real-time-collaboration -- --template react-ts`
   - [ ] Verify `npm run dev` starts without errors on the default scaffold
 
 - [x] Task 2: Install all production and dev dependencies (AC: #2)
@@ -36,7 +36,7 @@ so that I can start implementing features on a correctly configured, TypeScript-
   - [ ] Verify `npm install` completes with zero errors
 
 - [x] Task 3: Configure `vite.config.ts` (AC: #3)
-  - [ ] Import `react` from `@vitejs/plugin-react-swc`, `tailwindcss` from `@tailwindcss/vite`, `path` from `node:path`
+  - [ ] Import `react` from `@vitejs/plugin-react`, `tailwindcss` from `@tailwindcss/vite`, `path` from `node:path`
   - [ ] Add both plugins to `plugins: [react(), tailwindcss()]`
   - [ ] Add `resolve.alias: { '@': path.resolve(__dirname, './src') }`
 
@@ -95,14 +95,14 @@ nanoid sonner react-hook-form
 vitest @testing-library/react @testing-library/jest-dom jsdom
 ```
 
-**Note:** `@vitejs/plugin-react-swc` is pre-installed by the Vite template — do not reinstall.
+**Note:** `@vitejs/plugin-react` is pre-installed by the Vite template — do not reinstall.
 
 ### Exact Configuration File Contents
 
 **`vite.config.ts`:**
 ```typescript
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
@@ -268,7 +268,7 @@ type AsyncState<T> =
 ### Project Structure Notes
 
 - This is a greenfield project — `npm create vite@latest` creates the project from scratch
-- The Vite SWC template pre-installs: React, TypeScript, `@vitejs/plugin-react-swc`, ESLint with react-hooks plugin
+- The Vite template pre-installs: React, TypeScript, `@vitejs/plugin-react`, ESLint with react-hooks plugin
 - ESLint is pre-configured in the template with zero-warning target (NFR11) — do not modify unless necessary
 - `App.tsx` and `main.tsx` keep default scaffold content for now — Story 1.4 will replace them
 - `src/assets/` from the Vite scaffold can be deleted (not in architecture spec)

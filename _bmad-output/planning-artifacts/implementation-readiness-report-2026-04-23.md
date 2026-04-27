@@ -249,7 +249,7 @@ Story 9.1 attributes 44×44px touch targets to **FR40** ("Modals trap focus") �
 #### Epic 1: Project Foundation & Runnable Board Shell
 - **User Value:** Borderline — goal is "developer can run the project and see a seeded Kanban board." The deliverable (visible board with seed data) has functional value, but Stories 1.2 ("Implement Core State Architecture") and 1.3 ("Implement Mock API Layer") are pure infrastructure stories with no user-facing outcome.
 - **Independence:** ✅ Stands alone completely
-- **Starter Template Check:** ✅ Story 1.1 is exactly "Set up initial project from starter template" (Vite SWC template)
+- **Starter Template Check:** ✅ Story 1.1 is exactly "Set up initial project from starter template" (Vite template with `@vitejs/plugin-react`)
 
 #### Epic 2: Task CRUD & Full Task Display
 - **User Value:** ✅ Strong — "users can create, view, edit, and delete tasks"

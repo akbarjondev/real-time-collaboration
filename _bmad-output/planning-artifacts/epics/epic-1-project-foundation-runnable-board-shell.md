@@ -13,7 +13,7 @@ So that I can start implementing features on a correctly configured, TypeScript-
 **Acceptance Criteria:**
 
 **Given** a clean working directory
-**When** the project is initialized using `npm create vite@latest real-time-collaboration -- --template react-swc-ts`
+**When** the project is initialized using `npm create vite@latest real-time-collaboration -- --template react-ts`
 **Then** the project compiles with zero TypeScript errors in strict mode
 **And** `npm run dev` starts the Vite dev server without errors
 
@@ -23,7 +23,7 @@ So that I can start implementing features on a correctly configured, TypeScript-
 **And** all packages are resolvable
 
 **Given** the installed dependencies
-**When** `vite.config.ts` is configured with `@vitejs/plugin-react-swc`, `@tailwindcss/vite`, and `resolve.alias: { '@': path.resolve(__dirname, './src') }`
+**When** `vite.config.ts` is configured with `@vitejs/plugin-react`, `@tailwindcss/vite`, and `resolve.alias: { '@': path.resolve(__dirname, './src') }`
 **Then** imports using the `@/` alias resolve correctly to `src/`
 
 **Given** `tsconfig.app.json`

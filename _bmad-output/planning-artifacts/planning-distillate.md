@@ -49,7 +49,7 @@ parts: 1
 - React 18+ hooks-only functional components; concurrent features available
 - TypeScript 5.x strict; noUncheckedIndexedAccess; zero `any`; discriminated unions mandatory for async state
 - Tailwind CSS v4 via @tailwindcss/vite plugin; no tailwind.config.js; WCAG AA contrast by defaults
-- Vite 8 bundler; SWC ~10x faster than Babel; starter: `npm create vite@latest -- --template react-swc-ts`
+- Vite 8 bundler; `@vitejs/plugin-react` (Babel compiler); starter: `npm create vite@latest -- --template react-ts`
 - @tanstack/react-virtual: hooks-based TypeScript-native virtualization; estimateSize=72px; overscan=5
 - @dnd-kit/core + @dnd-kit/sortable + @dnd-kit/utilities: all three required; react-beautiful-dnd deprecated 2024
 - Sonner: React 18 native toast; Tailwind-compatible; bottom-right; richColors
@@ -105,7 +105,7 @@ parts: 1
 - Three data flow paths: (1) user action → useHistory → BoardAPIContext → boardReducer → mockRequest; (2) simulation tick → REMOTE_UPDATE → boardReducer; (3) keyboard shortcut → useHistory.undo() → HISTORY_APPLY
 
 ## Epics & Stories
-- Epic 1 (Foundation): npm create vite react-swc-ts; all deps; boardReducer + 7 contexts + custom hooks; BoardAPIContext useMemo([],[]); mockRequest<T>; 25 seed tasks; ErrorBoundary; ToastProvider; 3-column Kanban shell with count badges, cards, design tokens, empty states; FRs: FR4 partial, FR5
+- Epic 1 (Foundation): npm create vite react-ts; all deps; boardReducer + 7 contexts + custom hooks; BoardAPIContext useMemo([],[]); mockRequest<T>; 25 seed tasks; ErrorBoundary; ToastProvider; 3-column Kanban shell with count badges, cards, design tokens, empty states; FRs: FR4 partial, FR5
 - Epic 2 (Task CRUD): TaskCard 5 states (default/hover/done/dragging/in-flight); role=article; React.memo; create modal (N key or button); title required; inline validation on blur; unsaved-changes guard; react-hook-form uncontrolled; edit modal pre-populated; delete via modal; OP_ROLLBACK restores + toast.error; FRs: FR1–FR4, FR6
 - Epic 3 (Task Movement): DndContext (PointerSensor activationConstraint distance:8) + SortableContext per column; useBoardDnd hook; DragOverlay; moveTask() optimistic sequence; same-column drop = no-op; mobile (<768px) status Select as first field in edit modal dispatching through same moveTask() path; FRs: FR12–FR14
 - Epic 4 (Filtering & Search): filterTasks(tasks,filters)→Task[] pure function; AND logic; useMemo in BoardColumn; <50ms for 1000+ tasks; filter bar always visible; active chips (violet-100+×); filtered-empty-state; ⌘K/Ctrl+K overlay; MRU; role=combobox+focus trap; FRs: FR7–FR11
