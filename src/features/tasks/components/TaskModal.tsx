@@ -120,7 +120,18 @@ export function TaskModal({
     onClose()
   }
 
-  const { ref: rhfTitleRef, ...titleRegisterRest } = register('title', { required: 'Title is required' })
+  const { ref: rhfTitleRef, ...titleRegisterRest } = register('title', {
+    required: 'Title is required',
+    validate: (v) => v.trim() !== '' || 'Title is required',
+  })
+  const { ref: rhfDescRef, ...descRegisterRest } = register('description', {
+    required: 'Description is required',
+    validate: (v) => v.trim() !== '' || 'Description is required',
+  })
+  const { ref: rhfAssigneeRef, ...assigneeRegisterRest } = register('assignee', {
+    required: 'Assignee is required',
+    validate: (v) => v.trim() !== '' || 'Assignee is required',
+  })
 
   const onSubmit = handleSubmit(async (data) => {
     const savedValues = { ...data }
@@ -202,7 +213,7 @@ export function TaskModal({
               {/* Status — edit mode only, focused on mobile */}
               {mode === 'edit' && task && (
                 <div className="flex flex-col gap-1">
-                  <label className="text-sm font-medium text-zinc-700">Status</label>
+                  <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Status</label>
                   <Select
                     value={task.status}
                     onValueChange={(v) => handleStatusChange(v as TaskStatus)}
@@ -221,7 +232,7 @@ export function TaskModal({
 
               {/* Title */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="task-title" className="text-sm font-medium text-zinc-700">
+                <label htmlFor="task-title" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Title <span className="text-rose-600">*</span>
                 </label>
                 <input
@@ -243,7 +254,7 @@ export function TaskModal({
 
               {/* Priority */}
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium text-zinc-700">Priority</label>
+                <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Priority</label>
                 <Controller
                   name="priority"
                   control={control}
@@ -264,34 +275,52 @@ export function TaskModal({
 
               {/* Assignee */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="task-assignee" className="text-sm font-medium text-zinc-700">
-                  Assignee
+                <label htmlFor="task-assignee" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Assignee <span className="text-rose-600">*</span>
                 </label>
                 <input
                   id="task-assignee"
-                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 min-h-[44px]"
+                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive min-h-[44px]"
                   placeholder="Assignee name"
-                  {...register('assignee')}
+                  aria-invalid={!!errors.assignee}
+                  aria-describedby={errors.assignee ? 'assignee-error' : undefined}
+                  ref={rhfAssigneeRef}
+                  {...assigneeRegisterRest}
                 />
+                {errors.assignee && (
+                  <p id="assignee-error" className="mt-1 flex items-center gap-1 text-xs text-rose-600" role="alert">
+                    <AlertCircle className="h-3 w-3" aria-hidden="true" />
+                    {errors.assignee.message}
+                  </p>
+                )}
               </div>
 
               {/* Description */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="task-description" className="text-sm font-medium text-zinc-700">
-                  Description
+                <label htmlFor="task-description" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Description <span className="text-rose-600">*</span>
                 </label>
                 <textarea
                   id="task-description"
                   rows={3}
-                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 resize-none min-h-[44px]"
-                  placeholder="Optional description"
-                  {...register('description')}
+                  className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive resize-none min-h-[44px]"
+                  placeholder="Task description"
+                  aria-invalid={!!errors.description}
+                  aria-describedby={errors.description ? 'description-error' : undefined}
+                  ref={rhfDescRef}
+                  {...descRegisterRest}
                 />
+                {errors.description && (
+                  <p id="description-error" className="mt-1 flex items-center gap-1 text-xs text-rose-600" role="alert">
+                    <AlertCircle className="h-3 w-3" aria-hidden="true" />
+                    {errors.description.message}
+                  </p>
+                )}
               </div>
 
               {/* Tags */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="task-tags" className="text-sm font-medium text-zinc-700">
+                <label htmlFor="task-tags" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Tags
                 </label>
                 <input

@@ -9,7 +9,7 @@ export function UndoHintBar() {
     <div
       aria-live="polite"
       aria-atomic="false"
-      className="flex items-center justify-between px-4 border-b border-zinc-200 bg-white min-h-[44px]"
+      className="flex items-center justify-between px-4 border-b border-border bg-card min-h-[44px]"
     >
       <div className="flex items-center min-h-[44px]">
         {canUndo ? (
@@ -17,8 +17,8 @@ export function UndoHintBar() {
             onClick={undo}
             aria-label={`Undo: ${undoLabel ?? ''}`}
             className={cn(
-              'flex items-center gap-1.5 text-xs text-zinc-700 px-2 py-1 rounded',
-              'hover:bg-zinc-100 min-h-[44px] min-w-[44px]',
+              'flex items-center gap-1.5 text-xs text-foreground px-2 py-1 rounded',
+              'hover:bg-secondary min-h-[44px] min-w-[44px]',
               'focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none'
             )}
           >
@@ -26,7 +26,7 @@ export function UndoHintBar() {
             Undo: {undoLabel}
           </button>
         ) : (
-          <span className="text-xs text-zinc-500 px-2">Nothing to undo</span>
+          <span className="text-xs text-muted-foreground px-2">Nothing to undo</span>
         )}
       </div>
 
@@ -36,8 +36,8 @@ export function UndoHintBar() {
             onClick={redo}
             aria-label={`Redo: ${redoLabel ?? ''}`}
             className={cn(
-              'flex items-center gap-1.5 text-xs text-zinc-700 px-2 py-1 rounded',
-              'hover:bg-zinc-100 min-h-[44px] min-w-[44px]',
+              'flex items-center gap-1.5 text-xs text-foreground px-2 py-1 rounded',
+              'hover:bg-secondary min-h-[44px] min-w-[44px]',
               'focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none'
             )}
           >

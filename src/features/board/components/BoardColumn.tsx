@@ -56,14 +56,14 @@ export function BoardColumn({ status, title, onOpenCreate, onOpenEdit }: BoardCo
       role="region"
       aria-label={`${title} column, ${count} task${count !== 1 ? 's' : ''}`}
       className={cn(
-        'bg-zinc-100 rounded-xl p-3 flex flex-col w-full md:w-80 md:min-w-[280px] min-h-[120px] self-stretch',
+        'bg-secondary rounded-xl p-3 flex flex-col w-full md:w-80 md:min-w-[280px] min-h-[120px] self-stretch',
         isOver ? 'ring-2 ring-violet-400 ring-inset' : ''
       )}
     >
       <div className="flex items-center justify-between px-1 mb-2">
-        <h2 className="text-sm font-semibold text-zinc-700">{title}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         <span
-          className="bg-zinc-200 rounded-full px-2 py-0.5 text-xs text-zinc-600 font-medium tabular-nums"
+          className="bg-muted rounded-full px-2 py-0.5 text-xs text-muted-foreground font-medium tabular-nums"
           aria-hidden="true"
         >
           {count}
@@ -72,26 +72,26 @@ export function BoardColumn({ status, title, onOpenCreate, onOpenEdit }: BoardCo
 
       {count === 0 ? (
         isFiltered ? (
-          <div className="flex flex-col items-center gap-2 py-8 text-zinc-400 min-h-[120px]">
+          <div className="flex flex-col items-center gap-2 py-8 text-muted-foreground min-h-[120px]">
             <Filter className="h-8 w-8" aria-hidden="true" />
-            <p className="text-sm font-medium text-zinc-500">No matches</p>
+            <p className="text-sm font-medium">No matches</p>
             <p className="text-xs">No tasks match the current filter</p>
             <button
               onClick={() => filterAPI.resetFilters()}
-              className="text-xs text-violet-600 hover:text-violet-700 underline focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none rounded"
+              className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 underline focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none rounded"
             >
               Clear filter
             </button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 py-8 px-3 text-center min-h-[120px]">
-            <Inbox className="h-8 w-8 text-zinc-400" aria-hidden="true" />
-            <p className="text-sm font-medium text-zinc-500">No tasks</p>
-            <p className="text-xs text-zinc-400">Drag a task here or add one</p>
+            <Inbox className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
+            <p className="text-sm font-medium text-muted-foreground">No tasks</p>
+            <p className="text-xs text-muted-foreground/70">Drag a task here or add one</p>
             <Button
               variant="outline"
               size="sm"
-              className="mt-1 border-dashed border-zinc-300 text-zinc-400 hover:text-zinc-600 hover:border-zinc-400 focus-visible:ring-2 focus-visible:ring-violet-500 min-h-[44px]"
+              className="mt-1 border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 focus-visible:ring-2 focus-visible:ring-violet-500 min-h-[44px]"
               onClick={() => onOpenCreate({ })}
               aria-label={`Add task to ${title}`}
             >
@@ -131,7 +131,7 @@ export function BoardColumn({ status, title, onOpenCreate, onOpenEdit }: BoardCo
           </div>
           {/* drag-over placeholder outside the virtual scroller — always visible at bottom */}
           {isOver && (
-            <div className="h-14 rounded-lg border-2 border-dashed border-violet-400 opacity-50 mt-2" />
+            <div className="h-14 rounded-lg border-2 border-dashed border-violet-400 dark:border-violet-500 opacity-50 mt-2" />
           )}
         </SortableContext>
       )}

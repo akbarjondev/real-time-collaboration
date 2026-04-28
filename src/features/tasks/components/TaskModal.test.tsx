@@ -129,8 +129,9 @@ describe('TaskModal — create mode', () => {
   it('calls createTask and closes modal on valid submit', async () => {
     const onClose = vi.fn()
     renderModal({ onClose })
-    const titleInput = screen.getByLabelText(/title/i)
-    fireEvent.change(titleInput, { target: { value: 'New feature' } })
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'New feature' } })
+    fireEvent.change(screen.getByLabelText(/description/i), { target: { value: 'Feature description' } })
+    fireEvent.change(screen.getByLabelText(/assignee/i), { target: { value: 'Alice' } })
     fireEvent.click(screen.getByRole('button', { name: 'Create' }))
     await waitFor(() => {
       expect(onClose).toHaveBeenCalled()
@@ -144,8 +145,9 @@ describe('TaskModal — create mode', () => {
     const onOpenCreate = vi.fn()
     ;(mockHistory.createTask as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('failed'))
     renderModal({ onOpenCreate })
-    const titleInput = screen.getByLabelText(/title/i)
-    fireEvent.change(titleInput, { target: { value: 'Failing task' } })
+    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Failing task' } })
+    fireEvent.change(screen.getByLabelText(/description/i), { target: { value: 'Task description' } })
+    fireEvent.change(screen.getByLabelText(/assignee/i), { target: { value: 'Bob' } })
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Create' }))
     })
@@ -307,6 +309,8 @@ describe('TaskModal — toast notifications', () => {
   it('shows success toast on create success', async () => {
     renderModal()
     fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'New task title' } })
+    fireEvent.change(screen.getByLabelText(/description/i), { target: { value: 'Task description' } })
+    fireEvent.change(screen.getByLabelText(/assignee/i), { target: { value: 'Alice' } })
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Create' }))
     })
@@ -336,6 +340,8 @@ describe('TaskModal — toast notifications', () => {
     ;(mockHistory.createTask as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('fail'))
     renderModal()
     fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Failing task' } })
+    fireEvent.change(screen.getByLabelText(/description/i), { target: { value: 'Task description' } })
+    fireEvent.change(screen.getByLabelText(/assignee/i), { target: { value: 'Bob' } })
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Create' }))
     })

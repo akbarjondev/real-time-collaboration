@@ -13,9 +13,9 @@ type TaskCardProps = {
 }
 
 const PRIORITY_CONFIG: Record<Priority, { dot: string; badge: string; label: string }> = {
-  high:   { dot: 'bg-rose-500',  badge: 'bg-rose-100 text-rose-700 border-rose-200',    label: 'High' },
-  medium: { dot: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 border-amber-200', label: 'Medium' },
-  low:    { dot: 'bg-sky-500',   badge: 'bg-sky-100 text-sky-700 border-sky-200',       label: 'Low' },
+  high:   { dot: 'bg-rose-500',  badge: 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800',    label: 'High' },
+  medium: { dot: 'bg-amber-500', badge: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800', label: 'Medium' },
+  low:    { dot: 'bg-sky-500',   badge: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800',       label: 'Low' },
 }
 
 function formatDate(iso: string): string {
@@ -43,10 +43,10 @@ export const TaskCard = memo(function TaskCard({ task, isPending, onOpen, isOver
       aria-busy={isPending}
       tabIndex={isOverlay ? -1 : 0}
       className={cn(
-        'relative rounded-lg border bg-white p-4 transition-shadow min-h-[44px]',
-        'hover:border-zinc-300 hover:shadow-md',
+        'relative rounded-lg border bg-card p-4 transition-shadow min-h-[44px]',
+        'hover:border-zinc-300 dark:hover:border-zinc-600 hover:shadow-md',
         'focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none',
-        isPending ? 'border-zinc-200 card-pulse' : 'border-zinc-200',
+        isPending ? 'border-border card-pulse' : 'border-border',
         isDone && 'opacity-[0.65]',
         isDragging && !isOverlay ? 'opacity-0 pointer-events-none' : '',
         isOverlay ? 'cursor-grabbing' : 'cursor-grab',
@@ -57,7 +57,7 @@ export const TaskCard = memo(function TaskCard({ task, isPending, onOpen, isOver
     >
       {isPending && (
         <div
-          className="absolute top-2 right-2 h-3 w-3 animate-spin rounded-full border-2 border-violet-600 border-t-transparent"
+          className="absolute top-2 right-2 h-3 w-3 animate-spin rounded-full border-2 border-violet-600 dark:border-violet-400 border-t-transparent"
           aria-hidden="true"
         />
       )}
@@ -75,15 +75,15 @@ export const TaskCard = memo(function TaskCard({ task, isPending, onOpen, isOver
         </Badge>
       </div>
 
-      <p className={cn('text-sm font-medium text-zinc-900 leading-snug', isDone && 'line-through')}>
+      <p className={cn('text-sm font-medium text-foreground leading-snug', isDone && 'line-through')}>
         {task.title}
       </p>
 
       <div className="flex items-center justify-between mt-3">
-        <span className="text-xs text-zinc-500 truncate max-w-[60%]">
-          {task.assignee ?? <span className="text-zinc-300">Unassigned</span>}
+        <span className="text-xs text-muted-foreground truncate max-w-[60%]">
+          {task.assignee ?? <span className="text-muted-foreground/50">Unassigned</span>}
         </span>
-        <time className="text-xs text-zinc-500 shrink-0 ml-2" dateTime={task.createdAt}>
+        <time className="text-xs text-muted-foreground shrink-0 ml-2" dateTime={task.createdAt}>
           {formatDate(task.createdAt)}
         </time>
       </div>

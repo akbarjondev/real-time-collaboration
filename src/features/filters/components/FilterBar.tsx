@@ -22,12 +22,12 @@ export function FilterBar() {
     filters.searchQuery !== "";
 
   return (
-    <div className="border-b border-zinc-200 bg-white px-6 py-3 flex flex-col gap-2">
+    <div className="border-b border-border bg-card px-6 py-3 flex flex-col gap-2">
       <div className="flex items-center gap-3 flex-wrap">
         {/* Search input */}
         <div className="relative flex items-center">
           <Search
-            className="absolute left-2.5 h-4 w-4 text-zinc-400"
+            className="absolute left-2.5 h-4 w-4 text-muted-foreground"
             aria-hidden="true"
           />
           <input
@@ -38,7 +38,7 @@ export function FilterBar() {
               isMac ? "Search tasks… (⌘K)" : "Search tasks… (Ctrl+Shift+K)"
             }
             aria-label="Search tasks"
-            className="pl-9 pr-3 py-1.5 text-sm rounded-md border border-zinc-200 bg-zinc-50 focus:bg-white focus-visible:ring-2 focus-visible:ring-violet-500 focus:outline-none w-58"
+            className="pl-9 pr-3 py-1.5 text-sm rounded-md border border-input bg-secondary focus:bg-background focus-visible:ring-2 focus-visible:ring-violet-500 focus:outline-none w-58"
           />
         </div>
 
@@ -88,7 +88,7 @@ export function FilterBar() {
           <button
             onClick={() => filterAPI.resetFilters()}
             className={cn(
-              "text-sm text-zinc-500 hover:text-zinc-700 px-2 py-1 rounded",
+              "text-sm text-muted-foreground hover:text-foreground px-2 py-1 rounded",
               "focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none",
             )}
             aria-label="Clear all filters"
@@ -102,37 +102,37 @@ export function FilterBar() {
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2" aria-label="Active filters">
           {filters.assignee && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-100 border border-violet-300 text-violet-700">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-100 dark:bg-violet-900/30 border border-violet-300 dark:border-violet-700 text-violet-700 dark:text-violet-300">
               Assignee: {filters.assignee}
               <button
                 onClick={() => filterAPI.setAssignee(null)}
                 aria-label="Remove assignee filter"
-                className="ml-0.5 rounded-full hover:bg-violet-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:outline-none p-0.5"
+                className="ml-0.5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-800/50 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:outline-none p-0.5"
               >
                 <X className="h-3 w-3" aria-hidden="true" />
               </button>
             </span>
           )}
           {filters.priority && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-100 border border-violet-300 text-violet-700 capitalize">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-100 dark:bg-violet-900/30 border border-violet-300 dark:border-violet-700 text-violet-700 dark:text-violet-300 capitalize">
               Priority: {filters.priority}
               <button
                 onClick={() => filterAPI.setPriority(null)}
                 aria-label="Remove priority filter"
-                className="ml-0.5 rounded-full hover:bg-violet-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:outline-none p-0.5"
+                className="ml-0.5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-800/50 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:outline-none p-0.5"
               >
                 <X className="h-3 w-3" aria-hidden="true" />
               </button>
             </span>
           )}
           {filters.searchQuery && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-100 border border-violet-300 text-violet-700">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-violet-100 dark:bg-violet-900/30 border border-violet-300 dark:border-violet-700 text-violet-700 dark:text-violet-300">
               <Search className="h-3 w-3" aria-hidden="true" />
               "{filters.searchQuery}"
               <button
                 onClick={() => filterAPI.setSearch("")}
                 aria-label="Remove search filter"
-                className="ml-0.5 rounded-full hover:bg-violet-200 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:outline-none p-0.5"
+                className="ml-0.5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-800/50 focus-visible:ring-1 focus-visible:ring-violet-500 focus-visible:outline-none p-0.5"
               >
                 <X className="h-3 w-3" aria-hidden="true" />
               </button>
