@@ -122,15 +122,15 @@ export function TaskModal({
 
   const { ref: rhfTitleRef, ...titleRegisterRest } = register('title', {
     required: 'Title is required',
-    validate: (v) => v.trim() !== '' || 'Title is required',
+    validate: (v) => (v ?? '').trim() !== '' || 'Title is required',
   })
   const { ref: rhfDescRef, ...descRegisterRest } = register('description', {
     required: 'Description is required',
-    validate: (v) => v.trim() !== '' || 'Description is required',
+    validate: (v) => (v ?? '').trim() !== '' || 'Description is required',
   })
   const { ref: rhfAssigneeRef, ...assigneeRegisterRest } = register('assignee', {
     required: 'Assignee is required',
-    validate: (v) => v.trim() !== '' || 'Assignee is required',
+    validate: (v) => (v ?? '').trim() !== '' || 'Assignee is required',
   })
 
   const onSubmit = handleSubmit(async (data) => {

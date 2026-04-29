@@ -8,7 +8,11 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "tsc -b --noEmit",
+    "verify": "npm run typecheck && npm run test:run",
+    "prepare": "husky"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -44,6 +48,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
+    "husky": "^9.1.7",
     "jsdom": "^29.0.2",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
