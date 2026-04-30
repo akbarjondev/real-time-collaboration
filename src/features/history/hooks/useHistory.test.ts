@@ -71,7 +71,7 @@ describe('useHistoryImpl', () => {
     expect(result.current.cursor).toBe(49)
   })
 
-  it('undo decrements cursor and dispatches HISTORY_APPLY with inverse action', async () => {
+  it('undo calls boardAPI.moveTask with original status and decrements cursor on success', async () => {
     const { result } = renderHook(() => useHistoryImpl(mockDispatch, mockTasks), { wrapper })
 
     await act(async () => {
@@ -80,38 +80,33 @@ describe('useHistoryImpl', () => {
 
     vi.clearAllMocks()
 
-    act(() => {
-      result.current.undo()
+    await act(async () => {
+      await result.current.undo()
     })
 
     expect(result.current.cursor).toBe(-1)
-    expect(mockDispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'HISTORY_APPLY',
-        action: expect.objectContaining({ type: 'TASK_MOVE', newStatus: 'todo' }),
-      })
-    )
+    expect(tasksApi.moveTask).toHaveBeenCalledWith('task-1', 'todo')
   })
 
-  it('redo after undo increments cursor and dispatches HISTORY_APPLY with forward action', async () => {
+  it('redo calls boardAPI.moveTask with new status and increments cursor on success', async () => {
     const { result } = renderHook(() => useHistoryImpl(mockDispatch, mockTasks), { wrapper })
 
     await act(async () => {
       await result.current.moveTask('task-1', 'done')
     })
 
-    act(() => { result.current.undo() })
+    await act(async () => {
+      await result.current.undo()
+    })
+
     vi.clearAllMocks()
 
-    act(() => { result.current.redo() })
+    await act(async () => {
+      await result.current.redo()
+    })
 
     expect(result.current.cursor).toBe(0)
-    expect(mockDispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'HISTORY_APPLY',
-        action: expect.objectContaining({ type: 'TASK_MOVE', newStatus: 'done' }),
-      })
-    )
+    expect(tasksApi.moveTask).toHaveBeenCalledWith('task-1', 'done')
   })
 
   it('new push after undo clears redo entries', async () => {
@@ -120,7 +115,7 @@ describe('useHistoryImpl', () => {
     await act(async () => { await result.current.moveTask('task-1', 'done') })
     await act(async () => { await result.current.moveTask('task-1', 'in-progress') })
 
-    act(() => { result.current.undo() })
+    await act(async () => { await result.current.undo() })
     expect(result.current.canRedo).toBe(true)
 
     await act(async () => { await result.current.moveTask('task-1', 'todo') })
@@ -149,30 +144,96 @@ describe('useHistoryImpl', () => {
     expect(result.current.undoLabel).toBe('Move "Test Task" to In Progress')
     expect(result.current.redoLabel).toBeNull()
 
-    act(() => { result.current.undo() })
+    await act(async () => { await result.current.undo() })
 
     expect(result.current.undoLabel).toBe('Move "Test Task" to Done')
     expect(result.current.redoLabel).toBe('Move "Test Task" to In Progress')
   })
 
-  it('calling undo() when canUndo=false is a no-op (dispatch not called)', () => {
+  it('calling undo() when canUndo=false is a no-op (API not called)', async () => {
     const { result } = renderHook(() => useHistoryImpl(mockDispatch, []), { wrapper })
 
-    act(() => { result.current.undo() })
+    await act(async () => { await result.current.undo() })
 
-    expect(mockDispatch).not.toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'HISTORY_APPLY' })
-    )
+    expect(tasksApi.moveTask).not.toHaveBeenCalled()
+    expect(tasksApi.createTask).not.toHaveBeenCalled()
+    expect(tasksApi.updateTask).not.toHaveBeenCalled()
+    expect(tasksApi.deleteTask).not.toHaveBeenCalled()
   })
 
-  it('calling redo() when canRedo=false is a no-op (dispatch not called)', async () => {
+  it('calling redo() when canRedo=false is a no-op (API not called)', async () => {
     const { result } = renderHook(() => useHistoryImpl(mockDispatch, mockTasks), { wrapper })
 
     await act(async () => { await result.current.moveTask('task-1', 'done') })
     vi.clearAllMocks()
 
-    act(() => { result.current.redo() })
+    await act(async () => { await result.current.redo() })
 
-    expect(mockDispatch).not.toHaveBeenCalled()
+    expect(tasksApi.moveTask).not.toHaveBeenCalled()
+  })
+
+  it('undo does not move cursor when API fails', async () => {
+    const { result } = renderHook(() => useHistoryImpl(mockDispatch, mockTasks), { wrapper })
+
+    await act(async () => { await result.current.moveTask('task-1', 'done') })
+    
+    vi.mocked(tasksApi.moveTask).mockRejectedValueOnce(new Error('Network error'))
+
+    await act(async () => { await result.current.undo() })
+
+    expect(result.current.cursor).toBe(0)
+    expect(result.current.canUndo).toBe(true)
+  })
+
+  it('redo does not move cursor when API fails', async () => {
+    const { result } = renderHook(() => useHistoryImpl(mockDispatch, mockTasks), { wrapper })
+
+    await act(async () => { await result.current.moveTask('task-1', 'done') })
+    await act(async () => { await result.current.undo() })
+
+    vi.mocked(tasksApi.moveTask).mockRejectedValueOnce(new Error('Network error'))
+
+    await act(async () => { await result.current.redo() })
+
+    expect(result.current.cursor).toBe(-1)
+    expect(result.current.canRedo).toBe(true)
+  })
+
+  it('undo create calls deleteTask', async () => {
+    const { result } = renderHook(() => useHistoryImpl(mockDispatch, mockTasks), { wrapper })
+
+    await act(async () => {
+      await result.current.createTask({ title: 'New Task', status: 'todo', priority: 'low', tags: [] })
+    })
+
+    vi.clearAllMocks()
+
+    await act(async () => { await result.current.undo() })
+
+    expect(tasksApi.deleteTask).toHaveBeenCalled()
+  })
+
+  it('undo delete calls createTask with snapshot', async () => {
+    const { result } = renderHook(() => useHistoryImpl(mockDispatch, mockTasks), { wrapper })
+
+    await act(async () => { await result.current.deleteTask('task-1') })
+
+    vi.clearAllMocks()
+
+    await act(async () => { await result.current.undo() })
+
+    expect(tasksApi.createTask).toHaveBeenCalled()
+  })
+
+  it('undo update calls updateTask with original values', async () => {
+    const { result } = renderHook(() => useHistoryImpl(mockDispatch, mockTasks), { wrapper })
+
+    await act(async () => { await result.current.updateTask('task-1', { title: 'Updated Title' }) })
+
+    vi.clearAllMocks()
+
+    await act(async () => { await result.current.undo() })
+
+    expect(tasksApi.updateTask).toHaveBeenCalledWith('task-1', { title: 'Test Task' })
   })
 })

@@ -8,8 +8,8 @@ export type HistoryContextType = {
   redoLabel: string | null
   canUndo: boolean
   canRedo: boolean
-  undo: () => void
-  redo: () => void
+  undo: () => Promise<void>
+  redo: () => Promise<void>
   moveTask: (taskId: string, newStatus: TaskStatus) => Promise<void>
   createTask: (task: Omit<Task, 'id' | 'createdAt'>) => Promise<void>
   updateTask: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => Promise<void>

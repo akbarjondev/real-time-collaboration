@@ -27,8 +27,7 @@ export type BoardAction =
       localTask: Task;
     }
   | { type: "CONFLICT_RESOLVE_MINE"; taskId: string }
-  | { type: "CONFLICT_RESOLVE_THEIRS"; taskId: string; remoteTask: Task }
-  | { type: "HISTORY_APPLY"; action: BoardAction; inverse: BoardAction };
+  | { type: "CONFLICT_RESOLVE_THEIRS"; taskId: string; remoteTask: Task };
 
 export const initialBoardState: BoardState = {
   tasks: [],
@@ -173,10 +172,6 @@ export function boardReducer(
         ),
         conflict: null,
       };
-    }
-
-    case "HISTORY_APPLY": {
-      return boardReducer(state, action.action);
     }
 
     default:

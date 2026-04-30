@@ -1,8 +1,8 @@
-import { useReducer } from 'react'
+import { useReducer, useCallback } from 'react'
 import { nanoid } from 'nanoid'
 import type { Task, TaskStatus } from '@/types/task.types'
 import type { BoardAction } from '@/store/boardReducer'
-import type { HistoryEntry, UserAction } from '@/types/history.types'
+import type { HistoryEntry } from '@/types/history.types'
 import { useBoardAPI } from '@/store/BoardAPIContext'
 
 const MAX_HISTORY = 50
@@ -40,8 +40,8 @@ export type UseHistoryResult = {
   canRedo: boolean
   undoLabel: string | null
   redoLabel: string | null
-  undo: () => void
-  redo: () => void
+  undo: () => Promise<void>
+  redo: () => Promise<void>
   moveTask: (taskId: string, newStatus: TaskStatus) => Promise<void>
   createTask: (task: Omit<Task, 'id' | 'createdAt'>) => Promise<void>
   updateTask: (taskId: string, changes: Partial<Omit<Task, 'id' | 'createdAt'>>) => Promise<void>
@@ -49,7 +49,7 @@ export type UseHistoryResult = {
 }
 
 export function useHistoryImpl(
-  dispatch: React.Dispatch<BoardAction>,
+  _dispatch: React.Dispatch<BoardAction>,
   tasks: Task[],
 ): UseHistoryResult {
   const boardAPI = useBoardAPI()
@@ -64,34 +64,67 @@ export function useHistoryImpl(
     histDispatch({ type: 'PUSH', entry })
   }
 
-  function undo(): void {
+  const undo = useCallback(async (): Promise<void> => {
     if (!canUndo) return
     const entry = stack[cursor]
     if (!entry) return
-    histDispatch({ type: 'UNDO_CURSOR' })
-    dispatch({ type: 'HISTORY_APPLY', action: entry.inverse, inverse: entry.forward })
-  }
 
-  function redo(): void {
+    try {
+      switch (entry.type) {
+        case 'move':
+          await boardAPI.moveTask(entry.taskId, entry.originalStatus)
+          break
+        case 'create':
+          await boardAPI.deleteTask(entry.taskId)
+          break
+        case 'update':
+          await boardAPI.updateTask(entry.taskId, entry.originalValues)
+          break
+        case 'delete':
+          await boardAPI.createTask(entry.taskSnapshot, entry.taskId)
+          break
+      }
+      histDispatch({ type: 'UNDO_CURSOR' })
+    } catch {
+      // API failed — don't move cursor, state already rolled back by boardAPI
+    }
+  }, [canUndo, stack, cursor, boardAPI])
+
+  const redo = useCallback(async (): Promise<void> => {
     if (!canRedo) return
     const entry = stack[cursor + 1]
     if (!entry) return
-    histDispatch({ type: 'REDO_CURSOR' })
-    dispatch({ type: 'HISTORY_APPLY', action: entry.forward, inverse: entry.inverse })
-  }
+
+    try {
+      switch (entry.type) {
+        case 'move':
+          await boardAPI.moveTask(entry.taskId, entry.newStatus)
+          break
+        case 'create':
+          await boardAPI.createTask(entry.taskSnapshot, entry.taskId)
+          break
+        case 'update':
+          await boardAPI.updateTask(entry.taskId, entry.changes)
+          break
+        case 'delete':
+          await boardAPI.deleteTask(entry.taskId)
+          break
+      }
+      histDispatch({ type: 'REDO_CURSOR' })
+    } catch {
+      // API failed — don't move cursor, state already rolled back by boardAPI
+    }
+  }, [canRedo, stack, cursor, boardAPI])
 
   async function moveTask(taskId: string, newStatus: TaskStatus): Promise<void> {
     const original = tasks.find(t => t.id === taskId)
     if (!original) return
-    const opId = nanoid()
-    const inverseOpId = nanoid()
-    const forward: UserAction = { type: 'TASK_MOVE', taskId, newStatus, opId }
-    const inverse: UserAction = { type: 'TASK_MOVE', taskId, newStatus: original.status, opId: inverseOpId }
     const entry: HistoryEntry = {
-      id: nanoid(),
+      type: 'move',
+      taskId,
+      newStatus,
+      originalStatus: original.status,
       label: `Move "${original.title}" to ${STATUS_LABELS[newStatus]}`,
-      forward,
-      inverse,
     }
     push(entry)
     await boardAPI.moveTask(taskId, newStatus)
@@ -104,15 +137,11 @@ export function useHistoryImpl(
       id: taskId,
       createdAt: new Date().toISOString(),
     }
-    const opId = nanoid()
-    const inverseOpId = nanoid()
-    const forward: UserAction = { type: 'TASK_CREATE', task: newTask, opId }
-    const inverse: UserAction = { type: 'TASK_DELETE', taskId, opId: inverseOpId }
     const entry: HistoryEntry = {
-      id: nanoid(),
+      type: 'create',
+      taskId,
+      taskSnapshot: newTask,
       label: `Create task "${task.title}"`,
-      forward,
-      inverse,
     }
     push(entry)
     await boardAPI.createTask(task, taskId)
@@ -125,15 +154,12 @@ export function useHistoryImpl(
     for (const key of Object.keys(changes) as Array<keyof typeof changes>) {
       (originalValues as Record<string, unknown>)[key] = original[key]
     }
-    const opId = nanoid()
-    const inverseOpId = nanoid()
-    const forward: UserAction = { type: 'TASK_UPDATE', taskId, changes, opId }
-    const inverse: UserAction = { type: 'TASK_UPDATE', taskId, changes: originalValues, opId: inverseOpId }
     const entry: HistoryEntry = {
-      id: nanoid(),
+      type: 'update',
+      taskId,
+      changes,
+      originalValues,
       label: `Update task "${original.title}"`,
-      forward,
-      inverse,
     }
     push(entry)
     await boardAPI.updateTask(taskId, changes)
@@ -142,15 +168,11 @@ export function useHistoryImpl(
   async function deleteTask(taskId: string): Promise<void> {
     const original = tasks.find(t => t.id === taskId)
     if (!original) return
-    const opId = nanoid()
-    const inverseOpId = nanoid()
-    const forward: UserAction = { type: 'TASK_DELETE', taskId, opId }
-    const inverse: UserAction = { type: 'TASK_CREATE', task: original, opId: inverseOpId }
     const entry: HistoryEntry = {
-      id: nanoid(),
+      type: 'delete',
+      taskId,
+      taskSnapshot: original,
       label: `Delete task "${original.title}"`,
-      forward,
-      inverse,
     }
     push(entry)
     await boardAPI.deleteTask(taskId)
@@ -171,5 +193,3 @@ export function useHistoryImpl(
     deleteTask,
   }
 }
-
-

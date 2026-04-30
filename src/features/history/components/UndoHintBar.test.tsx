@@ -21,12 +21,12 @@ function makeHistory(overrides: Partial<HistoryContextType> = {}): HistoryContex
     undoLabel: null,
     canRedo: false,
     redoLabel: null,
-    undo: vi.fn(),
-    redo: vi.fn(),
-    moveTask: vi.fn(),
-    createTask: vi.fn(),
-    updateTask: vi.fn(),
-    deleteTask: vi.fn(),
+    undo: vi.fn().mockResolvedValue(undefined),
+    redo: vi.fn().mockResolvedValue(undefined),
+    moveTask: vi.fn().mockResolvedValue(undefined),
+    createTask: vi.fn().mockResolvedValue(undefined),
+    updateTask: vi.fn().mockResolvedValue(undefined),
+    deleteTask: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
 }
@@ -44,7 +44,7 @@ describe('UndoHintBar', () => {
   })
 
   it('clicking undo button calls undo()', () => {
-    const undo = vi.fn()
+    const undo = vi.fn().mockResolvedValue(undefined)
     renderWithHistory(makeHistory({ canUndo: true, undoLabel: 'Move "Task A" to Done', undo }))
     fireEvent.click(screen.getByRole('button', { name: /Undo:/i }))
     expect(undo).toHaveBeenCalledOnce()
@@ -56,7 +56,7 @@ describe('UndoHintBar', () => {
   })
 
   it('clicking redo button calls redo()', () => {
-    const redo = vi.fn()
+    const redo = vi.fn().mockResolvedValue(undefined)
     renderWithHistory(makeHistory({ canRedo: true, redoLabel: 'Move "Task A" to Done', redo }))
     fireEvent.click(screen.getByRole('button', { name: /Redo:/i }))
     expect(redo).toHaveBeenCalledOnce()

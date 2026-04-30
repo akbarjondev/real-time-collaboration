@@ -11,12 +11,12 @@ function makeHistory(overrides: Partial<HistoryContextType> = {}): HistoryContex
     undoLabel: 'Move "Task" to Done',
     canRedo: false,
     redoLabel: null,
-    undo: vi.fn(),
-    redo: vi.fn(),
-    moveTask: vi.fn(),
-    createTask: vi.fn(),
-    updateTask: vi.fn(),
-    deleteTask: vi.fn(),
+    undo: vi.fn().mockResolvedValue(undefined),
+    redo: vi.fn().mockResolvedValue(undefined),
+    moveTask: vi.fn().mockResolvedValue(undefined),
+    createTask: vi.fn().mockResolvedValue(undefined),
+    updateTask: vi.fn().mockResolvedValue(undefined),
+    deleteTask: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
 }
@@ -26,14 +26,14 @@ function fireKey(key: string, opts: Partial<KeyboardEventInit> = {}) {
 }
 
 describe('useUndoRedoShortcuts', () => {
-  let undo: ReturnType<typeof vi.fn>
-  let redo: ReturnType<typeof vi.fn>
+  let undo: () => Promise<void>
+  let redo: () => Promise<void>
   let historyValue: HistoryContextType
 
   beforeEach(() => {
-    undo = vi.fn()
-    redo = vi.fn()
-    historyValue = makeHistory({ undo: undo as () => void, redo: redo as () => void })
+    undo = vi.fn().mockResolvedValue(undefined)
+    redo = vi.fn().mockResolvedValue(undefined)
+    historyValue = makeHistory({ undo, redo })
   })
 
   afterEach(() => {

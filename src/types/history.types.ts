@@ -1,16 +1,33 @@
-import type { BoardAction } from '@/store/boardReducer'
+import type { Task, TaskStatus } from '@/types/task.types'
 
-export type UserAction = Extract<
-  BoardAction,
-  | { type: 'TASK_MOVE' }
-  | { type: 'TASK_CREATE' }
-  | { type: 'TASK_UPDATE' }
-  | { type: 'TASK_DELETE' }
->
-
-export type HistoryEntry = {
-  id: string
+export type MoveEntry = {
+  type: 'move'
+  taskId: string
+  newStatus: TaskStatus
+  originalStatus: TaskStatus
   label: string
-  forward: UserAction
-  inverse: UserAction
 }
+
+export type CreateEntry = {
+  type: 'create'
+  taskId: string
+  taskSnapshot: Task
+  label: string
+}
+
+export type UpdateEntry = {
+  type: 'update'
+  taskId: string
+  changes: Partial<Omit<Task, 'id' | 'createdAt'>>
+  originalValues: Partial<Omit<Task, 'id' | 'createdAt'>>
+  label: string
+}
+
+export type DeleteEntry = {
+  type: 'delete'
+  taskId: string
+  taskSnapshot: Task
+  label: string
+}
+
+export type HistoryEntry = MoveEntry | CreateEntry | UpdateEntry | DeleteEntry
