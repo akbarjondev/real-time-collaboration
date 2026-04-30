@@ -45,7 +45,7 @@ export const TaskCard = memo(function TaskCard({ task, isPending, onOpen, isOver
       className={cn(
         'relative rounded-lg border bg-card p-4 transition-shadow min-h-[44px]',
         'hover:border-zinc-300 dark:hover:border-zinc-600 hover:shadow-md',
-        'focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500',
         isPending ? 'border-border card-pulse' : 'border-border',
         isDone && 'opacity-[0.65]',
         isDragging && !isOverlay ? 'opacity-0 pointer-events-none' : '',
